@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<translate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromYDelta="-100%p"
+    android:fromXDelta="0"
+    android:duration="500">
+
+</translate>
+
+    <!--链接：https://www.jianshu.com/p/ec124c2131a4-->

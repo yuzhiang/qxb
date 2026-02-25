@@ -1,0 +1,752 @@
+<resources>
+    <string name="select">%1$s/%2$s</string>
+
+    <string name="start_school">2019-2-25</string>
+
+    <string name="main_tab_1">主页</string>
+    <string name="main_tab_2">课表</string>
+    <string name="main_tab_3">兰朵</string>
+    <string name="main_tab_4">我的</string>
+
+
+    <string name="main_tab_lnm1">排行</string>
+    <string name="main_tab_lnm2">学习</string>
+    <string name="main_tab_lnm3">统计</string>
+
+    <string name="main_tab_bill1">统计</string>
+    <string name="main_tab_bill2">记账</string>
+    <string name="main_tab_bill3">账单</string>
+
+    <string name="appbar_ah_scrolling_view_behavior" translatable="false">com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior</string>
+
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <string name="permission_request_denied">需要相应的权限</string>
+    <string name="error_gif">长宽不小于 %1$dpx，且大小不超过 %2$sM。</string>
+    <string name="error_original">大小不超过 %1$sM。</string>
+
+    <string name="et_user">校园卡号</string>
+    <string name="description">嗯~，不管以后能不能坚持，首先要有一颗想变成强者的心\n\n额，不废话了，防止学习时玩手机，开启轻学伴模式后，如果打开白名单以外的软件，将会拦截后返回轻学伴，大学加油！</string>
+    <string name="et_password">教务系统登录密码</string>
+    <string name="bt_sign_in">登    录</string>
+    <string name="et_Captcha">验证码</string>
+
+    <string name="title_activity_main">兰州大学</string>
+    <string name="title_activity_login">教务系统登录</string>
+
+    <string name="lesson">学期课程</string>
+    <string name="score">成绩查询</string>
+    <string name="exam">考试安排</string>
+    <string name="secret">密码修改</string>
+    <string name="calculate">不确定度</string>
+
+    <string name="communicate">其他</string>
+    <string name="share">分享一下</string>
+    <string name="send">联系我吗</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="_2">2</string>
+    <string name="_1">1</string>
+    <string name="_3">3</string>
+    <string name="_4">4</string>
+    <string name="time">2018</string>
+    <string name="mon">周一</string>
+    <string name="tue">周二</string>
+    <string name="wen">周三</string>
+    <string name="thu">周四</string>
+    <string name="fri">周五</string>
+    <string name="sat">周六</string>
+    <string name="sun">周日</string>
+    <string name="appwidget_text">开发中……</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
+
+    <string name="title_activity_lesson">Lesson</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_lesson2">Lesson2</string>
+    <string name="calculate_num">2.037+2.141+2.210+2.105+2.249</string>
+    <string name="TExperimentalData">实验数据(以“+”分开各组实验数据）</string>
+    <string name="TMinimumScaleValue">测量工具最小刻度（注意单位与实验数据一致）：</string>
+    <string name="title_activity_calculator">不确定度的计算（兰大教材）</string>
+    <string name="calculate_results">计算结果</string>
+    <string name="bt_calculate">直接进入计算器</string>
+    <string name="bt_time_table">直接进入课程表</string>
+    <string name="TVUncertaintyResult">计算结果：</string>
+    <string name="calculate_about">计算说明</string>
+    <string name="change_password_info">说明</string>
+    <string name="title_activity_settings">设置</string>
+
+
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="notice0">教学运行公告</string>
+    <string name="_2014_2">2014年秋</string>
+    <string name="_2015_1">2015年春</string>
+    <string name="_2015_2">2015年秋</string>
+    <string name="_2016_1">2016年春</string>
+    <string name="_2016_2">2016年秋</string>
+    <string name="_2017_1">2017年春</string>
+    <string name="_2017_2">2017年秋</string>
+    <string name="all">全部学年</string>
+    <string name="login_1">登录</string>
+    <string name="about">关于</string>
+    <string name="about_main">关于</string>
+    <string name="_right"><![CDATA[>]]></string>
+    <string name="_now_">o</string>
+    <string name="_left_"><![CDATA[<]]></string>
+    <string name="title_activity_about">关于</string>
+    <string name="change_table">切换课表</string>
+    <string name="title_activity_lesson_test">LessonTestActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="tv_about0">******更新日志******</string>
+    <string name="phy_yuh">yuh@PhyLzu</string>
+    <string name="title_activity_change_password">ChangePassword</string>
+    <string name="title_activity_score">Score</string>
+    <string name="title_activity_lesson_load">LessonLoadActivity</string>
+    <string name="_2018_1">2018年春</string>
+    <string name="tv_dialog_course_name">课程名：</string>
+    <string name="title_activity_add_course">AddCourseActivity</string>
+
+
+    <string name="before_week"><![CDATA[<<]]></string>
+    <string name="late_week"><![CDATA[>>]]></string>
+    <string name="record_donate">捐赠记录</string>
+    <string name="update_version">版本更新</string>
+    <string name="donate_list">捐赠名单</string>
+    <string name="calculator">计 算</string>
+    <string name="add_teachers">老师(可不填)：</string>
+    <string name="add_credit">学分(可不填)：</string>
+    <string name="add_room">教室号：</string>
+    <string name="add_time">时间：</string>
+    <string name="add_choose_time">点击选择</string>
+    <string name="add_weeks">周数：</string>
+    <string name="add_choose_weeks">点击选择</string>
+    <string name="add_color">颜色：</string>
+    <string name="add_choose_color">点击选择</string>
+    <string name="course_change_user">添加用户</string>
+    <string name="course_delt_user">清除该用户</string>
+    <string name="lib_user">不知道账号？下面有说明</string>
+    <string name="lib_password">图书馆密码</string>
+    <string name="tv_version">版本号</string>
+    <string name="tv_donate_name">捐赠名字</string>
+    <string name="tv_donate_time">捐赠时间</string>
+    <string name="tv_update_msg">更新日志</string>
+    <string name="_01">1</string>
+    <string name="_02">2</string>
+    <string name="_03">3</string>
+    <string name="_04">4</string>
+    <string name="_05">5</string>
+    <string name="_06">6</string>
+    <string name="_07">7</string>
+    <string name="_08">8</string>
+    <string name="_09">9</string>
+    <string name="_10">10</string>
+    <string name="_11">11</string>
+    <string name="_12">12</string>
+    <string name="_13">13</string>
+    <string name="_14">14</string>
+    <string name="_15">15</string>
+    <string name="_16">16</string>
+    <string name="_17">17</string>
+    <string name="_18">18</string>
+    <string name="_19">19</string>
+    <string name="_20">20</string>
+    <string name="bt_danWeek">单周</string>
+    <string name="bt_shuangWeek">双周</string>
+    <string name="bt_all_weeks">全周</string>
+    <string name="S_nav_resource">资源分享</string>
+
+    <string-array name="pref_entries_lib_notice">
+        <item>默认三天前提醒</item>
+        <item>逾期当天提醒</item>
+        <item>不再提醒</item>
+    </string-array>
+
+
+    <string-array name="pref_entryValues_lib_notice">
+        <item>3</item>
+        <item>0</item>
+        <item>-1000</item>
+    </string-array>
+
+
+    <string-array name="pref_entries_next_course">
+        <item>0.5小时内</item>
+        <item>1小时内</item>
+        <item>2小时内</item>
+        <item>3小时内</item>
+        <item>5小时内</item>
+    </string-array>
+
+
+    <string-array name="pref_entryValues_next_course">
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>300</item>
+    </string-array>
+
+
+    <string-array name="pref_entries_eCard">
+        <item>0元提醒</item>
+        <item>小于6元提醒（校车）</item>
+        <item>小于10元提醒</item>
+        <item>小于20元提醒（澡堂）</item>
+        <item>小于30元提醒</item>
+        <item>小于50元提醒</item>
+    </string-array>
+
+    <string-array name="pref_entryValues_eCard">
+        <item>0</item>
+        <item>6</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>50</item>
+    </string-array>
+
+
+    <string-array name="pref_entries_fee">
+        <item>0度提醒</item>
+        <item>小于3度提醒</item>
+        <item>小于7度提醒</item>
+        <item>小于10度提醒</item>
+        <item>小于20度提醒</item>
+        <item>小于30度提醒</item>
+
+    </string-array>
+
+    <string-array name="pref_entryValues_fee">
+        <item>0</item>
+        <item>3</item>
+        <item>7</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+    </string-array>
+
+
+    <string-array name="pref_entries_widget_update">
+        <item>1  个小时</item>
+        <item>3  个小时</item>
+        <item>6  个小时</item>
+        <item>12 个小时</item>
+        <item>不自动更新</item>
+    </string-array>
+
+
+    <string-array name="pref_entryValues_ybm">
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+    <string-array name="pref_entries_ybm">
+        <item>显示3条</item>
+        <item>显示4条</item>
+        <item>显示5条</item>
+    </string-array>
+
+
+    <string-array name="pref_entryValues_all2one">
+        <item>5</item>
+        <item>8</item>
+        <item>10</item>
+        <item>12</item>
+        <item>15</item>
+    </string-array>
+
+    <string-array name="pref_entries_all2one">
+        <item>显示5条</item>
+        <item>显示8条</item>
+        <item>默认显示10条</item>
+        <item>显示12条</item>
+        <item>显示15条</item>
+    </string-array>
+    <string-array name="pref_entryValues_main_notice">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>7</item>
+        <item>10000</item>
+    </string-array>
+
+    <string-array name="pref_entries_main_notice">
+        <item>每天显示1次</item>
+        <item>每天显示3次</item>
+        <item>每天显示5次</item>
+        <item>每天显示7次</item>
+        <item>每天显示10000次</item>
+    </string-array>
+
+    <string-array name="mlp_entryValues_all2one">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="mlp_entries_all2one">
+        <item>团委公告</item>
+        <item>学工通知</item>
+        <item>教务通知</item>
+        <item>新闻公告</item>
+    </string-array>
+
+    <string-array name="pref_entryValues_widget_update">
+        <item>1</item>
+        <item>3</item>
+        <item>6</item>
+        <item>12</item>
+        <item>-12</item>
+    </string-array>
+
+    <string-array name="pref_entries_daily_english">
+        <item>10条</item>
+        <item>50条</item>
+        <item>100条</item>
+        <item>500条</item>
+        <item>1000条</item>
+        <item>全拿走(卡死清数据)</item>
+    </string-array>
+
+    <string-array name="pref_entryValues_daily_english">
+        <item>10</item>
+        <item>50</item>
+        <item>100</item>
+        <item>500</item>
+        <item>1000</item>
+        <item>10000</item>
+    </string-array>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_3">Tab 3</string>
+
+    <string-array name="pref_entries_table_go_where">
+        <item>学期课程主用户</item>
+        <item>主界面</item>
+    </string-array>
+
+    <string-array name="pref_entryValues_table_go_where">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+
+    <string-array name="pref_entries_PlaySliderBack">
+        <item>全方位</item>
+        <item>左侧</item>
+        <item>右侧</item>
+        <item>底部</item>
+        <item>顶部</item>
+        <item>水平</item>
+        <item>垂直</item>
+
+    </string-array>
+
+    <string-array name="pref_entryValues_PlaySliderBack">
+        <item>ALL</item>
+        <item>LEFT</item>
+        <item>RIGHT</item>
+        <item>BOTTOM</item>
+        <item>TOP</item>
+        <item>HORIZONTAL</item>
+        <item>VERTICAL</item>
+
+    </string-array>
+
+
+    <string-array name="pref_entries_table_font_size">
+        <item>5dp</item>
+        <item>6dp</item>
+        <item>7dp</item>
+        <item>8dp</item>
+        <item>9dp</item>
+        <item>10dp(默认)</item>
+        <item>11dp</item>
+        <item>12dp</item>
+        <item>13dp</item>
+        <item>14dp</item>
+        <item>15dp</item>
+        <item>16dp</item>
+
+    </string-array>
+
+    <string-array name="pref_entryValues_table_font_size">
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+
+    </string-array>
+
+    <string-array name="pref_entries_table_height">
+        <item>30dp</item>
+        <item>35dp</item>
+        <item>40dp</item>
+        <item>45dp</item>
+        <item>50dp(默认)</item>
+        <item>55dp</item>
+        <item>60dp</item>
+        <item>65dp</item>
+        <item>70dp</item>
+        <item>75dp</item>
+        <item>80dp</item>
+
+    </string-array>
+
+    <string-array name="pref_entryValues_table_height">
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+        <item>55</item>
+        <item>60</item>
+        <item>65</item>
+        <item>70</item>
+        <item>75</item>
+        <item>80</item>
+
+    </string-array>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Sdg_last_course"><![CDATA[<]]></string>
+
+
+    <!-- CropView -->
+    <string name="crop_image_activity_title"></string>
+    <string name="crop_image_menu_rotate_left">反时针旋转</string>
+    <string name="crop_image_menu_rotate_right">旋转</string>
+    <string name="crop_image_menu_crop">裁剪</string>
+    <string name="pick_image_intent_chooser_title">选择图片</string>
+    <string name="saving_image">截图保存中...</string>
+    <string name="title_activity_learn_resource">LearnResourceActivity</string>
+    <string name="title_home">首页</string>
+    <string name="title_dashboard">课表</string>
+    <string name="title_notifications">轻学伴</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+    <string name="dont_show_again">Don\'t show again</string>
+
+    <string name="ex_msg_dialog_choice_confirm">Confirm button is only for multi choice lists. You must call setMultiChoiceItems first</string>
+    <string name="ex_msg_dialog_view_not_set">You must call method setView before calling configureView.</string>
+    <string name="last_show_course"><![CDATA[<]]></string>
+    <string name="next_show_course"><![CDATA[>]]></string>
+
+    <string name="title_activity_lost_found">LostFoundActivity</string>
+    <string name="title_activity_lnm">LnmActivity</string>
+    <string name="title_activity_tu_cao">TuCaoActivity</string>
+    <string name="login_msg">
+        1. 迎新系统：新生请选择迎新系统，账号为高考考生号，密码为身份证后六位\n
+        2. 信息门户、智慧学工：即邮箱账号和密码\n
+        3. 教务系统：账号为学号，密码为教务系统密码\n
+        4. 智慧一卡通：账号为学号，密码为校园卡充值密码\n
+    </string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="sbp_book_st">3</string>
+    <string name="title_activity_course_settings">Settings</string>
+    <string name="transition_ldr_forum_user">ldr_forum_user</string>
+    <string name="transition_ldr_forum_image">ldr_forum_image</string>
+    <string name="ldr_about_who">2018-2020 轻学伴网络科技工作室</string>
+
+
+    <string name="tn_nickname">tv_tn_nickname</string>
+    <string name="tn_mood">tv_tn_mood</string>
+    <string name="tn_head">tv_tn_head</string>
+
+    <string name="indicator_color_error">指示器的颜色只能设置成“@color/colorID or #000000”</string>
+    <string name="indicator_null_error">请先调用setIndicator()方法来设置指示器</string>
+    <string name="banner_adapter_null_error">Banner setAdapter() 参数不能为空</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+
+    <string name="id">85:4D:60:C0:FE:26:57:B3:4D:03:4A:36:FF:D1:5A:9B</string>
+
+    <string name="app_name_release">轻学伴</string>
+    <string name="app_name_debug">轻学伴（测试版）</string>
+
+    <string name="search_hint">Search</string>
+
+    <string-array name="course_time_grade">
+        <item>正常上课时间</item>
+        <item>一年级（疫情期间）</item>
+        <item>二年级（疫情期间）</item>
+        <item>三年级（疫情期间）</item>
+    </string-array>
+    <string-array name="course_time_grade_index">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string name="customactivityoncrash_error_activity_error_occurred_explanation">很抱歉，出现了一些错误，您可以：</string>
+    <string name="customactivityoncrash_error_activity_restart_app">Restart app</string>
+    <string name="customactivityoncrash_error_activity_close_app">Close app</string>
+    <string name="customactivityoncrash_error_activity_error_details">Error details</string>
+    <string name="customactivityoncrash_error_activity_error_details_title">Error details</string>
+    <string name="customactivityoncrash_error_activity_error_details_close">Close</string>
+    <string name="customactivityoncrash_error_activity_error_details_copy">Copy to clipboard</string>
+    <string name="customactivityoncrash_error_activity_error_details_copied">Copied to clipboard</string>
+    <string name="customactivityoncrash_error_activity_error_details_clipboard_label">Error information</string>
+
+    <string name="splash_loading">广告加载中...</string>
+    <string name="splash" />
+    <string name="click_to_skip">点击跳过 5</string>
+
+    <string name="email_suffix">@lzu.edu.cn</string>
+
+
+    <!-- 升级对话框 -->
+    <string name="update_title">发现新版本</string>
+
+    <string name="update_content">更新内容</string>
+
+    <string name="update_no">下次再说</string>
+    <string name="update_yes">立即更新</string>
+
+    <string name="update_permission_hint">必须先要授予权限才能正常下载更新哦</string>
+
+    <string name="update_status_start">正在下载</string>
+    <string name="update_status_running">下载中 %d%%</string>
+    <string name="update_status_successful">下载完成，点击安装</string>
+    <string name="update_status_failed">下载失败，点击重试</string>
+
+    <string name="update_no_update">当前已是最新版本</string>
+
+
+    <string name="common_permission_hint">请先授予权限</string>
+    <string name="common_permission_fail">授权失败，请手动授予权限</string>
+
+
+    <!-- 网络请求 -->
+    <string name="http_loading">加载中&#8230;</string>
+    <string name="http_token_error">登录失效，请重新登录</string>
+
+    <string name="http_unknown_error">请求出错，未知错误</string>
+    <string name="http_account_error">账号异常，请重新登录</string>
+    <string name="http_data_explain_error">数据解析异常，请稍后</string>
+    <string name="http_server_out_time">服务器请求超时，请稍后再试</string>
+    <string name="http_network_error">请求失败，请检查网络设置</string>
+    <string name="http_response_error">服务器响应异常，请稍后再试</string>
+    <string name="http_server_error">服务器连接异常，请稍后再试</string>
+    <string name="http_request_cancel">请求被中断，请重试</string>
+    <string name="http_response_null_body">服务器数据返回异常，请稍后再试</string>
+    <string name="http_response_md5_error">下载失败，文件 md5 校验失败</string>
+
+
+    <string name="common_share">分享</string>
+    <string name="common_confirm">确定</string>
+    <string name="common_confirm_find_me">联系客服</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_cancel_more">查看更多说明</string>
+    <string name="common_cancel_date">永久</string>
+
+    <string name="common_confirm_zj">跳转（最好连接校园网如LZU、iLZU）</string>
+    <string name="common_cancel_jj">间接跳转（推荐）</string>
+    <string name="common_confirm_go">前去查看</string>
+
+    <string name="common_confirm_forum">轻学伴社区规范</string>
+
+    <string name="jw_yjs">新研究生系统</string>
+    <string name="jwk">教务系统</string>
+
+
+    <!-- 选择对话框 -->
+    <string name="select_min_hint">至少要选择 %d 项</string>
+    <string name="select_max_hint">最多只能选择 %d 项</string>
+
+
+    <string name="common_import_course">导入</string>
+    <string name="common_import_course_save">保留</string>
+
+    <string name="common_confirm_find_ldr">联系开发者</string>
+    <string name="web_loading">如果出现问题，请“我的”，清空缓存\n\n或连接校园网，重试\n\n或在“我的-找到我们-联系客服”</string>
+    <string name="auto_check">点击获取“学号、年级、学院”信息\n\n手动登录官网，自动获取\n“偶尔”必须连接校园网！！！\n\n无法登录教务系统的新生，请使用方式二认证</string>
+
+
+    <!-- 日期对话框 -->
+    <string name="date_title">请选择日期</string>
+
+    <!-- 时间对话框 -->
+    <string name="time_title">请选择时间</string>
+
+
+    <string name="common_year">年</string>
+    <string name="common_month">月</string>
+    <string name="common_day">日</string>
+
+    <string name="common_hour">时</string>
+    <string name="common_minute">分</string>
+    <string name="common_second">秒</string>
+
+    <string name="add_exam_start_date">考试开始时间</string>
+    <string name="add_exam_end_date">考试结束时间</string>
+
+
+    <string name="agentweb_download_task_has_been_exist">The task already exists, do not repeat click to download!</string>
+    <string name="agentweb_tips">Note</string>
+    <string name="agentweb_honeycomblow">Wi-Fi disconnected. Continue the download via mobile data network?</string>
+    <string name="agentweb_download">Download</string>
+    <string name="agentweb_cancel">Cancel</string>
+    <string name="agentweb_download_fail">Download failed!</string>
+    <string name="agentweb_current_downloading_progress">Downloading:%s</string>
+    <string name="agentweb_current_downloaded_length">downloaded:%s</string>
+    <string name="agentweb_trickter">You have a new notice</string>
+    <string name="agentweb_file_download">Download</string>
+    <string name="agentweb_click_open">Tap to continue</string>
+    <string name="agentweb_coming_soon_download">Coming soon to download the file</string>
+    <string name="agentweb_camera">Camera</string>
+    <string name="agentweb_file_chooser">Files</string>
+    <string name="agentweb_loading">Loading ...</string>
+    <string name="agentweb_leave_app_and_go_other_page">leaving %s and opening another app?</string>
+    <string name="agentweb_leave">Go away</string>
+    <string name="agentweb_max_file_length_limit">The selected file can not be larger than %s MB</string>
+    <string name="agentweb_default_page_error">error~</string>
+
+
+    <!-- 注册 -->
+    <string name="register_title">注    册</string>
+    <string name="check_xyk_hint">需要认证学生身份，以保证信息安全</string>
+    <string name="register_hint">邮箱仅用于找回密码和保护账号安全</string>
+    <string name="register_password_hint1">不小于8位，且含3种：大、小写字母、数字、特殊字符</string>
+    <string name="register_password_hint2">请再次输入一次密码</string>
+
+    <string name="common_usr_name_hint">设置用户名，并查询是否可用</string>
+
+    <string name="forget_pw_mail_input_hint">注册邮箱，包括后缀名@…，老用户为兰大邮箱</string>
+    <string name="register_mail_input_hint">请填写邮箱，包括后缀名@…，建议QQ邮箱</string>
+    <string name="register_invite_code">邀请码，选填，认证后双方皆免广告7天</string>
+
+    <string name="common_mail_input_error">邮箱输入不正确</string>
+
+
+    <string name="common_password_input_error">请输入密码</string>
+    <string name="common_password_input_unlike">两次密码输入不一致，请重新输入</string>
+
+    <string name="common_xyk_id_input_hint">请输入学号（学号）如：320200916021</string>
+    <string name="common_name_input_hint">请输入真实姓名，与校园卡一致</string>
+    <string name="common_code_input_hint">请输入验证码</string>
+    <string name="common_code_send">发送验证码</string>
+    <string name="common_code_send_hint">验证码已发送，请注意查收</string>
+    <string name="common_code_error_hint">验证码错误，请检查输入</string>
+
+
+    <string name="password_forget_title">忘记密码</string>
+    <string name="go_mail_to_code">前往邮箱\n查看验证码</string>
+
+    <!-- 重置密码 -->
+    <string name="password_reset_title">设置轻学伴登录密码</string>
+    <string name="password_reset_phone_hint1">设置6&#8211;18位登录密码</string>
+    <string name="password_reset_phone_hint2">重新输入一次密码</string>
+    <string name="password_reset_input_error">两次密码输入不一致，请重新输入</string>
+    <string name="password_reset_success">修改成功</string>
+
+
+    <string name="common_step_next">下  一  步</string>
+    <string name="common_step_complete">完    成</string>
+    <string name="common_step_commit">提    交</string>
+    <string name="common_step_commit_ldr">提  交  审  核</string>
+</resources>

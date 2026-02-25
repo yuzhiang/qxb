@@ -1,0 +1,104 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_lnm_ll"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+
+    <TextView
+        android:id="@+id/tv_item_lnm_num"
+        android:layout_width="36dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:maxLines="1"
+        android:text="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_item_lnm_num"
+        android:layout_width="36dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <io.github.yuzhiang.qxb.view.headview.IdentityImageView
+        android:id="@+id/lnm_all_head"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/logo"
+        android:transitionName="@string/tn_head"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_item_lnm_num"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/lnm_all_head"
+        android:id="@+id/item_lnm_nick_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:text="轻学伴"
+        android:textColor="@color/colorTextContent"
+        app:layout_constraintBottom_toTopOf="@+id/item_lnm_mood"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/item_lnm_mood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:maxLines="1"
+        android:text="每一天都要好好的，加油！"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/item_lnm_nick_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_lnm_nick_name" />
+
+    <TextView
+        android:id="@+id/item_lnm_rate_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="6:00:00"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/item_lnm_nick_name"
+        app:layout_constraintEnd_toStartOf="@+id/ll_lnm_up"
+        app:layout_constraintTop_toTopOf="@+id/item_lnm_nick_name" />
+
+    <LinearLayout
+        android:paddingStart="12dp"
+        android:paddingEnd="0dp"
+        android:id="@+id/ll_lnm_up"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:id="@+id/iv_lnm_up"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ybf_thumb_up" />
+
+        <TextView
+            android:id="@+id/tv_lnm_up"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="1"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

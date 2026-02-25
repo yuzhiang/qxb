@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center"
+    android:id="@+id/ll_app"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="48dp">
+
+
+    <TextView
+        android:id="@+id/tv_app_num"
+        android:gravity="center"
+        android:text="1"
+        android:layout_width="36dp"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/iv_app_icon"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/logo"
+        android:layout_width="36dp"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_app_name"
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:text="轻学伴"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <CheckBox
+        android:id="@+id/cb_app_select"
+        android:layout_width="36dp"
+        android:layout_height="match_parent"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp" />
+</LinearLayout>

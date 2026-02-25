@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rl_start_learn"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.github.yuzhiang.qxb.view.WaveLoadingView
+        android:layout_marginTop="48dp"
+        android:id="@+id/wl_start_learn"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:wlv_borderColor="@color/main_icon_1"
+        app:wlv_borderWidth="2dp"
+        app:wlv_progressValue="0"
+        app:wlv_round_rectangle="true"
+        app:wlv_shapeType="circle"
+        app:wlv_titleBottom="轻学伴"
+        app:wlv_titleBottomColor="@color/main_icon_1"
+        app:wlv_titleBottomSize="12sp"
+        app:wlv_titleCenter="加载中"
+        app:wlv_titleCenterColor="@color/main_icon_1"
+        app:wlv_titleCenterSize="20sp"
+        app:wlv_titleTop="倒计时"
+        app:wlv_titleTopColor="@color/main_icon_1"
+        app:wlv_titleTopSize="12sp"
+        app:wlv_triangle_direction="north"
+        app:wlv_waveAmplitude="70"
+        app:wlv_waveColor="@color/main_icon_1" />
+
+    <Button
+        android:id="@+id/tv_start_learn_cal"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wl_start_learn"
+        android:layout_marginTop="16dp"
+        android:text="加载中"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wl_start_learn" />
+
+    <TextView
+        android:layout_margin="8dp"
+        android:id="@+id/tv_start_learn_cal_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wl_start_learn"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_start_learn_cal" />
+
+    <TextView
+        android:id="@+id/tv_start_learn_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="加载中"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_start_learn_cal_msg" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_lnm_start_learn"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

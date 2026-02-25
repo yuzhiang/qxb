@@ -1,0 +1,73 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_lnm_ll"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="horizontal">
+
+
+    <ImageView
+        android:visibility="gone"
+        android:text="1"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:id="@+id/item_pm_icon"
+        android:layout_width="48dp"
+        android:layout_height="match_parent" />
+
+
+    <LinearLayout
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:layout_width="0dp"
+        android:gravity="center_vertical"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:textColor="@color/colorTextContent"
+            android:text="无障碍权限"
+            android:gravity="center_vertical"
+            android:id="@+id/item_pm_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1" />
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:text="保证学习期间自动跳转回软件"
+            android:id="@+id/item_pm_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:padding="8dp"
+            android:id="@+id/item_pm_ok"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:src="@drawable/ic_right" />
+
+        <TextView
+            android:textColor="?attr/colorPrimary"
+            android:textSize="12sp"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:id="@+id/tv_item_pm_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp" />
+    </RelativeLayout>
+
+
+</LinearLayout>

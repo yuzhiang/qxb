@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><!-- 根据的 Service 的不同功能需要，你可能需要不同的配置 -->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:accessibilityFlags="flagIncludeNotImportantViews"
+    android:description="@string/description" /><!--android:accessibilityEventTypes="typeWindowStateChanged"-->
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+    <!--<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--&lt;!&ndash;监视的动作&ndash;&gt;-->
+    <!--android:accessibilityEventTypes="typeAllMask"-->
+    <!--&lt;!&ndash;提供反馈类型，语音震动等等。&ndash;&gt;-->
+    <!--android:accessibilityFeedbackType="feedbackGeneric"-->
+    <!--&lt;!&ndash;监视的view的状态，注意这里设置flagDefault会到时候部分界面状态改变，不触发onAccessibilityEvent(AccessibilityEvent event)的回调&ndash;&gt;-->
+    <!--android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows|flagIncludeNotImportantViews|flagReportViewIds|flagRequestTouchExplorationMode"-->
+    <!--&lt;!&ndash;是否要能够检索活动窗口的内容，此设置不能在运行时改变&ndash;&gt;-->
+    <!--android:canRetrieveWindowContent="true"-->
+    <!--&lt;!&ndash;功能描述&ndash;&gt;-->
+    <!--android:description="@string/description"-->
+    <!--&lt;!&ndash;同一事件间隔时间名&ndash;&gt;-->
+    <!--android:notificationTimeout="100"-->
+    <!--&lt;!&ndash;监控的软件包名&ndash;&gt;-->
+    <!--android:packageNames="com.tencent.mm,com.eg.android.AlipayGphone" />-->

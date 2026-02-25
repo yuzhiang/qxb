@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageButton
+        android:rotation="180"
+        android:id="@+id/iv_lnm_last"
+        style="@style/Widget.MaterialComponents.MaterialCalendar.HeaderToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_left"
+        android:tint="?attr/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_lnm_record_time_span"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_lnm_record_time_span" />
+
+    <ImageButton
+        android:id="@+id/iv_lnm_next"
+        style="@style/Widget.MaterialComponents.MaterialCalendar.HeaderToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_left"
+        android:tint="?attr/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_lnm_record_time_span"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_lnm_record_time_span" />
+
+    <TextView
+        android:id="@+id/tv_lnm_record_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="开始"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_lnm_record_time_span"
+        app:layout_constraintEnd_toStartOf="@+id/tv_lnm_record_time_span"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/iv_lnm_last"
+        app:layout_constraintTop_toTopOf="@+id/tv_lnm_record_time_span" />
+
+    <TextView
+        android:id="@+id/tv_lnm_record_time_span"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="-"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        app:layout_constraintEnd_toStartOf="@+id/tv_lnm_record_end"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/tv_lnm_record_start"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_lnm_record_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="结束"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_lnm_record_time_span"
+        app:layout_constraintEnd_toStartOf="@+id/iv_lnm_next"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/tv_lnm_record_time_span"
+        app:layout_constraintTop_toTopOf="@+id/tv_lnm_record_time_span" />
+
+
+    <TextView
+        android:id="@+id/tv_lnm_record_start0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="第2周"
+        android:textSize="12sp"
+        android:typeface="monospace"
+        app:layout_constraintEnd_toEndOf="@+id/tv_lnm_record_start"
+        app:layout_constraintStart_toStartOf="@+id/tv_lnm_record_start"
+        app:layout_constraintTop_toBottomOf="@+id/tv_lnm_record_start" />
+
+
+    <TextView
+        android:textSize="12sp"
+        android:id="@+id/tv_lnm_record_end0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="第3周"
+        android:typeface="monospace"
+        app:layout_constraintEnd_toEndOf="@+id/tv_lnm_record_end"
+        app:layout_constraintStart_toStartOf="@+id/tv_lnm_record_end"
+        app:layout_constraintTop_toBottomOf="@+id/tv_lnm_record_end" />
+
+    <TextView
+        android:id="@+id/tv_lnm_record_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="00.00"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_lnm_record_start0" />
+
+    <TextView
+        android:id="@+id/tv_lnm_record_times"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        android:text="小时"
+        android:textSize="12sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tv_lnm_record_time"
+        app:layout_constraintStart_toEndOf="@+id/tv_lnm_record_time" />
+
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/lc_lnm_record"
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_margin="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_lnm_record_time" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_marginTop="32dp"
+        android:lineSpacingExtra="5dp"
+        android:gravity="center_horizontal"
+        android:id="@+id/tv_empty_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:layout_marginTop="32dp"
+        android:layout_width="match_parent"
+        android:src="@drawable/ic_blank"
+        android:layout_height="120dp" />
+
+</LinearLayout>

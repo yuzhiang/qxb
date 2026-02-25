@@ -1,0 +1,228 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+    signingConfigs {
+        release {
+            storeFile file('yuzhiang.jks')
+            storePassword 'yza@fhasfy#589'
+            keyAlias = 'key0'
+            keyPassword 'yza@fhasfy#589'
+        }
+    }
+
+    compileSdk 36
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/rxjava.properties', 'META-INF/MANIFEST.MF', 'META-INF/NOTICE.md', 'META-INF/LICENSE.md', 'pom.properties', 'pom.xml']
+            pickFirsts += ['META-INF/LICENSE.txt']
+        }
+    }
+
+
+    defaultConfig {
+        applicationId "io.github.yuzhiang.qxb"
+        minSdkVersion 24
+        targetSdkVersion 36
+        versionCode project.property("versionCode").toString().toInteger()
+        versionName project.property("versionName").toString()
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                //room的数据库概要、记录
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            resValue "string", "app_name", "@string/app_name_release"
+            // 移除无用的resource文件
+//            shrinkResources true
+
+
+            signingConfig signingConfigs.release //增加签名
+
+        }
+
+        debug {
+//            applicationIdSuffix '.debug' //增加包名后缀--关键
+            resValue "string", "app_name", "@string/app_name_debug"
+
+
+//            // 混淆
+//            minifyEnabled true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules-yuh.pro', 'proguard-rules.pro', 'proguard-android.txt'
+//            // Zipalign优化
+//            zipAlignEnabled true
+//            // 移除无用的resource文件
+//            shrinkResources true
+
+
+            signingConfig signingConfigs.release
+
+        }
+    }
+
+    //Add the following configuration
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_21
+        sourceCompatibility JavaVersion.VERSION_21
+    }
+
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+        //数据库概要、记录存放位置
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+    namespace 'io.github.yuzhiang.qxb'
+    lint {
+        abortOnError false
+        checkDependencies true
+        checkReleaseBuilds false
+    }
+
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            outputFileName = "qxb-${variant.versionName}.${variant.versionCode}.apk"
+        }
+    }
+
+}
+
+dependencies {
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.gridlayout:gridlayout:1.1.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.2.21'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    testImplementation 'junit:junit:4.13.2'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.9.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.9.3'
+    implementation 'androidx.work:work-runtime:2.11.1'
+
+//    //测试工具
+//    implementation "com.pangle.cn:mediation-test-tools:${csjVersion}"
+
+    //Jsoup 1.12.2导入老师的课有时候有问题
+    implementation 'org.jsoup:jsoup:1.22.1'
+
+    //网络,4.9
+//    https://github.com/square/okhttp
+    implementation 'com.squareup.okhttp3:okhttp:5.3.2'
+    implementation('com.squareup.okhttp3:logging-interceptor:5.3.2')
+
+    //Gson
+    implementation 'com.google.code.gson:gson:2.13.1'
+
+    //下滑
+//    https://github.com/scwang90/SmartRefreshLayout
+    implementation 'io.github.scwang90:refresh-layout-kernel:2.1.1'      //核心必须依赖
+    implementation 'io.github.scwang90:refresh-header-classics:2.1.1'    //经典刷新头
+    implementation 'io.github.scwang90:refresh-header-material:2.1.1'    //谷歌刷新头
+    implementation 'io.github.scwang90:refresh-header-falsify:2.1.1'
+//    implementation  'com.scwang.smart:refresh-header-two-level:2.0.0'
+// https://mvnrepository.com/artifact/io.github.scwang90/refresh-drawable-path
+    implementation 'io.github.scwang90:refresh-drawable-path:2.1.1'
+
+    //图片加载
+//    https://github.com/bumptech/glide
+    implementation 'com.github.bumptech.glide:glide:5.0.5'
+    annotationProcessor 'com.github.bumptech.glide:compiler:5.0.5'
+
+
+    //解决Glide找不到Android声明库问题1
+    annotationProcessor 'androidx.annotation:annotation:1.9.1'
+
+//    https://github.com/greenrobot/EventBus
+    implementation 'org.greenrobot:eventbus:3.3.1'
+
+    //RX
+//    https://github.com/ReactiveX/RxAndroid
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.12'
+
+    //room
+    implementation "android.arch.persistence.room:runtime:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+
+    implementation 'androidx.room:room-runtime:2.7.2'
+    annotationProcessor 'androidx.room:room-compiler:2.7.2'
+
+//    implementation "androidx.room:room-rxjava2:2.2.5"
+    testImplementation 'androidx.room:room-testing:2.7.2'
+
+    //各种Utils
+//    https://github.com/Blankj/AndroidUtilCode/blob/master/lib/utilcode/README-CN.md
+    implementation 'com.blankj:utilcodex:1.31.1'
+
+    //画图表
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+//    https://github.com/AnyChart/AnyChart-Android
+//    implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'
+
+    //retrofit jar
+    implementation 'com.squareup.retrofit2:retrofit:3.0.0'
+//反序列化json工具
+    implementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:3.0.0'
+
+//    https://github.com/CymChad/BaseRecyclerViewAdapterHelper
+    implementation 'io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.3.3'
+
+
+    implementation 'com.github.aurelhubert:ahbottomnavigation:2.3.4'
+
+//    https://github.com/LuckSiege/PictureSelector/blob/version_component/README_CN.md
+    // PictureSelector 基础library (必须)
+    implementation 'io.github.lucksiege:pictureselector:v3.11.2'
+    // 图片压缩 library (按需引入)
+    implementation 'io.github.lucksiege:compress:v3.11.2'
+    // 图片裁剪 library (按需引入)
+    implementation 'io.github.lucksiege:ucrop:v3.11.2'
+    // 自定义相机 library (按需引入)
+//    implementation 'io.github.lucksiege:camerax:v3.0.1'
+
+
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
+
+    // 权限请求框架：https://github.com/getActivity/XXPermissions
+    implementation 'com.github.getActivity:XXPermissions:28.0'
+//    // Gson 解析容错：https://github.com/getActivity/GsonFactory
+//    implementation 'com.github.getActivity:GsonFactory:5.2'
+
+
+//https://juejin.cn/post/6864756344541413384
+    //1、lombok依赖
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+////依赖lombok的API，内部虽然已经声明了注解解释器，但在AndroidStudio上有Bug（导致编译报错找不到生成的方法），需要自己主动再声明一次
+    implementation 'org.projectlombok:lombok:1.18.42'
+//主动声明注解解释器
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
+
+
+// https://mvnrepository.com/artifact/com.uber.autodispose2/autodispose-android
+    implementation 'com.uber.autodispose2:autodispose-android:2.2.1'
+// https://mvnrepository.com/artifact/com.uber.autodispose2/autodispose-androidx-lifecycle
+    implementation 'com.uber.autodispose2:autodispose-androidx-lifecycle:2.2.1'
+
+    implementation "androidx.browser:browser:1.9.0"
+
+}

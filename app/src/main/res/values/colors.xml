@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="search_layover_bg">#50000000</color>
+
+    <color name="line_dark">#848C99</color>
+    <color name="main_icon_1">#03A9F4</color>
+    <color name="main_icon_2">#FFBB12</color>
+
+    <color name="prize1">#F9D00E</color>
+    <color name="prize2">#CDCDCD</color>
+    <color name="prize3">#F8CB86</color>
+    <color name="normal">#ff828282</color>
+    <color name="normal8">#50828282</color>
+    <color name="normalBackground">#fafafa</color>
+
+    <color name="colorPrimary">#03A9F4</color>
+    <!--    <color name ="colorPrimary">#4876FF</color>-->
+    <!--    <color name="colorPrimaryDark">#4876FF</color>-->
+    <color name="colorPrimaryDark">#03A9F4</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorWarning">#FF4081</color>
+
+    <color name="app_color_f6">#f6f6f6</color>
+
+
+    <color name="colorAccent1">#32d3eb</color>
+    <color name="colorAccent3">#5bc49f</color>
+    <color name="colorAccent4">#feb64d</color>
+    <color name="colorAccent5">#ff7c7c</color>
+    <color name="colorAccent6">#9287e7</color>
+
+    <!--    <item>#32d3eb</item>-->
+    <!--    <item>#5bc49f</item>-->
+    <!--    <item>#feb64d</item>-->
+    <!--    <item>#ff7c7c</item>-->
+    <!--    <item>#9287e7</item>-->
+    <!--红色 #FF0000-->
+    <!--橙色 #FF7F00-->
+    <!--黄色 #FFFF00-->
+    <!--绿色 #00FF00-->
+    <!--青色 #00FFFF-->
+    <!--蓝色 #0000FF-->
+    <!--紫色 #8B00FF-->
+    <color name="CH1">#037ef3</color>
+    <color name="CH2">#f85a40</color>
+    <color name="CH3">#00c16e</color>
+    <color name="CH4">#7552cc</color>
+    <color name="CH5">#0cb9c1</color>
+    <color name="CH6">#f48924</color>
+    <color name="CH7">#ffc845</color>
+
+    <color name="line">#ffeaeaea</color>
+
+
+    <color name="main1">#0ebeff</color>
+    <color name="main2">#00c16e</color>
+    <color name="main3">#ae63e4</color>
+    <color name="main4">#f48924</color>
+    <color name="main5">#dc9018</color>
+    <!--    <color name="main6">#76daff</color>-->
+
+
+    <color name="vip">#f6b64d</color>
+    <color name="vip80">#CCf6b64d</color>
+    <color name="boy">#CC35A4FE</color>
+    <color name="girl">#CCF49090</color>
+
+
+    <!--<color name="colorAccent">#ff74</color>-->
+
+    <!--<color name=""-->
+    <color name="spring_green">#ff47ee5c</color>
+
+
+    <color name="color_transparent">#e0000000</color>
+
+    <color name="lover">#BFB896E7</color>
+
+    <color name="color_8">#32cd32</color>
+
+    <color name="item_divider">#EFEFEF</color>
+    <color name="white0">#00ffffff</color>
+    <color name="transparent">#00000000</color>
+    <color name="gray_very_light">#e0e0e0</color>
+
+
+    <color name="gray">#bbbbbb</color>
+
+
+    <color name="green">#1DD618</color>
+
+    <color name="green_light">#8BC34A</color>
+
+    <color name="yellow">#FDD835</color>
+
+
+    <color name="ic_default_bg_color">#4D000000</color>
+
+    <!-- theme color -->
+
+    <color name="primary_dark_ldr">#375AC2</color>
+    <color name="primary_ldr">#4876FF</color>
+    <color name="accent_ldr">#54e346</color>
+
+    <color name="primary_dark_red">#E8505B</color>
+    <color name="primary_red">#E8505B</color>
+    <color name="accent_red">#F9D56E</color>
+
+    <color name="primary_dark_purple">#7B1FA2</color>
+    <color name="primary_purple">#9C27B0</color>
+    <color name="accent_purple">#E040FB</color>
+
+    <color name="primary_dark_purple_de">#7E0CF5</color>
+    <color name="primary_purple_de">#7E0CF5</color>
+    <color name="accent_purple_de">#CD4DCC</color>
+
+    <color name="pink">#fb7299</color>
+    <color name="pink_dark">#fb7299</color>
+    <color name="pink_trans">#FFD36B</color>
+
+    <color name="primary_dark_indigo">#303F9F</color>
+    <color name="primary_indigo">#3F51B5</color>
+    <color name="accent_indigo">#54e346</color>
+
+    <color name="primary_dark_light_blue">#0288D1</color>
+    <color name="primary_light_blue">#03A9F4</color>
+    <color name="accent_light_blue">#6ddccf</color>
+
+    <color name="primary_dark_green">#388E3C</color>
+    <color name="primary_green">#4CAF50</color>
+    <color name="accent_green">#ffce89</color>
+
+
+    <color name="primary_dark_blue_grey">#4B778D</color>
+    <color name="primary_blue_grey">#4B778D</color>
+    <color name="accent_blue_grey">#28B5B5</color>
+
+
+    <color name="orange">#F58634</color>
+    <color name="orange_dark">#F58634</color>
+    <color name="orange_trans">#FFCC29</color>
+
+    <color name="primary_ldr_purple">#FF7C7ED5</color>
+    <color name="primary_dark_ldr_purple">#FF7C7ED5</color>
+    <color name="accent_ldr_purple">#da9ff9</color>
+
+
+    <color name="coffee_purple">#543E3E</color>
+    <color name="coffee_dark_purple">#543E3E</color>
+    <color name="coffee_accent">#FFBB12</color>
+
+    <!-- theme color -->
+
+
+    <color name="colorTextTitle">#333333</color>
+    <color name="navigation_color">#F7F7F7</color>
+    <color name="navigation_color50">#80F7F7F7</color>
+    <!--    <color name="navigation_color">#747474</color>-->
+    <color name="colorTextContent">#444444</color>
+    <color name="colorAnonymous">#1f1f1f</color>
+    <color name="ldr_content">#ff181a25</color>
+    <color name="ldr_content80">#CC181a25</color>
+    <color name="ldr_content60">#99181a25</color>
+    <color name="background_color">#ffffff</color>
+    <color name="background_normal">#fafafa</color>
+    <color name="background_normal2">#fafafa</color>
+
+    <color name="main_background_color">#33aaff</color>
+
+    <color name="colorTextAssistant">#888888</color>
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorBackgroundDark">#f2f2f2</color>
+    <color name="colorDivision">#33aaaaaa</color>
+
+    <color name="usr_colorPrimary">#33aaff</color>
+    <color name="usr_colorPrimaryDark">#2299ee</color>
+    <color name="usr_colorPrimaryOverlay">#cc0094ff</color>
+    <color name="usr_colorAccent">#FF4081</color>
+
+
+    <!-- 白色 -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="white95">#F2FFFFFF</color>
+    <color name="white90">#E6FFFFFF</color>
+    <color name="white85">#D9FFFFFF</color>
+    <color name="white80">#CCFFFFFF</color>
+    <color name="white75">#BFFFFFFF</color>
+    <color name="white70">#B3FFFFFF</color>
+    <color name="white65">#A6FFFFFF</color>
+    <color name="white60">#99FFFFFF</color>
+    <color name="white55">#8CFFFFFF</color>
+    <color name="white50">#80FFFFFF</color>
+    <color name="white45">#73FFFFFF</color>
+    <color name="white40">#66FFFFFF</color>
+    <color name="white35">#59FFFFFF</color>
+    <color name="white30">#4DFFFFFF</color>
+    <color name="white25">#40FFFFFF</color>
+    <color name="white20">#33FFFFFF</color>
+    <color name="white15">#26FFFFFF</color>
+    <color name="white10">#1AFFFFFF</color>
+    <color name="white5">#0DFFFFFF</color>
+
+    <!-- 黑色 -->
+    <color name="black">#FF000000</color>
+    <color name="black95">#F2000000</color>
+    <color name="black90">#E6000000</color>
+    <color name="black85">#D9000000</color>
+    <color name="black80">#CC000000</color>
+    <color name="black75">#B000000F</color>
+    <color name="black70">#B3000000</color>
+    <color name="black65">#A6000000</color>
+    <color name="black60">#99000000</color>
+    <color name="black55">#8C000000</color>
+    <color name="black50">#80000000</color>
+    <color name="black45">#73000000</color>
+    <color name="black40">#66000000</color>
+    <color name="black35">#59000000</color>
+    <color name="black30">#4D000000</color>
+    <color name="black25">#40000000</color>
+    <color name="black20">#33000000</color>
+    <color name="black15">#26000000</color>
+    <color name="black10">#1A000000</color>
+    <color name="black5">#0D000000</color>
+
+
+    <!-- 按钮按压时的颜色 -->
+    <color name="colorButtonPressed">#AA5A8DDF</color>
+    <!-- 按钮禁用时的颜色 -->
+    <color name="colorButtonDisable">#BBBBBB</color>
+    <!-- 分割线的颜色 -->
+    <color name="colorLine">#ECECEC</color>
+    <!-- 图标颜色 -->
+    <color name="colorIcon">#7C7C7C</color>
+
+    <!-- 对话框确认按钮文本颜色 -->
+    <color name="colorConfirm">#007AFF</color>
+    <!-- 对话框取消按钮文本颜色 -->
+    <color name="colorCancel">#F44336</color>
+
+    <color name="msgContent">#333333</color>
+
+
+    <!-- 矢量图标的颜色 -->
+    <color name="common_icon_color">#7C7C7C</color>
+
+    <!-- 按钮按压时的颜色 -->
+    <color name="common_button_pressed_color">#AA5A8DDF</color>
+    <!-- 按钮禁用时的颜色 -->
+    <color name="common_button_disable_color">#BBBBBB</color>
+
+    <!-- 对话框确认按钮的文本颜色 -->
+    <color name="common_confirm_text_color">#007AFF</color>
+    <!-- 对话框取消按钮的文本颜色 -->
+    <color name="common_cancel_text_color">#F44336</color>
+
+
+    <!--    book-->
+    <color name="blue_light">#02A8F3</color>
+
+</resources>

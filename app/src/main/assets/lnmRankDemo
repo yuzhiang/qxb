@@ -1,0 +1,52 @@
+[
+  {
+    "id": 2026001,
+    "nickName": "晨读计划",
+    "avatar": "",
+    "signature": "先开始，再优化",
+    "xh": 2026001,
+    "sum": 1680,
+    "like": 16,
+    "upShow": true
+  },
+  {
+    "id": 2026002,
+    "nickName": "图书馆前排",
+    "avatar": "",
+    "signature": "手机放下，效率拉满",
+    "xh": 2026002,
+    "sum": 1510,
+    "like": 13,
+    "upShow": true
+  },
+  {
+    "id": 2026003,
+    "nickName": "自习室常驻",
+    "avatar": "",
+    "signature": "45分钟一组",
+    "xh": 2026003,
+    "sum": 1395,
+    "like": 11,
+    "upShow": true
+  },
+  {
+    "id": 2026004,
+    "nickName": "晚间复盘",
+    "avatar": "",
+    "signature": "每天推进一点点",
+    "xh": 2026004,
+    "sum": 1270,
+    "like": 9,
+    "upShow": true
+  },
+  {
+    "id": 2026005,
+    "nickName": "周末冲刺",
+    "avatar": "",
+    "signature": "专注比时长更重要",
+    "xh": 2026005,
+    "sum": 1180,
+    "like": 7,
+    "upShow": true
+  }
+]

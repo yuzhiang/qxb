@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:textColor">@color/normal</item>
+
+
+        <!--        <item name="colorPrimary">@color/colorPrimary</item>-->
+        <item name="colorPrimaryDark">@color/background_color</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <!--        <item name="android:navigationBarColor">@color/navigation_color</item>-->
+        <!--        <item name="android:windowIsTranslucent">true</item>-->
+
+        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
+        <!--        <item name="android:fitsSystemWindows">true</item>-->
+
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
+        <item name="android:background">?attr/colorPrimaryDark</item>
+        <item name="android:textColor">@color/colorTextContent</item>
+    </style>
+
+
+    <style name="RedTheme" parent="AppTheme">
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_red</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="purpleTheme" parent="AppTheme">
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_purple</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="purple_deTheme" parent="AppTheme">
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_purple_de</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="pinkTheme" parent="AppTheme">
+        <!--        <item name="colorPrimaryDark">@color/primary_dark_pink</item>-->
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/pink</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="indigoTheme" parent="AppTheme">
+        <!--        <item name="colorPrimaryDark">@color/primary_dark_indigo</item>-->
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_indigo</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="light_blueTheme" parent="AppTheme">
+        <!--        <item name="colorPrimaryDark">@color/primary_dark_light_blue</item>-->
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_light_blue</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="greenTheme" parent="AppTheme">
+        <!--        <item name="colorPrimaryDark">@color/primary_dark_green</item>-->
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <style name="ldrTheme" parent="AppTheme">
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_ldr</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <style name="limeTheme" parent="AppTheme">
+        <!--        <item name="colorPrimaryDark">@color/primary_dark_lime</item>-->
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="blue_greyTheme" parent="AppTheme">
+        <!--        <item name="colorPrimaryDark">@color/primary_dark_blue_grey</item>-->
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_blue_grey</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="ldr_purpleTheme" parent="AppTheme">
+        <!--        <item name="colorPrimaryDark">@color/primary_dark_blue_grey</item>-->
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/primary_ldr_purple</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="coffeeTheme" parent="AppTheme">
+        <item name="colorPrimaryDark">@color/navigation_color</item>
+        <item name="colorPrimary">@color/coffee_purple</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+</resources>
