@@ -57,6 +57,7 @@ import io.github.yuzhiang.qxb.common.Constant.Constant;
 import io.github.yuzhiang.qxb.databinding.ActivityStartLearnBinding;
 import io.github.yuzhiang.qxb.db.room.bean.Lnm;
 import io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils;
+import io.github.yuzhiang.qxb.model.StudyProjectRecord;
 import io.github.yuzhiang.qxb.model.LnmApp;
 import io.github.yuzhiang.qxb.model.eventbus.MeLnmShowChart;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
@@ -468,6 +469,18 @@ public class StartLearnActivity extends AppCompatActivity {
             boolean success = localEnd.getTime() + okSpan >= localPlan.getTime();
             Lnm lnm = buildLocalLnm((int) id, localStart, localPlan, localEnd, success);
             lnmDBUtils.insert(lnm);
+            String project = lnm2file.getSelectedStudyProject();
+            if (project == null || project.trim().isEmpty()) {
+                project = "未设置";
+            }
+            long durationMs = Math.max(0, localEnd.getTime() - localStart.getTime());
+            lnm2file.addStudyProjectRecord(new StudyProjectRecord(
+                    project,
+                    localStart.getTime(),
+                    localEnd.getTime(),
+                    durationMs,
+                    success
+            ));
 
             try {
                 LogUtils.file("\n\n学习结束(本地)：id-" + lnm.id + lnm.finish +

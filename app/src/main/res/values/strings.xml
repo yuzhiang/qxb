@@ -9,7 +9,7 @@
     <string name="main_tab_4">我的</string>
 
 
-    <string name="main_tab_lnm1">排行</string>
+    <string name="main_tab_lnm1">待办</string>
     <string name="main_tab_lnm2">学习</string>
     <string name="main_tab_lnm3">统计</string>
 
@@ -749,4 +749,5 @@
     <string name="common_step_complete">完    成</string>
     <string name="common_step_commit">提    交</string>
     <string name="common_step_commit_ldr">提  交  审  核</string>
+    <string name="main_tab_lnm4">排行</string>
 </resources>

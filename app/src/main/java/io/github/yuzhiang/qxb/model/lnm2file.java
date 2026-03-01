@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.yuzhiang.qxb.model.StudyProjectRecord;
+
 public class lnm2file {
     public static String file_name = "lnm";
     private static String plan = "plan";
@@ -24,6 +26,9 @@ public class lnm2file {
     private static String end = "end";
     private static String lnmId = "thisId";
     private static String manualCancelAt = "manualCancelAt";
+    private static String studyProjectsKey = "study_projects";
+    private static String studyProjectSelectedKey = "study_project_selected";
+    private static String studyProjectLogsKey = "study_project_logs";
 
     // Keep a process-local cache to avoid SharedPreferences async write timing issues.
     private static volatile Long cachePlan = null;
@@ -173,6 +178,54 @@ public class lnm2file {
         Set<String> s = SPUtils.getInstance(file_name).getStringSet("enableApp");
 
         return new ArrayList<>(s);
+    }
+
+    public static void saveStudyProjects(List<String> projects) {
+        if (projects == null) projects = new ArrayList<>();
+        SPUtils.getInstance(file_name).put(studyProjectsKey, new Gson().toJson(projects), true);
+    }
+
+    public static List<String> getStudyProjects() {
+        String json = SPUtils.getInstance(file_name).getString(studyProjectsKey, "");
+        if (json == null || json.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            List<String> list = new Gson().fromJson(json, new TypeToken<List<String>>() {
+            }.getType());
+            return list == null ? new ArrayList<>() : list;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public static void saveSelectedStudyProject(String name) {
+        SPUtils.getInstance(file_name).put(studyProjectSelectedKey, name == null ? "" : name, true);
+    }
+
+    public static String getSelectedStudyProject() {
+        return SPUtils.getInstance(file_name).getString(studyProjectSelectedKey, "");
+    }
+
+    public static void addStudyProjectRecord(StudyProjectRecord record) {
+        if (record == null) return;
+        List<StudyProjectRecord> records = getStudyProjectRecords();
+        records.add(record);
+        SPUtils.getInstance(file_name).put(studyProjectLogsKey, new Gson().toJson(records), true);
+    }
+
+    public static List<StudyProjectRecord> getStudyProjectRecords() {
+        String json = SPUtils.getInstance(file_name).getString(studyProjectLogsKey, "");
+        if (json == null || json.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            List<StudyProjectRecord> list = new Gson().fromJson(json, new TypeToken<List<StudyProjectRecord>>() {
+            }.getType());
+            return list == null ? new ArrayList<>() : list;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
 

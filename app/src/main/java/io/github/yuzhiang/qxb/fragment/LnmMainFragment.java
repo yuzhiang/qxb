@@ -18,14 +18,21 @@ import static io.github.yuzhiang.qxb.view.tastytoast.SimToast.toastEL;
 import static io.github.yuzhiang.qxb.view.tastytoast.SimToast.toastSe;
 import static autodispose2.AutoDispose.autoDisposable;
 
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -56,6 +63,11 @@ import io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils;
 import io.github.yuzhiang.qxb.model.LnmApp;
 import io.github.yuzhiang.qxb.model.eventbus.EBLnmBai;
 import io.github.yuzhiang.qxb.model.eventbus.MeLnmShowChart;
+
+import io.github.yuzhiang.qxb.model.eventbus.TodoImportantChanged;
+import io.github.yuzhiang.qxb.model.todo.TodoItem;
+import io.github.yuzhiang.qxb.model.todo.TodoPrefs;
+import io.github.yuzhiang.qxb.model.todo.TodoTimeUtils;
 import io.github.yuzhiang.qxb.model.lnm2file;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.pickpic.ImageCropEngine;
@@ -72,8 +84,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider;
 import io.reactivex.rxjava3.core.Observable;
@@ -117,6 +131,8 @@ public class LnmMainFragment extends LazyFragment {
 
         binding = LnmFragmentMainBinding.bind(view);
         StatusBarUtil.setPaddingSmart(mContext, binding.lnmTitle);
+
+        updateImportantBanner();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -210,58 +226,7 @@ public class LnmMainFragment extends LazyFragment {
                 }
             }
 
-            //辅助权限，手机时间都没问题
-            LogUtils.i(DetectService.isAccessibilitySettingsOn(mContext), Math.abs(spanTime) <= okSpan);
-            if (DetectService.isAccessibilitySettingsOn(mContext) && Math.abs(spanTime) <= okSpan) {
-
-                new TimePickerDialog(mContext, (view, hourOfDay, minute) -> {
-
-                    long inputTime = hourOfDay * 60 * 60 * 1000 + minute * 60 * 1000;
-                    if (inputTime > 4 * 60 * 60 * 1000) {
-
-                        new MessageDialog.Builder(mContext)
-                                .setTitle("警告！")
-                                .setMessage("你确定要一动不动的学习，超过4个小时？")
-                                .setConfirm("确定")
-                                .setCancel("点错了")
-                                .setCancelable(false)
-                                .setListener(new MessageDialog.OnListener() {
-                                    @Override
-                                    public void onConfirm(BaseDialog dialog) {
-                                        SimToast.toastEe("确定也不行…");
-
-                                    }
-
-                                    @Override
-                                    public void onCancel(BaseDialog dialog) {
-                                        SimToast.toastSe("重新选择吧…");
-                                    }
-                                }).show();
-
-                    } else {
-
-                        if (UsrMsgUtils.getSignature().isEmpty()) {
-                            TastyToast.makeText(mContext, "记得在“我的”界面修改个人签名", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
-                        }
-
-                        lnm2file.saveTime(hourOfDay, minute);
-                        lnm2file.savePlanSpan(inputTime);
-
-
-                        Intent intent = new Intent(mContext, StartLearnActivity.class);
-                        intent.putExtra(lnmState, lnmStart);
-                        startActivity(intent);
-
-                    }
-
-                }, lnm2file.getHourOfDay(), lnm2file.getMinute(), true)
-                        .show();
-
-            } else {
-                SimToast.toastSL("请先授予相关的权限");
-                startActivity(new Intent(mContext, PermissionActivity.class));
-
-            }
+            showStudyProjectSelector(this::startLearnAfterProjectSelected);
         });
 
         binding.tvBai.setOnClickListener(v -> startActivity(new Intent(mContext, BaiMingDanActivity.class)));
@@ -352,6 +317,317 @@ public class LnmMainFragment extends LazyFragment {
     }
 
 
+
+    private void showImportantActionDialog(TodoItem important) {
+        if (important == null) return;
+        String[] items = new String[]{"编辑", "删除"};
+        new AlertDialog.Builder(mContext)
+                .setTitle("重要待办")
+                .setItems(items, (d, which) -> {
+                    if (which == 0) {
+                        showEditImportantDialog(important);
+                    } else {
+                        TodoPrefs.saveImportant(null);
+                        EventBus.getDefault().post(new TodoImportantChanged(null));
+                        updateImportantBanner();
+                    }
+                })
+                .show();
+    }
+
+    private void showEditImportantDialog(TodoItem item) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_add_todo, null);
+        EditText etTitle = view.findViewById(R.id.et_todo_title);
+        View categorySection = view.findViewById(R.id.rg_category_mode);
+        TextView tvCategoryLabel = view.findViewById(R.id.tv_category_label);
+        Spinner spCategory = view.findViewById(R.id.sp_category);
+        EditText etCategoryNew = view.findViewById(R.id.et_category_new);
+        RadioButton rbRepeatYes = view.findViewById(R.id.rb_repeat_yes);
+        RadioButton rbRepeatNo = view.findViewById(R.id.rb_repeat_no);
+        View rgRepeatUnit = view.findViewById(R.id.rg_repeat_unit);
+        RadioButton rbRepeatDay = view.findViewById(R.id.rb_repeat_day);
+        RadioButton rbRepeatMonth = view.findViewById(R.id.rb_repeat_month);
+        RadioButton rbRepeatYear = view.findViewById(R.id.rb_repeat_year);
+        RadioButton rbNonRepeatCountdown = view.findViewById(R.id.rb_non_repeat_countdown);
+        RadioButton rbNonRepeatDate = view.findViewById(R.id.rb_non_repeat_date);
+        View layoutCountdown = view.findViewById(R.id.layout_countdown);
+        View layoutDate = view.findViewById(R.id.layout_date);
+        TextView tvPickDate = view.findViewById(R.id.tv_pick_date);
+        TextView tvPickTime = view.findViewById(R.id.tv_pick_time);
+        android.widget.Switch swImportant = view.findViewById(R.id.sw_important);
+
+        swImportant.setChecked(true);
+        swImportant.setEnabled(false);
+        categorySection.setVisibility(View.GONE);
+        tvCategoryLabel.setVisibility(View.GONE);
+        spCategory.setVisibility(View.GONE);
+        etCategoryNew.setVisibility(View.GONE);
+
+        etTitle.setText(item.getTitle());
+        if (item.isRepeat()) {
+            rbRepeatYes.setChecked(true);
+            rgRepeatUnit.setVisibility(View.VISIBLE);
+            rbRepeatNo.setChecked(false);
+            String unit = item.getRepeatUnit();
+            if ("月".equals(unit)) rbRepeatMonth.setChecked(true);
+            else if ("年".equals(unit)) rbRepeatYear.setChecked(true);
+            else rbRepeatDay.setChecked(true);
+        } else {
+            rbRepeatNo.setChecked(true);
+            rgRepeatUnit.setVisibility(View.GONE);
+        }
+
+        rbRepeatYes.setOnCheckedChangeListener((buttonView, isChecked) -> rgRepeatUnit.setVisibility(isChecked ? View.VISIBLE : View.GONE));
+
+        Calendar selected = Calendar.getInstance();
+        selected.setTimeInMillis(item.getDueAt());
+        rbNonRepeatDate.setChecked(true);
+        rbNonRepeatCountdown.setChecked(false);
+        layoutCountdown.setVisibility(View.GONE);
+        layoutDate.setVisibility(View.VISIBLE);
+        tvPickDate.setText(String.format(Locale.CHINA, "%d-%02d-%02d", selected.get(Calendar.YEAR), selected.get(Calendar.MONTH) + 1, selected.get(Calendar.DAY_OF_MONTH)));
+        tvPickTime.setText(String.format(Locale.CHINA, "%02d:%02d", selected.get(Calendar.HOUR_OF_DAY), selected.get(Calendar.MINUTE)));
+
+        tvPickDate.setOnClickListener(v -> {
+            DatePickerDialog dialog = new DatePickerDialog(mContext,
+                    (view1, year, month, dayOfMonth) -> {
+                        selected.set(Calendar.YEAR, year);
+                        selected.set(Calendar.MONTH, month);
+                        selected.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        tvPickDate.setText(String.format(Locale.CHINA, "%d-%02d-%02d", year, month + 1, dayOfMonth));
+                    },
+                    selected.get(Calendar.YEAR),
+                    selected.get(Calendar.MONTH),
+                    selected.get(Calendar.DAY_OF_MONTH));
+            dialog.show();
+        });
+        tvPickTime.setOnClickListener(v -> {
+            TimePickerDialog dialog = new TimePickerDialog(mContext,
+                    (view12, hourOfDay, minute) -> {
+                        selected.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        selected.set(Calendar.MINUTE, minute);
+                        selected.set(Calendar.SECOND, 0);
+                        tvPickTime.setText(String.format(Locale.CHINA, "%02d:%02d", hourOfDay, minute));
+                    },
+                    selected.get(Calendar.HOUR_OF_DAY),
+                    selected.get(Calendar.MINUTE),
+                    true);
+            dialog.show();
+        });
+
+        AlertDialog dialog = new AlertDialog.Builder(mContext)
+                .setTitle("编辑重要待办")
+                .setView(view)
+                .setNegativeButton("取消", null)
+                .setPositiveButton("保存", null)
+                .create();
+
+        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String title = etTitle.getText().toString().trim();
+            if (TextUtils.isEmpty(title)) {
+                SimToast.toastEL("请输入待办名称");
+                return;
+            }
+            boolean repeat = rbRepeatYes.isChecked();
+            String repeatUnit = null;
+            long dueAt;
+            if (repeat) {
+                Calendar repeatCal = Calendar.getInstance();
+                if (rbRepeatDay.isChecked()) {
+                    repeatUnit = "天";
+                    repeatCal.add(Calendar.DAY_OF_YEAR, 1);
+                } else if (rbRepeatMonth.isChecked()) {
+                    repeatUnit = "月";
+                    repeatCal.add(Calendar.MONTH, 1);
+                } else {
+                    repeatUnit = "年";
+                    repeatCal.add(Calendar.YEAR, 1);
+                }
+                dueAt = repeatCal.getTimeInMillis();
+            } else {
+                dueAt = selected.getTimeInMillis();
+                if (dueAt <= System.currentTimeMillis()) {
+                    SimToast.toastEL("请选择未来的时间");
+                    return;
+                }
+            }
+
+            item.setTitle(title);
+            item.setRepeat(repeat);
+            item.setRepeatUnit(repeatUnit);
+            item.setDueAt(dueAt);
+            TodoPrefs.saveImportant(item);
+            EventBus.getDefault().post(new TodoImportantChanged(item));
+            updateImportantBanner();
+            dialog.dismiss();
+        }));
+
+        dialog.show();
+    }
+
+    private void showStudyProjectSelector(Runnable onSelected) {
+        List<String> projects = lnm2file.getStudyProjects();
+        if (projects.isEmpty()) {
+            showAddProjectDialog(() -> showStudyProjectSelector(onSelected));
+            return;
+        }
+        String selected = lnm2file.getSelectedStudyProject();
+        int checked = projects.indexOf(selected);
+        if (checked < 0) checked = 0;
+        final int[] picked = {checked};
+        String[] items = projects.toArray(new String[0]);
+        new AlertDialog.Builder(mContext)
+                .setTitle("选择学习项目")
+                .setSingleChoiceItems(items, checked, (d, which) -> picked[0] = which)
+                .setPositiveButton("开始", (d, w) -> {
+                    String name = items[picked[0]];
+                    lnm2file.saveSelectedStudyProject(name);
+                    onSelected.run();
+                })
+                .setNeutralButton("管理", (d, w) -> showManageProjectsDialog(onSelected))
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    private void showManageProjectsDialog(Runnable onSelected) {
+        List<String> projects = new ArrayList<>(lnm2file.getStudyProjects());
+        if (projects.isEmpty()) {
+            showAddProjectDialog(() -> showManageProjectsDialog(onSelected));
+            return;
+        }
+        String[] items = projects.toArray(new String[0]);
+        new AlertDialog.Builder(mContext)
+                .setTitle("管理学习项目")
+                .setItems(items, (d, which) -> showProjectActionDialog(projects, which, onSelected))
+                .setPositiveButton("新增", (d, w) -> showAddProjectDialog(() -> showManageProjectsDialog(onSelected)))
+                .setNegativeButton("返回", (d, w) -> showStudyProjectSelector(onSelected))
+                .show();
+    }
+
+    private void showProjectActionDialog(List<String> projects, int index, Runnable onSelected) {
+        if (projects == null || index < 0 || index >= projects.size()) return;
+        String current = projects.get(index);
+        String[] actions = new String[]{"编辑", "删除"};
+        new AlertDialog.Builder(mContext)
+                .setTitle(current)
+                .setItems(actions, (d, which) -> {
+                    if (which == 0) {
+                        showEditProjectDialog(projects, index, onSelected);
+                    } else {
+                        projects.remove(index);
+                        lnm2file.saveStudyProjects(projects);
+                        if (current.equals(lnm2file.getSelectedStudyProject())) {
+                            lnm2file.saveSelectedStudyProject(projects.isEmpty() ? "" : projects.get(0));
+                        }
+                        showManageProjectsDialog(onSelected);
+                    }
+                })
+                .show();
+    }
+
+    private void showAddProjectDialog(Runnable onDone) {
+        EditText input = new EditText(mContext);
+        input.setHint("输入学习项目");
+        new AlertDialog.Builder(mContext)
+                .setTitle("新增学习项目")
+                .setView(input)
+                .setNegativeButton("取消", null)
+                .setPositiveButton("保存", (d, w) -> {
+                    String name = input.getText().toString().trim();
+                    if (name.isEmpty()) {
+                        SimToast.toastEL("项目名称不能为空");
+                        return;
+                    }
+                    List<String> projects = new ArrayList<>(lnm2file.getStudyProjects());
+                    projects.add(name);
+                    lnm2file.saveStudyProjects(projects);
+                    lnm2file.saveSelectedStudyProject(name);
+                    onDone.run();
+                })
+                .show();
+    }
+
+    private void showEditProjectDialog(List<String> projects, int index, Runnable onSelected) {
+        if (projects == null || index < 0 || index >= projects.size()) return;
+        String current = projects.get(index);
+        EditText input = new EditText(mContext);
+        input.setText(current);
+        input.setSelection(input.getText().length());
+        new AlertDialog.Builder(mContext)
+                .setTitle("编辑学习项目")
+                .setView(input)
+                .setNegativeButton("取消", null)
+                .setPositiveButton("保存", (d, w) -> {
+                    String name = input.getText().toString().trim();
+                    if (name.isEmpty()) {
+                        SimToast.toastEL("项目名称不能为空");
+                        return;
+                    }
+                    projects.set(index, name);
+                    lnm2file.saveStudyProjects(projects);
+                    if (current.equals(lnm2file.getSelectedStudyProject())) {
+                        lnm2file.saveSelectedStudyProject(name);
+                    }
+                    showManageProjectsDialog(onSelected);
+                })
+                .show();
+    }
+
+    private void startLearnAfterProjectSelected() {
+        //辅助权限，手机时间都没问题
+        LogUtils.i(DetectService.isAccessibilitySettingsOn(mContext), Math.abs(spanTime) <= okSpan);
+        if (DetectService.isAccessibilitySettingsOn(mContext) && Math.abs(spanTime) <= okSpan) {
+
+            new TimePickerDialog(mContext, (view, hourOfDay, minute) -> {
+
+                long inputTime = hourOfDay * 60 * 60 * 1000 + minute * 60 * 1000;
+                if (inputTime > 4 * 60 * 60 * 1000) {
+
+                    new MessageDialog.Builder(mContext)
+                            .setTitle("警告！")
+                            .setMessage("你确定要一动不动的学习，超过4个小时？")
+                            .setConfirm("确定")
+                            .setCancel("点错了")
+                            .setCancelable(false)
+                            .setListener(new MessageDialog.OnListener() {
+                                @Override
+                                public void onConfirm(BaseDialog dialog) {
+                                    SimToast.toastEe("确定也不行…");
+
+                                }
+
+                                @Override
+                                public void onCancel(BaseDialog dialog) {
+                                    SimToast.toastSe("重新选择吧…");
+                                }
+                            }).show();
+
+                } else {
+
+                    if (UsrMsgUtils.getSignature().isEmpty()) {
+                        TastyToast.makeText(mContext, "记得在“我的”界面修改个人签名", TastyToast.LENGTH_LONG, TastyToast.SUCCESS);
+                    }
+
+                    lnm2file.saveTime(hourOfDay, minute);
+                    lnm2file.savePlanSpan(inputTime);
+
+
+                    Intent intent = new Intent(mContext, StartLearnActivity.class);
+                    intent.putExtra(lnmState, lnmStart);
+                    startActivity(intent);
+
+                }
+
+            }, lnm2file.getHourOfDay(), lnm2file.getMinute(), true)
+                    .show();
+
+        } else {
+            SimToast.toastSL("请先授予相关的权限");
+            startActivity(new Intent(mContext, PermissionActivity.class));
+
+        }
+    }
+
     private void updateApps() {
 
         List<String> stringList = lnm2file.getEnableApp();
@@ -363,6 +639,26 @@ public class LnmMainFragment extends LazyFragment {
             lnmApps.add(new LnmApp(AppUtils.getAppName(packageName), AppUtils.getAppIcon(packageName), packageName));
         }
         enableAppAdapter.submitList(lnmApps);
+    }
+
+
+    private void updateImportantBanner() {
+        TodoItem important = TodoPrefs.loadImportant();
+        if (important == null) {
+            binding.includeImportantBanner.getRoot().setVisibility(View.GONE);
+            return;
+        }
+        binding.includeImportantBanner.getRoot().setVisibility(View.VISIBLE);
+        binding.includeImportantBanner.tvImportantTitle.setText(important.getTitle());
+        binding.includeImportantBanner.tvImportantDays.setText(TodoTimeUtils.formatImportantDays(important.getDueAt()));
+        binding.includeImportantBanner.getRoot().setOnClickListener(v -> {
+            showImportantActionDialog(important);
+        });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTodoImportantChanged(TodoImportantChanged event) {
+        updateImportantBanner();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

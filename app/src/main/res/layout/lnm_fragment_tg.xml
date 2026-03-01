@@ -9,27 +9,23 @@
         android:id="@+id/abl_ltj"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:theme="@style/AppTheme.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/lnm_tj_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize">
-            <!--app:popupTheme="@style/popup_theme">-->
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/actionBarSize">
 
                 <ImageView
-                    android:layout_marginStart="16dp"
                     android:id="@+id/lnm_title_qa"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
+                    android:layout_marginStart="16dp"
                     android:gravity="center"
                     android:paddingStart="8dp"
                     android:paddingEnd="16dp"
@@ -40,26 +36,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="轻学伴模式"
+                    android:text="学习统计"
                     android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:padding="8dp"
-                    android:layout_toStartOf="@+id/lnm_title_qa"
-                    android:id="@+id/tv_lnm_tj_more"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="详细统计"
-                    android:textColor="@android:color/white" />
-
             </RelativeLayout>
-
-
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <include
+        android:id="@+id/include_important_banner"
+        layout="@layout/view_important_banner" />
 
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
         android:id="@+id/SwipeRefreshLayout_lnm_tg"
@@ -68,116 +55,273 @@
         app:srlAccentColor="@android:color/white"
         app:srlEnablePreviewInEditMode="true"
         app:srlPrimaryColor="?attr/colorPrimaryDark">
-        <!--srlAccentColor srlPrimaryColor 将会改变 Header 和 Footer 的主题颜色-->
-        <!--srlEnablePreviewInEditMode 可以开启和关闭预览功能-->
+
         <com.scwang.smart.refresh.header.ClassicsHeader
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/lnmTj1"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="16dp"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="1dp"
-                app:cardPreventCornerOverlap="false"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintVertical_weight="1"
-                app:layout_constraintBottom_toTopOf="@+id/lnmTj2"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="72dp">
 
-                <RelativeLayout
+                <androidx.cardview.widget.CardView
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="true">
 
-                    <TextView
-                        android:id="@+id/tv_lnm_count"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/colorPrimaryDark"
-                        android:elevation="5dp"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="完成率：100%"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                    <com.github.mikephil.charting.charts.CombinedChart
-                        android:id="@+id/chart_lnm"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@+id/tv_lnm_count"
-                        android:layout_margin="8dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="今日锁机"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
-                </RelativeLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
 
+                            <TextView
+                                android:id="@+id/tv_stat_today_time"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="时长 0h 0m"
+                                android:textSize="13sp" />
 
-            </androidx.cardview.widget.CardView>
+                            <TextView
+                                android:id="@+id/tv_stat_today_count"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="次数 0"
+                                android:textSize="13sp" />
+                        </LinearLayout>
 
-            <androidx.cardview.widget.CardView
-                app:layout_constraintVertical_weight="1"
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="12dp"
+                            android:background="#EEEEEE" />
 
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="72dp"
-                android:id="@+id/lnmTj2"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="1dp"
-                app:cardPreventCornerOverlap="false"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintTop_toBottomOf="@+id/lnmTj1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="本周 / 本月 / 本年"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
-                <RelativeLayout
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tv_stat_week"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="本周：0h 0m · 平均 0m · 差 0m"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tv_stat_month"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="本月：0h 0m · 平均 0m · 差 0m"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tv_stat_year"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="本年：0h 0m · 平均 0m · 差 0m"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="true">
 
-                    <TextView
-                        android:id="@+id/tv_lnm_count3"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tv_lnm_count"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/colorPrimaryDark"
+                            android:elevation="5dp"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="完成率：100%"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp" />
+
+                        <com.github.mikephil.charting.charts.CombinedChart
+                            android:id="@+id/chart_lnm"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp"
+                            android:layout_below="@+id/tv_lnm_count"
+                            android:layout_margin="8dp" />
+
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="true">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tv_lnm_count3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/colorPrimaryDark"
+                            android:elevation="5dp"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:text="最近三周对比"
+                            android:textColor="@android:color/white"
+                            android:textSize="12sp" />
+
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/chart_lnm_weeks"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp"
+                            android:layout_below="@+id/tv_lnm_count3"
+                            android:layout_margin="8dp" />
+
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/lnmTj3"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/colorPrimaryDark"
-                        android:elevation="5dp"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:text="连续学习0天  共0天"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/chart_lnm_weeks"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@+id/tv_lnm_count3"
-                        android:layout_margin="8dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="学习项目分布"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
-                </RelativeLayout>
+                        <LinearLayout
+                            android:id="@+id/layout_project_unit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
 
+                            <TextView
+                                android:id="@+id/tv_project_unit_min"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_tag"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="4dp"
+                                android:text="分钟"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="12sp" />
 
-            </androidx.cardview.widget.CardView>
+                            <TextView
+                                android:id="@+id/tv_project_unit_sec"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/bg_tag"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="4dp"
+                                android:text="秒"
+                                android:textColor="@android:color/darker_gray"
+                                android:textSize="12sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                        </LinearLayout>
+
+                        <com.github.mikephil.charting.charts.PieChart
+                            android:id="@+id/chart_project_pie"
+                            android:layout_width="match_parent"
+                            android:layout_height="260dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="学习项目时长"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/chart_project_bar"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
 
     </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
