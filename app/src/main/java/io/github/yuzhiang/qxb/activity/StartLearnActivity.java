@@ -29,6 +29,11 @@ import android.provider.Settings;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.content.Context;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -61,6 +66,7 @@ import io.github.yuzhiang.qxb.model.StudyProjectRecord;
 import io.github.yuzhiang.qxb.model.LnmApp;
 import io.github.yuzhiang.qxb.model.eventbus.MeLnmShowChart;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
+import io.github.yuzhiang.qxb.receiver.StudyAdminReceiver;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -96,6 +102,9 @@ public class StartLearnActivity extends AppCompatActivity {
 
     boolean showCal = true;
     private int calAction = CAL_ACTION_NONE;
+    private int screenOnCount = 0;
+    private BroadcastReceiver screenOnReceiver;
+    private boolean screenReceiverRegistered = false;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -110,7 +119,11 @@ public class StartLearnActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityStartLearnBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        io.github.yuzhiang.qxb.MyUtils.UsrMsgUtils.applyPageBackground(binding.getRoot());
         binding.tvStartLearnCal.setOnClickListener(v -> onCalButtonClick());
+        binding.tvStartLearnHistory.setOnClickListener(v -> {
+            startActivity(new Intent(StartLearnActivity.this, LnmRecordActivity.class));
+        });
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -469,6 +482,8 @@ public class StartLearnActivity extends AppCompatActivity {
             boolean success = localEnd.getTime() + okSpan >= localPlan.getTime();
             Lnm lnm = buildLocalLnm((int) id, localStart, localPlan, localEnd, success);
             lnmDBUtils.insert(lnm);
+            lnm2file.saveScreenOnCount((int) id, screenOnCount);
+            unregisterScreenReceiverIfNeeded();
             String project = lnm2file.getSelectedStudyProject();
             if (project == null || project.trim().isEmpty()) {
                 project = "未设置";
@@ -521,6 +536,8 @@ public class StartLearnActivity extends AppCompatActivity {
         if (id > 0) {
             lnmDBUtils.deleteById((int) id);
             lnmDBUtils.deletePendingAll();
+            lnm2file.saveScreenOnCount((int) id, screenOnCount);
+            unregisterScreenReceiverIfNeeded();
             timeOff();
 
             try {
@@ -535,6 +552,7 @@ public class StartLearnActivity extends AppCompatActivity {
             finish();
         } else {
             lnmDBUtils.deletePendingAll();
+            unregisterScreenReceiverIfNeeded();
             timeOff();
             finish();
         }
@@ -545,14 +563,14 @@ public class StartLearnActivity extends AppCompatActivity {
 
         if (success) {
 
-            binding.tvStartLearnMsg.setText("真棒！学习结束");
+            toastSL("真棒！学习结束，亮屏 " + screenOnCount + " 次，学习期间少看手机");
 
             toastSL("学习成功！");
 
         } else {
             toastEL("学习失败！");
 
-            binding.tvStartLearnMsg.setText("学习失败");
+            toastEL("学习失败，亮屏 " + screenOnCount + " 次，学习期间少看手机");
 
         }
 
@@ -581,6 +599,9 @@ public class StartLearnActivity extends AppCompatActivity {
     private void LearnStart() {
 
         saveLnmTime(startTime, planTime, new Date());
+        screenOnCount = 0;
+        registerScreenReceiverIfNeeded();
+        lockScreenIfPossible();
 
         if (showCal) {
             binding.tvStartLearnCal.setClickable(true);
@@ -590,7 +611,7 @@ public class StartLearnActivity extends AppCompatActivity {
             binding.tvStartLearnCal.setClickable(false);
             calAction = CAL_ACTION_NONE;
         }
-        binding.tvStartLearnMsg.setText(UsrMsgUtils.getSignature());
+        // 移除底部提示文本
 
         binding.wlStartLearn.setAnimDuration(3000);
         binding.wlStartLearn.pauseAnimation();
@@ -720,6 +741,46 @@ public class StartLearnActivity extends AppCompatActivity {
 
     }
 
+    private void registerScreenReceiverIfNeeded() {
+        if (screenReceiverRegistered) return;
+        if (screenOnReceiver == null) {
+            screenOnReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+                        screenOnCount++;
+                    }
+                }
+            };
+        }
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        registerReceiver(screenOnReceiver, filter);
+        screenReceiverRegistered = true;
+    }
+
+    private void unregisterScreenReceiverIfNeeded() {
+        if (!screenReceiverRegistered) return;
+        try {
+            unregisterReceiver(screenOnReceiver);
+        } catch (Exception ignored) {
+        }
+        screenReceiverRegistered = false;
+    }
+
+    private void lockScreenIfPossible() {
+        try {
+            DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+            if (dpm == null) return;
+            ComponentName admin = new ComponentName(this, StudyAdminReceiver.class);
+            if (dpm.isAdminActive(admin)) {
+                dpm.lockNow();
+            }
+        } catch (Exception e) {
+            LogUtils.i("lockNow failed: " + e);
+        }
+    }
+
     private String timeOO(long timeO) {
         String timeOO = String.valueOf(timeO);
         if (timeOO.length() == 1) timeOO = "0" + timeOO;
@@ -808,6 +869,7 @@ public class StartLearnActivity extends AppCompatActivity {
     protected void onDestroy() {
         LogUtils.i("=====onDestroy");
 
+        unregisterScreenReceiverIfNeeded();
         timeOff();
         super.onDestroy();
 

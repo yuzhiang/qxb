@@ -12,8 +12,10 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import io.github.yuzhiang.qxb.model.StudyProjectRecord;
@@ -212,6 +214,82 @@ public class lnm2file {
         List<StudyProjectRecord> records = getStudyProjectRecords();
         records.add(record);
         SPUtils.getInstance(file_name).put(studyProjectLogsKey, new Gson().toJson(records), true);
+    }
+
+    public static String getDeletedStudyProjectName() {
+        return "已删除";
+    }
+
+    public static void renameStudyProjectInRecords(String oldName, String newName) {
+        if (oldName == null || newName == null) return;
+        String oldTrim = oldName.trim();
+        String newTrim = newName.trim();
+        if (oldTrim.isEmpty() || newTrim.isEmpty() || oldTrim.equals(newTrim)) return;
+        List<StudyProjectRecord> records = getStudyProjectRecords();
+        boolean changed = false;
+        for (StudyProjectRecord r : records) {
+            if (r == null) continue;
+            if (oldTrim.equals(r.getProject())) {
+                r.setProject(newTrim);
+                changed = true;
+            }
+        }
+        if (changed) {
+            SPUtils.getInstance(file_name).put(studyProjectLogsKey, new Gson().toJson(records), true);
+        }
+    }
+
+    public static void moveStudyProjectRecordsToDeleted(String name) {
+        if (name == null) return;
+        String oldTrim = name.trim();
+        if (oldTrim.isEmpty()) return;
+        String deleted = getDeletedStudyProjectName();
+        List<StudyProjectRecord> records = getStudyProjectRecords();
+        boolean changed = false;
+        for (StudyProjectRecord r : records) {
+            if (r == null) continue;
+            if (oldTrim.equals(r.getProject())) {
+                r.setProject(deleted);
+                changed = true;
+            }
+        }
+        if (changed) {
+            SPUtils.getInstance(file_name).put(studyProjectLogsKey, new Gson().toJson(records), true);
+        }
+    }
+
+    public static void clearStudyProjectRecords() {
+        SPUtils.getInstance(file_name).put(studyProjectLogsKey, "[]", true);
+    }
+
+    private static final String screenOnCountKey = "study_screen_on_counts";
+
+    public static void saveScreenOnCount(int lnmId, int count) {
+        if (lnmId <= 0) return;
+        Map<String, Integer> map = getAllScreenOnCounts();
+        map.put(String.valueOf(lnmId), Math.max(0, count));
+        SPUtils.getInstance(file_name).put(screenOnCountKey, new Gson().toJson(map), true);
+    }
+
+    public static int getScreenOnCount(int lnmId) {
+        if (lnmId <= 0) return 0;
+        Map<String, Integer> map = getAllScreenOnCounts();
+        Integer v = map.get(String.valueOf(lnmId));
+        return v == null ? 0 : v;
+    }
+
+    public static Map<String, Integer> getAllScreenOnCounts() {
+        String json = SPUtils.getInstance(file_name).getString(screenOnCountKey, "");
+        if (json == null || json.trim().isEmpty()) {
+            return new HashMap<>();
+        }
+        try {
+            Map<String, Integer> map = new Gson().fromJson(json, new TypeToken<Map<String, Integer>>() {
+            }.getType());
+            return map == null ? new HashMap<>() : map;
+        } catch (Exception e) {
+            return new HashMap<>();
+        }
     }
 
     public static List<StudyProjectRecord> getStudyProjectRecords() {

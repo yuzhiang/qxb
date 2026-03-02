@@ -5,7 +5,8 @@
     android:id="@+id/main_content"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_page_white">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

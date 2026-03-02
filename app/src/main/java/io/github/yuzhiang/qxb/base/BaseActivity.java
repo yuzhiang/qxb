@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.github.yuzhiang.qxb.MyUtils.StatusBarUtil;
+import io.github.yuzhiang.qxb.MyUtils.UsrMsgUtils;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 public class BaseActivity extends AppCompatActivity {
@@ -30,6 +31,19 @@ public class BaseActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        View root = findViewById(android.R.id.content);
+        UsrMsgUtils.applyPageBackground(root);
+    }
+
+    @Override
+    public void setContentView(View view) {
+        super.setContentView(view);
+        UsrMsgUtils.applyPageBackground(view);
     }
 
     //    状态栏沉浸

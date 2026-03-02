@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_page_white"
     tools:context=".activity.PermissionActivity">
 
 
     <RelativeLayout
         android:id="@+id/rl_lnm_pm"
         android:elevation="4dp"
-        android:background="?attr/colorPrimaryDark"
+        android:background="@color/primary_red"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize">
 

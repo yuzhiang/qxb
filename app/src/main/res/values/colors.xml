@@ -4,8 +4,8 @@
     <color name="search_layover_bg">#50000000</color>
 
     <color name="line_dark">#848C99</color>
-    <color name="main_icon_1">#03A9F4</color>
-    <color name="main_icon_2">#FFBB12</color>
+    <color name="main_icon_1">#E8505B</color>
+    <color name="main_icon_2">#F28B82</color>
 
     <color name="prize1">#F9D00E</color>
     <color name="prize2">#CDCDCD</color>
@@ -14,21 +14,21 @@
     <color name="normal8">#50828282</color>
     <color name="normalBackground">#fafafa</color>
 
-    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorPrimary">#E8505B</color>
     <!--    <color name ="colorPrimary">#4876FF</color>-->
     <!--    <color name="colorPrimaryDark">#4876FF</color>-->
-    <color name="colorPrimaryDark">#03A9F4</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorWarning">#FF4081</color>
+    <color name="colorPrimaryDark">#D6454E</color>
+    <color name="colorAccent">#FF6B6B</color>
+    <color name="colorWarning">#FF6B6B</color>
 
     <color name="app_color_f6">#f6f6f6</color>
 
 
-    <color name="colorAccent1">#32d3eb</color>
-    <color name="colorAccent3">#5bc49f</color>
-    <color name="colorAccent4">#feb64d</color>
-    <color name="colorAccent5">#ff7c7c</color>
-    <color name="colorAccent6">#9287e7</color>
+    <color name="colorAccent1">#FF8A80</color>
+    <color name="colorAccent3">#FF6B6B</color>
+    <color name="colorAccent4">#FF9E99</color>
+    <color name="colorAccent5">#FF5C6C</color>
+    <color name="colorAccent6">#FFA3A3</color>
 
     <!--    <item>#32d3eb</item>-->
     <!--    <item>#5bc49f</item>-->
@@ -42,22 +42,22 @@
     <!--青色 #00FFFF-->
     <!--蓝色 #0000FF-->
     <!--紫色 #8B00FF-->
-    <color name="CH1">#037ef3</color>
-    <color name="CH2">#f85a40</color>
-    <color name="CH3">#00c16e</color>
-    <color name="CH4">#7552cc</color>
-    <color name="CH5">#0cb9c1</color>
-    <color name="CH6">#f48924</color>
-    <color name="CH7">#ffc845</color>
+    <color name="CH1">#E8505B</color>
+    <color name="CH2">#FF6B6B</color>
+    <color name="CH3">#FF8A80</color>
+    <color name="CH4">#F28B82</color>
+    <color name="CH5">#FF9E99</color>
+    <color name="CH6">#FF5C6C</color>
+    <color name="CH7">#FFA3A3</color>
 
     <color name="line">#ffeaeaea</color>
 
 
-    <color name="main1">#0ebeff</color>
-    <color name="main2">#00c16e</color>
-    <color name="main3">#ae63e4</color>
-    <color name="main4">#f48924</color>
-    <color name="main5">#dc9018</color>
+    <color name="main1">#E8505B</color>
+    <color name="main2">#FF6B6B</color>
+    <color name="main3">#FF8A80</color>
+    <color name="main4">#F28B82</color>
+    <color name="main5">#FF9E99</color>
     <!--    <color name="main6">#76daff</color>-->
 
 
@@ -99,9 +99,9 @@
 
     <!-- theme color -->
 
-    <color name="primary_dark_ldr">#375AC2</color>
-    <color name="primary_ldr">#4876FF</color>
-    <color name="accent_ldr">#54e346</color>
+    <color name="primary_dark_ldr">#C63844</color>
+    <color name="primary_ldr">#E8505B</color>
+    <color name="accent_ldr">#FF8A80</color>
 
     <color name="primary_dark_red">#E8505B</color>
     <color name="primary_red">#E8505B</color>
@@ -119,13 +119,13 @@
     <color name="pink_dark">#fb7299</color>
     <color name="pink_trans">#FFD36B</color>
 
-    <color name="primary_dark_indigo">#303F9F</color>
-    <color name="primary_indigo">#3F51B5</color>
-    <color name="accent_indigo">#54e346</color>
+    <color name="primary_dark_indigo">#C63844</color>
+    <color name="primary_indigo">#E8505B</color>
+    <color name="accent_indigo">#FF8A80</color>
 
-    <color name="primary_dark_light_blue">#0288D1</color>
-    <color name="primary_light_blue">#03A9F4</color>
-    <color name="accent_light_blue">#6ddccf</color>
+    <color name="primary_dark_light_blue">#C63844</color>
+    <color name="primary_light_blue">#E8505B</color>
+    <color name="accent_light_blue">#FF8A80</color>
 
     <color name="primary_dark_green">#388E3C</color>
     <color name="primary_green">#4CAF50</color>
@@ -166,7 +166,7 @@
     <color name="background_normal">#fafafa</color>
     <color name="background_normal2">#fafafa</color>
 
-    <color name="main_background_color">#33aaff</color>
+    <color name="main_background_color">#E8505B</color>
 
     <color name="colorTextAssistant">#888888</color>
 
@@ -174,10 +174,10 @@
     <color name="colorBackgroundDark">#f2f2f2</color>
     <color name="colorDivision">#33aaaaaa</color>
 
-    <color name="usr_colorPrimary">#33aaff</color>
-    <color name="usr_colorPrimaryDark">#2299ee</color>
-    <color name="usr_colorPrimaryOverlay">#cc0094ff</color>
-    <color name="usr_colorAccent">#FF4081</color>
+    <color name="usr_colorPrimary">#E8505B</color>
+    <color name="usr_colorPrimaryDark">#D6454E</color>
+    <color name="usr_colorPrimaryOverlay">#CCF06A72</color>
+    <color name="usr_colorAccent">#FF6B6B</color>
 
 
     <!-- 白色 -->
@@ -226,7 +226,7 @@
 
 
     <!-- 按钮按压时的颜色 -->
-    <color name="colorButtonPressed">#AA5A8DDF</color>
+    <color name="colorButtonPressed">#AACB3B45</color>
     <!-- 按钮禁用时的颜色 -->
     <color name="colorButtonDisable">#BBBBBB</color>
     <!-- 分割线的颜色 -->
@@ -235,9 +235,9 @@
     <color name="colorIcon">#7C7C7C</color>
 
     <!-- 对话框确认按钮文本颜色 -->
-    <color name="colorConfirm">#007AFF</color>
+    <color name="colorConfirm">#E8505B</color>
     <!-- 对话框取消按钮文本颜色 -->
-    <color name="colorCancel">#F44336</color>
+    <color name="colorCancel">#C62828</color>
 
     <color name="msgContent">#333333</color>
 
@@ -246,17 +246,20 @@
     <color name="common_icon_color">#7C7C7C</color>
 
     <!-- 按钮按压时的颜色 -->
-    <color name="common_button_pressed_color">#AA5A8DDF</color>
+    <color name="common_button_pressed_color">#AACB3B45</color>
     <!-- 按钮禁用时的颜色 -->
     <color name="common_button_disable_color">#BBBBBB</color>
 
     <!-- 对话框确认按钮的文本颜色 -->
-    <color name="common_confirm_text_color">#007AFF</color>
+    <color name="common_confirm_text_color">#E8505B</color>
     <!-- 对话框取消按钮的文本颜色 -->
-    <color name="common_cancel_text_color">#F44336</color>
+    <color name="common_cancel_text_color">#C62828</color>
 
 
     <!--    book-->
-    <color name="blue_light">#02A8F3</color>
+    <color name="blue_light">#FF6B6B</color>
+
+    <!-- red theme surfaces -->
+    <color name="card_red_bg">#FFFDF4F4</color>
 
 </resources>

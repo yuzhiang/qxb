@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import io.github.yuzhiang.qxb.MyUtils.UsrMsgUtils
 
 abstract class LazyFragment : Fragment() {
     private var isFirstLoad = true // 是否第一次加载
@@ -21,6 +22,7 @@ abstract class LazyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        UsrMsgUtils.applyPageBackground(view)
         initView(view)
 
     }

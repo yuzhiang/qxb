@@ -12,6 +12,7 @@ import androidx.appcompat.widget.ThemedSpinnerAdapter;
 import androidx.core.content.ContextCompat;
 
 import io.github.yuzhiang.qxb.MyUtils.UsrMsgUtils;
+import io.github.yuzhiang.qxb.R;
 
 import java.util.List;
 
@@ -41,10 +42,26 @@ public class SpinnerAdapterToolbar extends ArrayAdapter<String> implements Theme
         }
 
         TextView textView = view.findViewById(android.R.id.text1);
-        textView.setTextColor(ContextCompat.getColor(getContext(), UsrMsgUtils.getThemeColor()));
+        textView.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
         textView.setMaxLines(1);
         textView.setText(getItem(position));
 
+        return view;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view;
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            view = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+        } else {
+            view = convertView;
+        }
+        TextView textView = view.findViewById(android.R.id.text1);
+        textView.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+        textView.setMaxLines(1);
+        textView.setText(getItem(position));
         return view;
     }
 

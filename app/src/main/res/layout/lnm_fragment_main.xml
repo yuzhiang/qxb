@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cl_lnm_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_page_white">
 
     <TextView
         android:elevation="4dp"
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
         android:layout_centerHorizontal="true"
-        android:background="?attr/colorPrimaryDark"
+        android:background="@color/primary_red"
         android:gravity="center"
         android:maxLines="1"
         android:paddingStart="16dp"
@@ -26,12 +27,37 @@
     <include
         android:id="@+id/include_important_banner"
         layout="@layout/view_important_banner"
-        app:layout_constraintTop_toBottomOf="@+id/include_important_banner"
+        app:layout_constraintTop_toBottomOf="@+id/lnm_title"
+        app:layout_constraintBottom_toTopOf="@+id/tv_project_manage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    
+    <TextView
+        android:id="@+id/tv_project_manage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_project_chip"
+        android:elevation="6dp"
+        android:minHeight="32dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:drawableStart="@drawable/ic_timeline"
+        android:drawableEnd="@drawable/ic_right"
+        android:drawablePadding="6dp"
+        android:text="选择学习项目"
+        android:textColor="@color/colorPrimary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/lnm_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-
         android:id="@+id/tv_start_lnm"
         android:layout_width="120dp"
         android:layout_height="120dp"
@@ -40,11 +66,28 @@
         android:gravity="center"
         android:text="锁 机 学 习"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/include_important_banner"
+        app:layout_constraintTop_toBottomOf="@+id/tv_lnm_history"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0.35"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_lnm_history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_tag"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:text="历史记录"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@+id/tv_project_manage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <TextView
         android:id="@+id/tv_check_pm"
@@ -58,7 +101,7 @@
         android:text="权限核对"
         app:layout_constraintBottom_toBottomOf="@+id/tv_start_lnm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include_important_banner" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_start_lnm" />
 
     <TextView
         android:id="@+id/tv_lnm_pic"
@@ -71,7 +114,7 @@
         android:text="选背景图"
         app:layout_constraintBottom_toBottomOf="@+id/tv_start_lnm"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include_important_banner" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_start_lnm" />
 
 
     <TextView

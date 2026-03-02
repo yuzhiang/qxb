@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rl_start_learn"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_page_white">
 
     <io.github.yuzhiang.qxb.view.WaveLoadingView
         android:layout_marginTop="48dp"
@@ -58,16 +59,20 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_start_learn_cal" />
 
     <TextView
-        android:id="@+id/tv_start_learn_msg"
-        android:layout_width="match_parent"
+        android:id="@+id/tv_start_learn_history"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
-        android:text="加载中"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_tag"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:text="查看锁机历史"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_start_learn_cal_msg" />
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_lnm_start_learn"

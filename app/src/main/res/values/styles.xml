@@ -203,7 +203,7 @@
 
     <style name="AlertDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimary">@color/primary_light_blue</item>
+        <item name="colorPrimary">@color/primary_red</item>
     </style>
 
     <style name="MyAlertDialog" parent="AlertDialogTheme">
@@ -258,6 +258,7 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:textColor">@color/white</item>
+        <item name="android:background">@color/primary_red</item>
 
     </style>
 

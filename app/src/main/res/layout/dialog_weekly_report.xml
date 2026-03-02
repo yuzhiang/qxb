@@ -1,29 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tv_weekly_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="上周锁机周报"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <com.github.mikephil.charting.charts.RadarChart
-        android:id="@+id/chart_weekly_radar"
-        android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:layout_marginTop="12dp" />
-
-    <TextView
-        android:id="@+id/tv_weekly_report"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textSize="12sp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_weekly_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="锁机周报"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_weekly_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="2026-03-01 ~ 2026-03-07"
+            android:textSize="12sp"
+            android:textColor="@color/colorTextAssistant" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_weekly_total"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tag"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="总时长 0分钟"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_weekly_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tag"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="次数 0"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_weekly_rate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_tag"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="完成率 0%"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_weekly_compare"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="较前两周：时长↑0分钟，次数↑0次，完成率↑0%"
+            android:textSize="12sp" />
+
+        <com.github.mikephil.charting.charts.RadarChart
+            android:id="@+id/chart_weekly_radar"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="12dp" />
+
+        <TextView
+            android:id="@+id/tv_weekly_avg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="日均 0分钟 · 单次均值 0分钟"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_weekly_deep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="深度学习块 ≥45分钟：0次（0%）"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_weekly_streak"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="最长连续学习：0天"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_weekly_peak"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="高峰日：无"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_weekly_low"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="低谷日：无"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_weekly_project"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="项目偏向：暂无"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_weekly_report"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</ScrollView>

@@ -218,17 +218,41 @@ public class LnmRankFragment extends LazyFragment {
             result.add(item);
         }
 
+        long myId = -1L;
+        try {
+            myId = UsrMsgUtils.getUserModel().getId();
+        } catch (Exception ignored) {
+        }
+        if (myId <= 0) {
+            myId = 999999L;
+        }
+        String myNick = UsrMsgUtils.getNickName();
+        boolean hasMe = false;
+        for (LnmTime item : result) {
+            if (item.getId() != null && item.getId().equals(myId)) {
+                hasMe = true;
+                break;
+            }
+        }
+        if (!hasMe) {
+            LnmTime me = new LnmTime();
+            me.setId(myId);
+            me.setNickName(myNick);
+            me.setSignature(UsrMsgUtils.getSignature());
+            me.setSum(960);
+            me.setLike(0);
+            me.setAvatar(UsrMsgUtils.getLocalAvatar());
+            me.setXh(myId);
+            me.setUpShow(bang < 2);
+            result.add(me);
+        }
+
         Collections.sort(result, (o1, o2) -> Integer.compare(o2.getSum(), o1.getSum()));
         lnmAdapter.submitList(result);
 
         all = result.size();
         p = 0;
         String name = UsrMsgUtils.getNickName() + "（本地演示榜单）";
-        long myId = -1L;
-        try {
-            myId = UsrMsgUtils.getUserModel().getId();
-        } catch (Exception ignored) {
-        }
         for (int i = 0; i < all; i++) {
             if (result.get(i).getId() != null && result.get(i).getId().equals(myId)) {
                 p = i;

@@ -207,6 +207,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorOnSecondary">@color/white</item>
+        <item name="android:windowBackground">@drawable/bg_page_red</item>
 
     </style>
 
@@ -239,7 +240,7 @@
     </style>
 
 
-    <style name="AppTheme.FullScreen" parent="light_blueTheme">
+    <style name="AppTheme.FullScreen" parent="RedTheme">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>

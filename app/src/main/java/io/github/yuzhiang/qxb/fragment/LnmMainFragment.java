@@ -54,6 +54,7 @@ import io.github.yuzhiang.qxb.Service.DetectService;
 import io.github.yuzhiang.qxb.activity.BaiMingDanActivity;
 import io.github.yuzhiang.qxb.activity.PermissionActivity;
 import io.github.yuzhiang.qxb.activity.StartLearnActivity;
+import io.github.yuzhiang.qxb.activity.LnmRecordActivity;
 import io.github.yuzhiang.qxb.adapter.EnableAppAdapter;
 import io.github.yuzhiang.qxb.base.BaseDialog;
 import io.github.yuzhiang.qxb.base.LazyFragment;
@@ -133,6 +134,8 @@ public class LnmMainFragment extends LazyFragment {
         StatusBarUtil.setPaddingSmart(mContext, binding.lnmTitle);
 
         updateImportantBanner();
+        binding.tvProjectManage.setOnClickListener(v -> showManageProjectsDialog(this::startLearnAfterProjectSelected));
+        binding.tvLnmHistory.setOnClickListener(v -> startActivity(new Intent(mContext, LnmRecordActivity.class)));
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -248,6 +251,7 @@ public class LnmMainFragment extends LazyFragment {
 
         binding.lnmTitle.setText(UsrMsgUtils.getSignature());
         updateApps();
+        updateProjectManageLabel();
     }
 
     private void setBackGround() {
@@ -465,6 +469,16 @@ public class LnmMainFragment extends LazyFragment {
         dialog.show();
     }
 
+
+    private void updateProjectManageLabel() {
+        String selected = lnm2file.getSelectedStudyProject();
+        if (selected == null || selected.trim().isEmpty()) {
+            binding.tvProjectManage.setText("选择学习项目");
+        } else {
+            binding.tvProjectManage.setText("当前：" + selected);
+        }
+    }
+
     private void showStudyProjectSelector(Runnable onSelected) {
         List<String> projects = lnm2file.getStudyProjects();
         if (projects.isEmpty()) {
@@ -482,6 +496,7 @@ public class LnmMainFragment extends LazyFragment {
                 .setPositiveButton("开始", (d, w) -> {
                     String name = items[picked[0]];
                     lnm2file.saveSelectedStudyProject(name);
+                    updateProjectManageLabel();
                     onSelected.run();
                 })
                 .setNeutralButton("管理", (d, w) -> showManageProjectsDialog(onSelected))
@@ -514,6 +529,7 @@ public class LnmMainFragment extends LazyFragment {
                     if (which == 0) {
                         showEditProjectDialog(projects, index, onSelected);
                     } else {
+                        lnm2file.moveStudyProjectRecordsToDeleted(current);
                         projects.remove(index);
                         lnm2file.saveStudyProjects(projects);
                         if (current.equals(lnm2file.getSelectedStudyProject())) {
@@ -542,6 +558,7 @@ public class LnmMainFragment extends LazyFragment {
                     projects.add(name);
                     lnm2file.saveStudyProjects(projects);
                     lnm2file.saveSelectedStudyProject(name);
+                    updateProjectManageLabel();
                     onDone.run();
                 })
                 .show();
@@ -565,6 +582,7 @@ public class LnmMainFragment extends LazyFragment {
                     }
                     projects.set(index, name);
                     lnm2file.saveStudyProjects(projects);
+                    lnm2file.renameStudyProjectInRecords(current, name);
                     if (current.equals(lnm2file.getSelectedStudyProject())) {
                         lnm2file.saveSelectedStudyProject(name);
                     }

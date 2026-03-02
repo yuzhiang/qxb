@@ -13,6 +13,7 @@ import static io.github.yuzhiang.qxb.common.Constant.Constant.userType0;
 import static io.github.yuzhiang.qxb.common.LdrConfig.spPath;
 
 import android.util.Base64;
+import android.view.View;
 
 import com.blankj.utilcode.util.ConvertUtils;
 import com.blankj.utilcode.util.EncryptUtils;
@@ -206,6 +207,10 @@ public class UsrMsgUtils {
     }
 
     public static String getNickName() {
+        String localNick = SPUtils.getInstance(fileName).getString("localNick", "");
+        if (localNick != null && localNick.trim().length() > 0) {
+            return localNick;
+        }
         String nickName = noNickName;
         try {
             User user = getUserModel();
@@ -217,7 +222,77 @@ public class UsrMsgUtils {
         return nickName;
     }
 
+    public static void saveLocalProfile(String nickName, String avatar) {
+        SPUtils.getInstance(fileName).put("localNick", nickName == null ? "" : nickName.trim());
+        SPUtils.getInstance(fileName).put("localAvatar", avatar == null ? "" : avatar.trim());
+    }
+
+    public static String getLocalAvatar() {
+        return SPUtils.getInstance(fileName).getString("localAvatar", "");
+    }
+
+    public static final int BG_STYLE_WHITE = 0;
+    public static final int BG_STYLE_RED = 1;
+    public static final int BG_STYLE_WARM = 2;
+    public static final int BG_STYLE_SOFT = 3;
+    public static final int BG_STYLE_IMAGE = 4;
+    private static final String KEY_BG_STYLE = "appBgStyle";
+    private static final String KEY_BG_IMAGE = "appBgImage";
+
+    public static int getPageBgStyle() {
+        return SPUtils.getInstance(fileName).getInt(KEY_BG_STYLE, BG_STYLE_WHITE);
+    }
+
+    public static void setPageBgStyle(int style) {
+        SPUtils.getInstance(fileName).put(KEY_BG_STYLE, style);
+    }
+
+    public static int getPageBgRes() {
+        int style = getPageBgStyle();
+        if (style == BG_STYLE_RED) return R.drawable.bg_page_red;
+        if (style == BG_STYLE_WARM) return R.drawable.bg_page_warm;
+        if (style == BG_STYLE_SOFT) return R.drawable.bg_page_soft;
+        return R.drawable.bg_page_white;
+    }
+
+    public static void setPageBgImage(String path) {
+        SPUtils.getInstance(fileName).put(KEY_BG_IMAGE, path == null ? "" : path.trim());
+    }
+
+    public static String getPageBgImage() {
+        return SPUtils.getInstance(fileName).getString(KEY_BG_IMAGE, "");
+    }
+
+    public static void applyPageBackground(View root) {
+        if (root == null) return;
+        if (getPageBgStyle() == BG_STYLE_IMAGE) {
+            String path = getPageBgImage();
+            if (path != null && path.trim().length() > 0) {
+                android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeFile(path);
+                if (bitmap != null) {
+                    android.graphics.drawable.BitmapDrawable drawable =
+                            new android.graphics.drawable.BitmapDrawable(root.getResources(), bitmap);
+                    root.setBackground(drawable);
+                    return;
+                }
+            }
+        }
+        root.setBackgroundResource(getPageBgRes());
+    }
+
+    public static void saveLocalSignature(String signature) {
+        SPUtils.getInstance(fileName).put("localSignature", signature == null ? "" : signature.trim());
+    }
+
+    public static String getLocalSignature() {
+        return SPUtils.getInstance(fileName).getString("localSignature", "");
+    }
+
     public static String getSignature() {
+        String localSignature = getLocalSignature();
+        if (localSignature != null && localSignature.trim().length() > 0) {
+            return localSignature;
+        }
         String signature = noMood;
         try {
             User user = getUserModel();

@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.SPUtils;
 import io.github.yuzhiang.qxb.fragment.LnmAllFragment;
 import io.github.yuzhiang.qxb.fragment.LnmRankFragment;
 import io.github.yuzhiang.qxb.fragment.LnmMainFragment;
+import io.github.yuzhiang.qxb.fragment.LnmMyFragment;
 import io.github.yuzhiang.qxb.fragment.LnmTJFragment;
 import io.github.yuzhiang.qxb.MyUtils.UsrMsgUtils;
 import io.github.yuzhiang.qxb.R;
@@ -54,7 +55,8 @@ public class LearnNoMobileActivity extends BaseActivity {
                 LnmAllFragment.newInstance(),
                 LnmMainFragment.newInstance(),
                 LnmTJFragment.newInstance(),
-                LnmRankFragment.newInstance()
+                LnmRankFragment.newInstance(),
+                LnmMyFragment.newInstance()
         );
 
         binding.lnmVp.setAdapter(new Viewpager2Adapter(this, mFragments));
@@ -81,7 +83,8 @@ public class LearnNoMobileActivity extends BaseActivity {
                 new AHBottomNavigationItem(R.string.main_tab_lnm1, R.drawable.ic_timeline, R.color.white),
                 new AHBottomNavigationItem(R.string.main_tab_lnm2, R.drawable.ic_pets, R.color.white),
                 new AHBottomNavigationItem(R.string.main_tab_lnm3, R.drawable.ic_tongji_24dp, R.color.white),
-                new AHBottomNavigationItem(R.string.main_tab_lnm4, R.drawable.ic_timeline, R.color.white)
+                new AHBottomNavigationItem(R.string.main_tab_lnm4, R.drawable.ic_timeline, R.color.white),
+                new AHBottomNavigationItem(R.string.main_tab_lnm5, R.drawable.ic_boy, R.color.white)
         ));
 
         // Set background color

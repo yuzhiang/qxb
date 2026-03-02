@@ -5,8 +5,13 @@ import static io.github.yuzhiang.qxb.MyUtils.UsrMsgUtils.getAccentThemeColor;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.LogUtils;
@@ -27,6 +32,7 @@ import io.github.yuzhiang.qxb.base.LazyFragment;
 import io.github.yuzhiang.qxb.databinding.VpLnmRecordFragmentBinding;
 import io.github.yuzhiang.qxb.db.room.bean.Lnm;
 import io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils;
+import io.github.yuzhiang.qxb.model.lnm2file;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,6 +51,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
 
 
     private VpLnmRecordFragmentBinding binding;
+    private RecordAdapter recordAdapter;
 
 
     private Activity mContext;
@@ -69,6 +76,9 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
         super.initView(view);
         mContext = getActivity();
         binding = VpLnmRecordFragmentBinding.bind(view);
+        recordAdapter = new RecordAdapter();
+        binding.rvLnmRecordDetail.setLayoutManager(new LinearLayoutManager(mContext));
+        binding.rvLnmRecordDetail.setAdapter(recordAdapter);
 
         int textColor = ContextCompat.getColor(mContext, R.color.colorTextContent);
 
@@ -349,7 +359,73 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
         binding.lcLnmRecord.invalidate(); // refresh
         binding.lcLnmRecord.animateY(800);
 
+        if (!dateList.isEmpty()) {
+            Date start = dateList.get(0);
+            Date end = dateList.get(dateList.size() - 1);
+            updateRecordList(start, end);
+        }
 
+    }
+
+    private void updateRecordList(Date start, Date end) {
+        List<Lnm> list = lnmDBUtils.findBetween(start, end);
+        if (list == null) list = new ArrayList<>();
+        list.sort((a, b) -> {
+            long ta = a != null && a.createdDate != null ? a.createdDate.getTime() : 0;
+            long tb = b != null && b.createdDate != null ? b.createdDate.getTime() : 0;
+            return Long.compare(tb, ta);
+        });
+        if (list.size() > 50) {
+            list = list.subList(0, 50);
+        }
+        recordAdapter.submit(list);
+        binding.tvLnmRecordDetailLabel.setText(list.isEmpty() ? "历史记录（暂无）" : "历史记录（" + list.size() + "）");
+    }
+
+    private static class RecordAdapter extends RecyclerView.Adapter<RecordHolder> {
+        private final List<Lnm> data = new ArrayList<>();
+
+        void submit(List<Lnm> list) {
+            data.clear();
+            if (list != null) data.addAll(list);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public RecordHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_lnm_record_detail, parent, false);
+            return new RecordHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(RecordHolder holder, int position) {
+            Lnm lnm = data.get(position);
+            if (lnm == null || lnm.createdDate == null) return;
+            String start = TimeUtils.date2String(lnm.createdDate, "yyyy-MM-dd HH:mm");
+            String end = TimeUtils.date2String(lnm.endTime != null ? lnm.endTime : lnm.schedule, "HH:mm");
+            long endMs = lnm.endTime != null ? lnm.endTime.getTime() : lnm.schedule.getTime();
+            long durMin = Math.max(0, TimeUtils.getTimeSpan(endMs, lnm.createdDate.getTime(), TimeConstants.MIN));
+            int screenOn = lnm2file.getScreenOnCount(lnm.id);
+            String status = lnm.finish ? "成功" : "失败";
+            holder.title.setText(start + " ~ " + end);
+            holder.sub.setText("时长 " + durMin + "m · " + status + " · 亮屏 " + screenOn + " 次");
+        }
+
+        @Override
+        public int getItemCount() {
+            return data.size();
+        }
+    }
+
+    private static class RecordHolder extends RecyclerView.ViewHolder {
+        final TextView title;
+        final TextView sub;
+
+        RecordHolder(View itemView) {
+            super(itemView);
+            title = itemView.findViewById(R.id.tv_record_title);
+            sub = itemView.findViewById(R.id.tv_record_sub);
+        }
     }
 
 

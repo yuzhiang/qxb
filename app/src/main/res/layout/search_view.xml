@@ -21,7 +21,7 @@
             android:id="@+id/search_top_bar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimaryDark">
+            android:background="@color/primary_red">
 
             <EditText
                 android:id="@+id/searchTextView"
