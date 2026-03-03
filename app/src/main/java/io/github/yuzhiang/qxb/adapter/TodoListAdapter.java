@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void bindGroup(GroupHolder holder, TodoListEntry entry, int position) {
         holder.tvName.setText(entry.getGroup().getName());
         int count = entry.getGroup().getItems() == null ? 0 : entry.getGroup().getItems().size();
-        holder.tvCount.setText(count + " 条待办");
+        holder.tvCount.setText(count + " 项作业");
         holder.ivSticky.setVisibility(entry.isSticky() ? View.VISIBLE : View.GONE);
         holder.ivExpand.setImageResource(entry.isExpanded() ? android.R.drawable.arrow_down_float
                 : android.R.drawable.arrow_up_float);
@@ -142,9 +143,10 @@ public class TodoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private void bindItem(ItemHolder holder, TodoListEntry entry, int position) {
-        holder.tvTitle.setText(entry.getItem().getTitle());
-        if (entry.getItem().isRepeat()) {
-            String unit = entry.getItem().getRepeatUnit();
+        TodoItem item = entry.getItem();
+        holder.tvTitle.setText(item.getTitle());
+        if (item.isRepeat()) {
+            String unit = item.getRepeatUnit();
             String label = "重复";
             if (unit != null && !unit.isEmpty()) {
                 label = "每" + unit;
@@ -153,21 +155,36 @@ public class TodoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             holder.tvRepeat.setText("不重复");
         }
-        holder.tvCountdown.setText(TodoTimeUtils.formatCountdown(entry.getItem().getDueAt()));
+        holder.tvCountdown.setText(TodoTimeUtils.formatCountdown(item.getDueAt()));
 
         holder.cbDone.setOnCheckedChangeListener(null);
-        holder.cbDone.setChecked(entry.getItem().isCompleted());
+        holder.cbDone.setChecked(item.isCompleted());
         holder.cbDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (listener != null) {
                 listener.onItemCheckedChanged(position, entry, isChecked);
             }
         });
 
-        int textColor = entry.getItem().isCompleted() ? 0xFF9E9E9E : 0xFF000000;
-        int subColor = entry.getItem().isCompleted() ? 0xFFBDBDBD : 0xFF666666;
+        int textColor = item.isCompleted() ? 0xFF9E9E9E : 0xFF000000;
+        int subColor = item.isCompleted() ? 0xFFBDBDBD : 0xFF666666;
         holder.tvTitle.setTextColor(textColor);
         holder.tvRepeat.setTextColor(subColor);
         holder.tvCountdown.setTextColor(subColor);
+        if (holder.tvStatus != null) {
+            if (!item.isCompleted()) {
+                holder.tvStatus.setText("未打卡");
+                holder.tvStatus.setTextColor(subColor);
+            } else if (item.getStudentCheckedAt() <= 0) {
+                holder.tvStatus.setText("已完成");
+                holder.tvStatus.setTextColor(subColor);
+            } else if (item.isParentConfirmed()) {
+                holder.tvStatus.setText("家长已确认");
+                holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green));
+            } else {
+                holder.tvStatus.setText("已打卡，待家长确认");
+                holder.tvStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.colorWarning));
+            }
+        }
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
@@ -203,6 +220,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         CheckBox cbDone;
         TextView tvRepeat;
         TextView tvCountdown;
+        TextView tvStatus;
 
         ItemHolder(@NonNull View itemView) {
             super(itemView);
@@ -210,6 +228,7 @@ public class TodoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             cbDone = itemView.findViewById(R.id.cb_todo_done);
             tvRepeat = itemView.findViewById(R.id.tv_todo_repeat);
             tvCountdown = itemView.findViewById(R.id.tv_todo_countdown);
+            tvStatus = itemView.findViewById(R.id.tv_todo_status);
         }
     }
 }

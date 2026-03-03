@@ -17,7 +17,7 @@
             android:id="@+id/tv_group_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="分组"
+            android:text="科目"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="3 条待办"
+            android:text="3 项作业"
             android:textColor="@android:color/darker_gray"
             android:textSize="12sp" />
 
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="最近倒计时"
+            android:text="最近到期"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="12sp" />
     </LinearLayout>

@@ -112,7 +112,7 @@ public class LnmRankFragment extends LazyFragment {
 
         View empty = LayoutInflater.from(mContext).inflate(R.layout.rv_empty_view, binding.rvLnm, false);
         TextView tv = empty.findViewById(R.id.tv_empty_msg);
-        tv.setText("好好学习，加油！");
+        tv.setText("保持好习惯，加油！");
         lnmAdapter.setStateView(empty);
         lnmAdapter.setStateViewEnable(true);
 

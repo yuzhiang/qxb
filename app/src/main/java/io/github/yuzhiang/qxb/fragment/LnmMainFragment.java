@@ -326,7 +326,7 @@ public class LnmMainFragment extends LazyFragment {
         if (important == null) return;
         String[] items = new String[]{"编辑", "删除"};
         new AlertDialog.Builder(mContext)
-                .setTitle("重要待办")
+                .setTitle("重要目标")
                 .setItems(items, (d, which) -> {
                     if (which == 0) {
                         showEditImportantDialog(important);
@@ -420,7 +420,7 @@ public class LnmMainFragment extends LazyFragment {
         });
 
         AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑重要待办")
+                .setTitle("编辑重要目标")
                 .setView(view)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", null)
@@ -429,7 +429,7 @@ public class LnmMainFragment extends LazyFragment {
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入待办名称");
+                SimToast.toastEL("请输入作业名称");
                 return;
             }
             boolean repeat = rbRepeatYes.isChecked();
@@ -473,7 +473,7 @@ public class LnmMainFragment extends LazyFragment {
     private void updateProjectManageLabel() {
         String selected = lnm2file.getSelectedStudyProject();
         if (selected == null || selected.trim().isEmpty()) {
-            binding.tvProjectManage.setText("选择学习项目");
+            binding.tvProjectManage.setText("选择学科");
         } else {
             binding.tvProjectManage.setText("当前：" + selected);
         }
@@ -491,7 +491,7 @@ public class LnmMainFragment extends LazyFragment {
         final int[] picked = {checked};
         String[] items = projects.toArray(new String[0]);
         new AlertDialog.Builder(mContext)
-                .setTitle("选择学习项目")
+                .setTitle("选择学科")
                 .setSingleChoiceItems(items, checked, (d, which) -> picked[0] = which)
                 .setPositiveButton("开始", (d, w) -> {
                     String name = items[picked[0]];
@@ -512,7 +512,7 @@ public class LnmMainFragment extends LazyFragment {
         }
         String[] items = projects.toArray(new String[0]);
         new AlertDialog.Builder(mContext)
-                .setTitle("管理学习项目")
+                .setTitle("管理学科")
                 .setItems(items, (d, which) -> showProjectActionDialog(projects, which, onSelected))
                 .setPositiveButton("新增", (d, w) -> showAddProjectDialog(() -> showManageProjectsDialog(onSelected)))
                 .setNegativeButton("返回", (d, w) -> showStudyProjectSelector(onSelected))
@@ -543,15 +543,15 @@ public class LnmMainFragment extends LazyFragment {
 
     private void showAddProjectDialog(Runnable onDone) {
         EditText input = new EditText(mContext);
-        input.setHint("输入学习项目");
+        input.setHint("输入学科");
         new AlertDialog.Builder(mContext)
-                .setTitle("新增学习项目")
+                .setTitle("新增学科")
                 .setView(input)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", (d, w) -> {
                     String name = input.getText().toString().trim();
                     if (name.isEmpty()) {
-                        SimToast.toastEL("项目名称不能为空");
+                        SimToast.toastEL("学科名称不能为空");
                         return;
                     }
                     List<String> projects = new ArrayList<>(lnm2file.getStudyProjects());
@@ -571,13 +571,13 @@ public class LnmMainFragment extends LazyFragment {
         input.setText(current);
         input.setSelection(input.getText().length());
         new AlertDialog.Builder(mContext)
-                .setTitle("编辑学习项目")
+                .setTitle("编辑学科")
                 .setView(input)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", (d, w) -> {
                     String name = input.getText().toString().trim();
                     if (name.isEmpty()) {
-                        SimToast.toastEL("项目名称不能为空");
+                        SimToast.toastEL("学科名称不能为空");
                         return;
                     }
                     projects.set(index, name);
@@ -602,8 +602,8 @@ public class LnmMainFragment extends LazyFragment {
                 if (inputTime > 4 * 60 * 60 * 1000) {
 
                     new MessageDialog.Builder(mContext)
-                            .setTitle("警告！")
-                            .setMessage("你确定要一动不动的学习，超过4个小时？")
+                            .setTitle("提示")
+                            .setMessage("你确定要持续专注超过4个小时？")
                             .setConfirm("确定")
                             .setCancel("点错了")
                             .setCancelable(false)
@@ -733,7 +733,7 @@ public class LnmMainFragment extends LazyFragment {
 
         if (plan == null || start == null) {
             new AlertDialog.Builder(mContext, R.style.MyAlertDialog)
-                    .setMessage("检测到残留学习状态，已无法恢复，本次记录将清除。")
+                    .setMessage("检测到残留专注状态，已无法恢复，本次记录将清除。")
                     .setCancelable(false)
                     .setTitle("注意！")
                     .setNegativeButton("清除", (d, i) -> {
@@ -743,9 +743,9 @@ public class LnmMainFragment extends LazyFragment {
             return;
         }
 
-        String s = "发现有以前的本地学习数据未处理！\n\n";
+        String s = "发现有以前的本地专注数据未处理！\n\n";
         double time = Math.ceil(TimeUtils.getTimeSpan(plan, start, TimeConstants.SEC) / 60.0);
-        s = s + "上次计划学习约" + time + "分钟，未在中断后及时返回。\n将记为学习失败（用于统计完成率）。";
+        s = s + "上次计划专注约" + time + "分钟，未在中断后及时返回。\n将记为专注失败（用于统计完成率）。";
 
         new AlertDialog.Builder(mContext, R.style.MyAlertDialog)
                 .setMessage(s)
@@ -753,8 +753,8 @@ public class LnmMainFragment extends LazyFragment {
                 .setTitle("注意！")
                 .setNegativeButton("记为失败", (d, i) -> {
 
-                    LogUtils.file("\n\n处理上次本地学习记录 ~ ");
-                    LogUtils.i("处理上次本地学习记录 ~ ");
+                    LogUtils.file("\n\n处理上次本地专注记录 ~ ");
+                    LogUtils.i("处理上次本地专注记录 ~ ");
                     failLastLearn(id);
                 }).create().show();
 
@@ -776,8 +776,8 @@ public class LnmMainFragment extends LazyFragment {
 
     private void showResumeLearnDialog() {
         new AlertDialog.Builder(mContext, R.style.MyAlertDialog)
-                .setTitle("继续学习")
-                .setMessage("检测到上次学习仍在进行中，是否继续？")
+                .setTitle("继续专注")
+                .setMessage("检测到上次专注仍在进行中，是否继续？")
                 .setCancelable(false)
                 .setPositiveButton("继续", (d, i) -> {
                     Intent intent = new Intent(mContext, StartLearnActivity.class);
@@ -809,22 +809,22 @@ public class LnmMainFragment extends LazyFragment {
         lnmDBUtils.insert(lnm);
         EventBus.getDefault().post(new MeLnmShowChart(true));
 
-        LogUtils.file("\n\n上次学习记录本地保存成功！");
-        toastSe("上次学习记录已保存到本地！\n可以开始学习");
+        LogUtils.file("\n\n上次专注记录本地保存成功！");
+        toastSe("上次专注记录已保存到本地！\n可以开始专注");
         finishLearn();
 
     }
 
     private void cancelLastLearn(long id) {
         lnmDBUtils.deleteById((int) id);
-        toastSe("成功！\n可以开始学习");
+        toastSe("成功！\n可以开始专注");
         finishLearn();
 
         try {
-            LogUtils.file("\n\n上次学习取消(本地)：id-" + id);
+            LogUtils.file("\n\n上次专注取消(本地)：id-" + id);
         } catch (Exception e) {
             toastSe("错误！请重试");
-            LogUtils.file("\n\n上次学习取消(本地)：记录错误" + e);
+            LogUtils.file("\n\n上次专注取消(本地)：记录错误" + e);
             e.printStackTrace();
         }
     }
@@ -851,8 +851,8 @@ public class LnmMainFragment extends LazyFragment {
         lnmDBUtils.insert(lnm);
         EventBus.getDefault().post(new MeLnmShowChart(true));
 
-        LogUtils.file("\n\n上次学习记录已记为失败：id-" + id);
-        toastSe("上次中断学习已记为失败\n可以开始学习");
+        LogUtils.file("\n\n上次专注记录已记为失败：id-" + id);
+        toastSe("上次中断专注已记为失败\n可以开始专注");
         finishLearn();
     }
 

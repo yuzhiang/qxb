@@ -8,7 +8,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
@@ -19,17 +21,17 @@ import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.RomUtils;
 import com.blankj.utilcode.util.SPUtils;
 
-import io.github.yuzhiang.qxb.fragment.LnmAllFragment;
-import io.github.yuzhiang.qxb.fragment.LnmRankFragment;
-import io.github.yuzhiang.qxb.fragment.LnmMainFragment;
 import io.github.yuzhiang.qxb.fragment.LnmMyFragment;
 import io.github.yuzhiang.qxb.fragment.LnmTJFragment;
+import io.github.yuzhiang.qxb.fragment.LnmWeeklyFragment;
 import io.github.yuzhiang.qxb.MyUtils.UsrMsgUtils;
 import io.github.yuzhiang.qxb.R;
 import io.github.yuzhiang.qxb.adapter.Viewpager2Adapter;
 import io.github.yuzhiang.qxb.base.BaseActivity;
 import io.github.yuzhiang.qxb.databinding.ActivityLearnNoMobileBinding;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
+import io.github.yuzhiang.qxb.model.ParentTodayReport;
+import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,17 +54,18 @@ public class LearnNoMobileActivity extends BaseActivity {
 
 
         List<Fragment> mFragments = Arrays.asList(
-                LnmAllFragment.newInstance(),
-                LnmMainFragment.newInstance(),
+                LnmWeeklyFragment.newInstance(),
                 LnmTJFragment.newInstance(),
-                LnmRankFragment.newInstance(),
-                LnmMyFragment.newInstance()
+                LnmMyFragment.newInstance(false)
         );
 
         binding.lnmVp.setAdapter(new Viewpager2Adapter(this, mFragments));
 
         binding.lnmVp.setOffscreenPageLimit(mFragments.size());
         binding.lnmVp.setUserInputEnabled(false);
+        if (binding.tvRuleHint != null) {
+            binding.tvRuleHint.setVisibility(View.GONE);
+        }
 
 //        //ViewPager的监听事件
         binding.lnmVp.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -73,17 +76,17 @@ public class LearnNoMobileActivity extends BaseActivity {
         });
 
         menu();
-
+        if (savedInstanceState == null) {
+            binding.getRoot().post(this::showParentTodayDialog);
+        }
 
     }
 
     private void menu() {
 
         binding.bottomNavigationLnm.addItems(Arrays.asList(
-                new AHBottomNavigationItem(R.string.main_tab_lnm1, R.drawable.ic_timeline, R.color.white),
-                new AHBottomNavigationItem(R.string.main_tab_lnm2, R.drawable.ic_pets, R.color.white),
-                new AHBottomNavigationItem(R.string.main_tab_lnm3, R.drawable.ic_tongji_24dp, R.color.white),
-                new AHBottomNavigationItem(R.string.main_tab_lnm4, R.drawable.ic_timeline, R.color.white),
+                new AHBottomNavigationItem(R.string.main_tab_lnm3, R.drawable.ic_suggestion, R.color.white),
+                new AHBottomNavigationItem(R.string.main_tab_lnm6, R.drawable.ic_tongji_24dp, R.color.white),
                 new AHBottomNavigationItem(R.string.main_tab_lnm5, R.drawable.ic_boy, R.color.white)
         ));
 
@@ -101,6 +104,13 @@ public class LearnNoMobileActivity extends BaseActivity {
 
         binding.bottomNavigationLnm.setCurrentItem(0);
 
+    }
+
+    public void switchToTab(int index) {
+        if (binding == null) return;
+        int safeIndex = Math.max(0, Math.min(index, binding.bottomNavigationLnm.getItemsCount() - 1));
+        binding.lnmVp.setCurrentItem(safeIndex, false);
+        binding.bottomNavigationLnm.setCurrentItem(safeIndex);
     }
 
 
@@ -163,5 +173,28 @@ public class LearnNoMobileActivity extends BaseActivity {
 
     }
 
+    private void showParentTodayDialog() {
+        ParentTodayReport.TodayStats stats = ParentTodayReport.buildTodayStats();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("今日快报")
+                .setMessage(ParentTodayReport.buildDetailLines(stats))
+                .setPositiveButton("知道了", null)
+                .setNeutralButton("一键确认", (d, w) -> {
+                    int confirmed = ParentTodayReport.confirmPendingTodos();
+                    if (confirmed <= 0) {
+                        SimToast.toastEL("暂无待确认作业");
+                    } else {
+                        SimToast.toastSe("已确认 " + confirmed + " 项作业");
+                    }
+                })
+                .create();
+        dialog.setOnShowListener(d -> {
+            if (stats.pendingConfirm <= 0) {
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
+                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setAlpha(0.5f);
+            }
+        });
+        dialog.show();
+    }
 
 }

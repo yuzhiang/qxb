@@ -239,7 +239,7 @@ public class PermissionActivity extends BaseActivity {
 
         LnmPermission pm = new LnmPermission(
                 WZA, "无障碍权限",
-                "保证学习期间自动跳转回软件(偶尔需要重启手机)",
+                "保证专注期间自动跳转回软件(偶尔需要重启手机)",
                 R.drawable.logo, 0, "");
         if (isAS()) {
             pm.setPmOk(1);

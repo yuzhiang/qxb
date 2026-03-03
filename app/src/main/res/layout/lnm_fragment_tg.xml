@@ -30,7 +30,7 @@
                     android:gravity="center"
                     android:paddingStart="8dp"
                     android:paddingEnd="16dp"
-                    android:text="周报"
+                    android:text="说明"
                     android:textColor="@android:color/white"
                     android:textSize="14sp" />
 
@@ -39,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="学习统计"
+                    android:text="专注统计"
                     android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
@@ -96,30 +96,38 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="今日锁机"
+                            android:text="关键指标"
                             android:textSize="14sp"
                             android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_seed_data"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="生成测试数据"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorPrimary" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:orientation="horizontal">
+                            android:orientation="vertical">
 
                             <TextView
                                 android:id="@+id/tv_stat_today_time"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="时长 0h 0m"
+                                android:text="规则遵守：--"
                                 android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/tv_stat_today_count"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="次数 0"
+                                android:layout_marginTop="6dp"
+                                android:text="作业专注：--"
                                 android:textSize="13sp" />
                         </LinearLayout>
 
@@ -133,7 +141,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
-                            android:text="本周 / 本月 / 本年"
+                            android:text="习惯概览"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -147,7 +155,7 @@
                                 android:id="@+id/tv_stat_week"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="本周：0h 0m · 平均 0m · 差 0m"
+                                android:text="早睡达标：0/7 天"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -155,7 +163,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
-                                android:text="本月：0h 0m · 平均 0m · 差 0m"
+                                android:text="连续打卡：专注 0 天 · 早睡 0 天"
                                 android:textSize="12sp" />
 
                             <TextView
@@ -164,6 +172,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
                                 android:text="本年：0h 0m · 平均 0m · 差 0m"
+                                android:visibility="gone"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
@@ -171,10 +180,10 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/card_stat_overview"
+                    android:id="@+id/card_stat_toggle"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="@color/card_red_bg"
@@ -182,30 +191,14 @@
                     app:cardElevation="1dp"
                     app:cardUseCompatPadding="true">
 
-                    <RelativeLayout
+                    <TextView
+                        android:id="@+id/tv_stat_toggle"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:id="@+id/tv_lnm_count"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="?attr/colorPrimaryDark"
-                            android:elevation="5dp"
-                            android:gravity="center"
-                            android:padding="8dp"
-                            android:text="学习历程（分钟）"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
-
-                        <com.github.mikephil.charting.charts.CombinedChart
-                            android:id="@+id/chart_lnm"
-                            android:layout_width="match_parent"
-                            android:layout_height="220dp"
-                            android:layout_below="@+id/tv_lnm_count"
-                            android:layout_margin="8dp" />
-
-                    </RelativeLayout>
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:padding="12dp"
+                        android:text="展开学科统计"
+                        android:textSize="12sp" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -232,7 +225,7 @@
                             android:elevation="5dp"
                             android:gravity="center"
                             android:padding="8dp"
-                            android:text="最近三周对比（分钟）"
+                            android:text="作业专注趋势（近7天）"
                             android:textColor="@android:color/white"
                             android:textSize="12sp" />
 
@@ -247,7 +240,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/card_stat_project"
+                    android:id="@+id/card_stat_sleep_report"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginTop="16dp"
@@ -265,10 +258,55 @@
                         android:padding="12dp">
 
                         <TextView
+                            android:id="@+id/tv_sleep_report_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="睡眠报告"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_sleep_report_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="暂无睡眠报告"
+                            android:textSize="12sp" />
+
+                        <Button
+                            android:id="@+id/btn_sleep_report_history"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="查看历史睡眠报告" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_stat_project"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/card_red_bg"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
                             android:id="@+id/tv_project_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="学习项目分布（分钟）"
+                            android:text="学科分布（分钟）"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -320,7 +358,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="学习项目时长（分钟）"
+                            android:text="学科时长（分钟）"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -354,7 +392,7 @@
                             android:id="@+id/tv_record_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="学习记录趋势（分钟）"
+                            android:text="睡眠尝试玩手机（近7天）"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -363,6 +401,65 @@
                             android:layout_width="match_parent"
                             android:layout_height="220dp"
                             android:layout_marginTop="8dp" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_stat_reward"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/card_red_bg"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="1dp"
+                    app:cardUseCompatPadding="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/tv_reward_trend_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="奖励/兑换趋势（近7天）"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/chart_reward_trend"
+                            android:layout_width="match_parent"
+                            android:layout_height="220dp"
+                            android:layout_marginTop="8dp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="● 奖励获得"
+                                android:textSize="12sp"
+                                android:textColor="@color/spring_green" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:text="● 兑换使用"
+                                android:textSize="12sp"
+                                android:textColor="@color/colorAccent" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

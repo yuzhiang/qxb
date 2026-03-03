@@ -1,12 +1,10 @@
 package io.github.yuzhiang.qxb.fragment;
 
 import static io.github.yuzhiang.qxb.common.LzuUrl.lnmMsg;
-import static io.github.yuzhiang.qxb.MyUtils.LnmRetrofitUtils.schedulersTransformer;
 import static io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils.findBetween;
 import static io.github.yuzhiang.qxb.view.tastytoast.SimToast.toastEL;
 import static io.github.yuzhiang.qxb.view.tastytoast.SimToast.toastSL;
 import static io.github.yuzhiang.qxb.view.tastytoast.SimToast.toastSe;
-import static autodispose2.AutoDispose.autoDisposable;
 
 import android.content.Context;
 import android.app.DatePickerDialog;
@@ -27,7 +25,6 @@ import androidx.appcompat.app.AlertDialog;
 import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
-import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -38,7 +35,6 @@ import com.github.mikephil.charting.charts.RadarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -71,6 +67,10 @@ import io.github.yuzhiang.qxb.model.todo.TodoPrefs;
 import io.github.yuzhiang.qxb.model.todo.TodoTimeUtils;
 import io.github.yuzhiang.qxb.model.StudyProjectRecord;
 import io.github.yuzhiang.qxb.model.lnm2file;
+import io.github.yuzhiang.qxb.model.focus.SleepReportStore;
+import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
+import io.github.yuzhiang.qxb.model.reward.RewardEngine;
+import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
@@ -80,6 +80,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -87,11 +88,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.Collections;
 
-import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
 
 
 public class LnmTJFragment extends LazyFragment {
@@ -105,10 +101,11 @@ public class LnmTJFragment extends LazyFragment {
     private static final String WEEKLY_REPORT_ENABLED = "weekly_report_enabled";
     private static final String WEEKLY_REPORT_REPEAT = "weekly_report_allow_repeat";
     private static final String STATS_CARD_ORDER_KEY = "stats_card_order";
+    private static final String STATS_ADVANCED_EXPANDED_KEY = "stats_advanced_expanded";
     private boolean projectUnitInMinutes = true;
-    private List<String> overviewLabels = new ArrayList<>();
     private List<String> weeksLabels = new ArrayList<>();
     private List<String> recordLabels = new ArrayList<>();
+    private List<String> rewardLabels = new ArrayList<>();
 
 
     @Override
@@ -136,30 +133,21 @@ public class LnmTJFragment extends LazyFragment {
         StatusBarUtil.setPaddingSmart(mContext, binding.ablLtj);
 
         updateImportantBanner();
+        updateSleepReportHint();
+        if (binding.btnSleepReportHistory != null) {
+            binding.btnSleepReportHistory.setOnClickListener(v -> showSleepReportHistory());
+        }
+        if (binding.tvSeedData != null) {
+            binding.tvSeedData.setOnClickListener(v -> showSeedDataDialog());
+        }
 
         int textColor = ContextCompat.getColor(mContext, R.color.colorTextContent);
 
-        XAxis xAxis = binding.chartLnm.getXAxis();
-        xAxis.setTextColor(textColor);
-        xAxis.setAxisMinimum(0f);
-
-        YAxis ylAxis = binding.chartLnm.getAxisLeft();
-        ylAxis.setTextColor(textColor);
-        ylAxis.enableGridDashedLine(10f, 10f, 0f);
-        YAxis yrAxis = binding.chartLnm.getAxisRight();
-        yrAxis.setTextColor(textColor);
-        yrAxis.setDrawGridLines(false);
-        xAxis.setPosition(XAxis.XAxisPosition.TOP);
-
-        binding.chartLnm.getDescription().setText("学习历程（分钟，滑动查看）");
-        binding.chartLnm.getDescription().setTextColor(textColor);
-        binding.chartLnm.setNoDataText("快去学习吧，还没有数据");
-        binding.tvLnmCount.setText("学习历程（分钟）");
-        binding.tvLnmCount3.setText("最近三周对比（分钟）");
+        binding.tvLnmCount3.setText("作业专注趋势（近7天）");
 
         XAxis xAxisWeek = binding.chartLnmWeeks.getXAxis();
         xAxisWeek.setTextColor(textColor);
-        xAxisWeek.setPosition(XAxis.XAxisPosition.TOP);
+        xAxisWeek.setPosition(XAxis.XAxisPosition.BOTTOM);
 
         YAxis ylAxisWeek = binding.chartLnmWeeks.getAxisLeft();
         ylAxisWeek.setTextColor(textColor);
@@ -169,16 +157,54 @@ public class LnmTJFragment extends LazyFragment {
         yrAxisWeek.setTextColor(textColor);
         yrAxisWeek.setDrawGridLines(false);
 
+        if (binding.chartRecordTrend != null) {
+            XAxis xAxisRecord = binding.chartRecordTrend.getXAxis();
+            xAxisRecord.setTextColor(textColor);
+            xAxisRecord.setPosition(XAxis.XAxisPosition.BOTTOM);
+            YAxis ylAxisRecord = binding.chartRecordTrend.getAxisLeft();
+            ylAxisRecord.setTextColor(textColor);
+            ylAxisRecord.enableGridDashedLine(10f, 10f, 0f);
+            YAxis yrAxisRecord = binding.chartRecordTrend.getAxisRight();
+            yrAxisRecord.setTextColor(textColor);
+            yrAxisRecord.setDrawGridLines(false);
+        }
+        if (binding.chartRewardTrend != null) {
+            XAxis xAxisReward = binding.chartRewardTrend.getXAxis();
+            xAxisReward.setTextColor(textColor);
+            xAxisReward.setPosition(XAxis.XAxisPosition.BOTTOM);
+            YAxis ylAxisReward = binding.chartRewardTrend.getAxisLeft();
+            ylAxisReward.setTextColor(textColor);
+            ylAxisReward.enableGridDashedLine(10f, 10f, 0f);
+            YAxis yrAxisReward = binding.chartRewardTrend.getAxisRight();
+            yrAxisReward.setTextColor(textColor);
+            yrAxisReward.setDrawGridLines(false);
+        }
+
         setupProjectUnitToggle();
         setupChartClickDetails();
-        updateProjectCharts();
-        updateRecordTrendChart();
-        binding.chartLnmWeeks.getDescription().setText("最近三周对比（分钟）");
+        updatePrimaryCharts();
+        binding.chartLnmWeeks.getDescription().setText("作业专注趋势（近7天）");
         binding.chartLnmWeeks.getDescription().setTextColor(textColor);
-        binding.chartLnmWeeks.setNoDataText("快去学习吧，还没有数据");
-        binding.chartLnm.getXAxis().setGranularity(1f); // minimum axis-step (interval) is 1
+        binding.chartLnmWeeks.setNoDataText("暂无作业专注数据");
+        if (binding.chartRecordTrend != null) {
+            binding.chartRecordTrend.getDescription().setText("睡眠尝试玩手机（近7天）");
+            binding.chartRecordTrend.getDescription().setTextColor(textColor);
+            binding.chartRecordTrend.setNoDataText("暂无睡眠报告数据");
+        }
+        if (binding.chartRewardTrend != null) {
+            binding.chartRewardTrend.getDescription().setText("奖励/兑换趋势（近7天）");
+            binding.chartRewardTrend.getDescription().setTextColor(textColor);
+            binding.chartRewardTrend.setNoDataText("暂无奖励数据");
+        }
         binding.chartLnmWeeks.getXAxis().setGranularity(1f); // minimum axis-step (interval) is 1
+        if (binding.chartRecordTrend != null) {
+            binding.chartRecordTrend.getXAxis().setGranularity(1f);
+        }
+        if (binding.chartRewardTrend != null) {
+            binding.chartRewardTrend.getXAxis().setGranularity(1f);
+        }
 
+        initAdvancedToggle();
         setupStatsCardReorder();
 
 
@@ -188,10 +214,34 @@ public class LnmTJFragment extends LazyFragment {
         if (binding == null || binding.layoutStatsCards == null) return;
         applyStatsCardOrder();
         setCardLongPress(binding.cardStatSummary);
-        setCardLongPress(binding.cardStatOverview);
+        setCardLongPress(binding.cardStatToggle);
         setCardLongPress(binding.cardStatWeeks);
         setCardLongPress(binding.cardStatProject);
         setCardLongPress(binding.cardStatRecord);
+        setCardLongPress(binding.cardStatReward);
+    }
+
+    private void initAdvancedToggle() {
+        if (binding == null || binding.tvStatToggle == null) return;
+        boolean expanded = SPUtils.getInstance().getBoolean(STATS_ADVANCED_EXPANDED_KEY, false);
+        setAdvancedExpanded(expanded);
+        binding.tvStatToggle.setOnClickListener(v -> {
+            boolean nowExpanded = binding.cardStatProject != null && binding.cardStatProject.getVisibility() != View.VISIBLE;
+            setAdvancedExpanded(nowExpanded);
+            SPUtils.getInstance().put(STATS_ADVANCED_EXPANDED_KEY, nowExpanded);
+        });
+        if (binding.cardStatToggle != null) {
+            binding.cardStatToggle.setOnClickListener(v -> binding.tvStatToggle.performClick());
+        }
+    }
+
+    private void setAdvancedExpanded(boolean expanded) {
+        if (binding.cardStatProject != null) {
+            binding.cardStatProject.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        }
+        if (binding.tvStatToggle != null) {
+            binding.tvStatToggle.setText(expanded ? "收起学科统计" : "展开学科统计");
+        }
     }
 
     private void setCardLongPress(View card) {
@@ -305,7 +355,7 @@ public class LnmTJFragment extends LazyFragment {
     protected void initEvent() {
         super.initEvent();
 
-        binding.lnmTitleQa.setOnClickListener(v -> showWeeklyReportSettings());
+        binding.lnmTitleQa.setOnClickListener(v -> showMsg(false));
         binding.lnmTitleQa.setOnLongClickListener(v -> {
             showSeedDataDialog();
             return true;
@@ -389,22 +439,19 @@ public class LnmTJFragment extends LazyFragment {
         if (binding == null) return;
         String unit = projectUnitInMinutes ? "分钟" : "秒";
         if (binding.tvProjectTitle != null) {
-            binding.tvProjectTitle.setText("学习项目分布（" + unit + "）");
+            binding.tvProjectTitle.setText("学科分布（" + unit + "）");
         }
         if (binding.tvProjectBarTitle != null) {
-            binding.tvProjectBarTitle.setText("学习项目时长（" + unit + "）");
+            binding.tvProjectBarTitle.setText("学科时长（" + unit + "）");
         }
     }
 
     private void setupChartClickDetails() {
         if (binding == null) return;
-        View.OnClickListener overviewListener = v -> showOverviewChartDetail();
         View.OnClickListener weeksListener = v -> showWeeksChartDetail();
         View.OnClickListener projectListener = v -> showProjectChartDetail();
         View.OnClickListener recordListener = v -> showRecordTrendDetail();
-
-        // Chart clicks show point detail; avoid duplicate dialogs from chart click + point selection.
-        if (binding.tvLnmCount != null) binding.tvLnmCount.setOnClickListener(overviewListener);
+        View.OnClickListener rewardListener = v -> showRewardTrendDetail();
 
         // Chart clicks show point detail; avoid duplicate dialogs from chart click + point selection.
         if (binding.tvLnmCount3 != null) binding.tvLnmCount3.setOnClickListener(weeksListener);
@@ -416,37 +463,20 @@ public class LnmTJFragment extends LazyFragment {
 
         // Chart clicks show point detail; avoid duplicate dialogs from chart click + point selection.
         if (binding.tvRecordTitle != null) binding.tvRecordTitle.setOnClickListener(recordListener);
+        if (binding.tvRewardTrendTitle != null) binding.tvRewardTrendTitle.setOnClickListener(rewardListener);
 
         setupChartValueListeners();
     }
 
     private void setupChartValueListeners() {
         if (binding == null) return;
-        if (binding.chartLnm != null) {
-            binding.chartLnm.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-                @Override
-                public void onValueSelected(Entry e, Highlight h) {
-                    String label = getLabelByIndex(overviewLabels, e.getX());
-                    String value = formatMinutesValue(e.getY());
-                    showPointDetailDialog("学习历程", label, value, "");
-                }
-
-                @Override
-                public void onNothingSelected() {
-                }
-            });
-        }
         if (binding.chartLnmWeeks != null) {
             binding.chartLnmWeeks.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
-                    int dataSetIndex = h != null ? h.getDataSetIndex() : 0;
-                    String series = (dataSetIndex >= 0 && binding.chartLnmWeeks.getData() != null)
-                            ? binding.chartLnmWeeks.getData().getDataSetByIndex(dataSetIndex).getLabel()
-                            : "";
-                    String label = buildWeekDateLabel(dataSetIndex, Math.round(e.getX()), series);
+                    String label = getLabelByIndex(weeksLabels, e.getX());
                     String value = formatMinutesValue(e.getY());
-                    showPointDetailDialog("最近三周对比", label, value, series.isEmpty() ? "" : ("周别：" + series));
+                    showPointDetailDialog("作业专注趋势", label, "作业专注", value, "");
                 }
 
                 @Override
@@ -459,8 +489,29 @@ public class LnmTJFragment extends LazyFragment {
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
                     String label = getLabelByIndex(recordLabels, e.getX());
+                    String value = formatCountValue(e.getY(), "次");
+                    showPointDetailDialog("睡眠尝试玩手机", label, "尝试玩手机", value, "");
+                }
+
+                @Override
+                public void onNothingSelected() {
+                }
+            });
+        }
+        if (binding.chartRewardTrend != null) {
+            binding.chartRewardTrend.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                @Override
+                public void onValueSelected(Entry e, Highlight h) {
+                    String label = getLabelByIndex(rewardLabels, e.getX());
+                    int dataSetIndex = h != null ? h.getDataSetIndex() : 0;
+                    String series = (binding.chartRewardTrend.getData() != null
+                            && dataSetIndex >= 0
+                            && binding.chartRewardTrend.getData().getDataSetByIndex(dataSetIndex) != null)
+                            ? binding.chartRewardTrend.getData().getDataSetByIndex(dataSetIndex).getLabel()
+                            : "";
+                    String metric = series.contains("兑换") ? "兑换使用" : "奖励获得";
                     String value = formatMinutesValue(e.getY());
-                    showPointDetailDialog("学习记录趋势", label, value, "");
+                    showPointDetailDialog("奖励/兑换趋势", label, metric, value, "");
                 }
 
                 @Override
@@ -498,13 +549,28 @@ public class LnmTJFragment extends LazyFragment {
 
     private String formatMinutesValue(float value) {
         int mins = Math.max(0, Math.round(value));
+        return formatMinutesText(mins);
+    }
+
+    private String formatCountValue(float value, String unit) {
+        int count = Math.max(0, Math.round(value));
+        return count + unit;
+    }
+
+    private String formatMinutesText(int minutes) {
+        int mins = Math.max(0, minutes);
+        if (mins >= 60) {
+            int hours = mins / 60;
+            int rem = mins % 60;
+            return hours + "小时" + rem + "分钟";
+        }
         return mins + "分钟";
     }
 
-    private void showPointDetailDialog(String title, String dateLabel, String value, String extra) {
+    private void showPointDetailDialog(String title, String dateLabel, String metricName, String value, String extra) {
         StringBuilder sb = new StringBuilder();
         sb.append("日期：").append(dateLabel).append("\n");
-        sb.append("时长：").append(value);
+        sb.append(metricName).append("：").append(value);
         if (extra != null && !extra.trim().isEmpty()) {
             sb.append("\n").append(extra);
         }
@@ -516,34 +582,80 @@ public class LnmTJFragment extends LazyFragment {
         Calendar now = Calendar.getInstance();
 
         Range day = buildDayRange(now);
-        Range week = buildWeekRange(now, 0);
-        Range month = buildMonthRange(now, 0);
-        Range year = buildYearRange(now, 0);
+        Range last7 = buildRecentDaysRange(7);
+        updateKeyStats(day, last7);
+    }
 
-        Stat dayStat = calcStat(day.start, day.end);
-        Stat weekStat = calcStat(week.start, week.end);
-        Stat monthStat = calcStat(month.start, month.end);
-        Stat yearStat = calcStat(year.start, year.end);
+    private void updateKeyStats(Range day, Range week) {
+        int blockedToday = calcBlockedAttempts(day.start, day.end);
+        int blockedWeek = calcBlockedAttempts(week.start, week.end);
+        int homeworkToday = calcHomeworkMinutes(day.start, day.end);
+        int homeworkWeek = calcHomeworkMinutes(week.start, week.end);
+        int sleepOkDays = calcSleepOkDays(7);
 
-        Stat weekAvg = calcAvgOfPrevious(week, 2, "week");
-        Stat monthAvg = calcAvgOfPrevious(month, 2, "month");
-        Stat yearAvg = calcAvgOfPrevious(year, 2, "year");
+        RewardEngine.settleDailyIfNeeded();
+        RewardPrefs.RewardState st = RewardPrefs.loadState();
 
         if (binding.tvStatTodayTime != null) {
-            binding.tvStatTodayTime.setText("时长 " + formatDuration(dayStat.totalMs));
+            binding.tvStatTodayTime.setText("规则遵守：今日违规 " + blockedToday + " 次 · 近7天 " + blockedWeek + " 次");
         }
         if (binding.tvStatTodayCount != null) {
-            binding.tvStatTodayCount.setText("次数 " + dayStat.count);
+            binding.tvStatTodayCount.setText("作业专注：今日 " + formatMinutesText(homeworkToday) + " · 近7天 " + formatMinutesText(homeworkWeek));
         }
         if (binding.tvStatWeek != null) {
-            binding.tvStatWeek.setText("本周：" + formatDuration(weekStat.totalMs) + " · 平均 " + formatDuration(weekAvg.totalMs) + " · 差 " + formatDiff(weekStat.totalMs - weekAvg.totalMs));
+            binding.tvStatWeek.setText("早睡达标：" + sleepOkDays + "/7 天");
         }
         if (binding.tvStatMonth != null) {
-            binding.tvStatMonth.setText("本月：" + formatDuration(monthStat.totalMs) + " · 平均 " + formatDuration(monthAvg.totalMs) + " · 差 " + formatDiff(monthStat.totalMs - monthAvg.totalMs));
+            binding.tvStatMonth.setText("连续打卡：专注 " + st.focusStreakDays + " 天 · 早睡 " + st.sleepStreakDays + " 天");
         }
-        if (binding.tvStatYear != null) {
-            binding.tvStatYear.setText("本年：" + formatDuration(yearStat.totalMs) + " · 平均 " + formatDuration(yearAvg.totalMs) + " · 差 " + formatDiff(yearStat.totalMs - yearAvg.totalMs));
+    }
+
+    private int calcBlockedAttempts(Calendar start, Calendar end) {
+        List<Lnm> list = lnmDBUtils.findBetween(start.getTime(), end.getTime());
+        if (list == null || list.isEmpty()) return 0;
+        int total = 0;
+        for (Lnm l : list) {
+            if (l == null) continue;
+            total += lnm2file.getScreenOnCount(l.id);
         }
+        return total;
+    }
+
+    private int calcHomeworkMinutes(Calendar start, Calendar end) {
+        List<Lnm> list = lnmDBUtils.findBetween(start.getTime(), end.getTime());
+        if (list == null || list.isEmpty()) return 0;
+        int total = 0;
+        for (Lnm l : list) {
+            if (l == null || l.createdDate == null) continue;
+            if (!isHomeworkTime(l.createdDate)) continue;
+            long endMs = l.endTime != null ? l.endTime.getTime() : l.schedule.getTime();
+            total += (int) Math.max(0, (endMs - l.createdDate.getTime()) / 60000L);
+        }
+        return total;
+    }
+
+    private boolean isHomeworkTime(Date date) {
+        FocusRulePrefs.RuleConfig rule = FocusRulePrefs.load();
+        if (rule == null || !rule.enabled) return false;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        boolean weekend = (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
+        int nowMin = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
+        FocusRulePrefs.TimeWindow w = weekend ? rule.weekendHomework : rule.schoolHomework;
+        return w != null && w.contains(nowMin);
+    }
+
+    private int calcSleepOkDays(int days) {
+        List<DayBucket> buckets = buildRecentDayBuckets(days);
+        if (buckets.isEmpty()) return 0;
+        Map<String, SleepReportStore.SleepReport> map = buildSleepReportMap(buckets);
+        int ok = 0;
+        for (DayBucket b : buckets) {
+            SleepReportStore.SleepReport r = map.get(b.key);
+            if (r != null && r.attemptCount == 0) ok++;
+        }
+        return ok;
     }
 
     private static class Range {
@@ -556,6 +668,13 @@ public class LnmTJFragment extends LazyFragment {
         long totalMs;
         int count;
         Stat(long totalMs, int count) { this.totalMs = totalMs; this.count = count; }
+    }
+
+    private static class DayBucket {
+        Calendar start;
+        Calendar end;
+        String key;
+        String label;
     }
 
     private Range buildDayRange(Calendar now) {
@@ -654,75 +773,77 @@ public class LnmTJFragment extends LazyFragment {
         return new Range(start, end);
     }
 
-    private void showOverviewChartDetail() {
-        List<Lnm> list = lnmDBUtils.findByTimeAsc();
-        if (list == null || list.isEmpty()) {
-            showStatsDetailDialog("学习历程（分钟）", "暂无学习记录");
-            return;
+    private List<DayBucket> buildRecentDayBuckets(int days) {
+        List<DayBucket> buckets = new ArrayList<>();
+        if (days <= 0) return buckets;
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.add(Calendar.DAY_OF_YEAR, -(days - 1));
+        for (int i = 0; i < days; i++) {
+            DayBucket b = new DayBucket();
+            b.start = (Calendar) cal.clone();
+            b.end = (Calendar) cal.clone();
+            b.end.add(Calendar.DAY_OF_YEAR, 1);
+            b.key = TimeUtils.date2String(b.start.getTime(), "yyyy-MM-dd");
+            b.label = TimeUtils.date2String(b.start.getTime(), "M/d");
+            buckets.add(b);
+            cal.add(Calendar.DAY_OF_YEAR, 1);
         }
-        long totalMs = 0;
-        int count = 0;
-        int finished = 0;
-        long longest = 0;
-        for (Lnm l : list) {
-            if (l == null || l.createdDate == null) continue;
-            long endMs = l.endTime != null ? l.endTime.getTime() : l.schedule.getTime();
-            long dur = Math.max(0, endMs - l.createdDate.getTime());
-            totalMs += dur;
-            count++;
-            if (l.finish) finished++;
-            if (dur > longest) longest = dur;
+        return buckets;
+    }
+
+    private Map<String, SleepReportStore.SleepReport> buildSleepReportMap(List<DayBucket> buckets) {
+        Map<String, SleepReportStore.SleepReport> map = new HashMap<>();
+        if (buckets == null || buckets.isEmpty()) return map;
+        java.util.HashSet<String> keys = new java.util.HashSet<>();
+        for (DayBucket b : buckets) {
+            if (b != null && b.key != null) keys.add(b.key);
         }
-        long avg = count == 0 ? 0 : totalMs / count;
-        float rate = count == 0 ? 0f : (finished * 100f / count);
-
-        Range last7 = buildRecentDaysRange(7);
-        Range last30 = buildRecentDaysRange(30);
-        Stat stat7 = calcStat(last7.start, last7.end);
-        Stat stat30 = calcStat(last30.start, last30.end);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("总时长：").append(formatDuration(totalMs)).append("\n");
-        sb.append("总次数：").append(count).append("\n");
-        sb.append("完成率：").append(String.format(Locale.CHINA, "%.0f", rate)).append("%\n");
-        sb.append("单次均值：").append(formatDuration(avg)).append("\n");
-        sb.append("最长单次：").append(formatDuration(longest)).append("\n");
-        sb.append("近7天：").append(formatDuration(stat7.totalMs)).append("（").append(stat7.count).append("次）\n");
-        sb.append("近30天：").append(formatDuration(stat30.totalMs)).append("（").append(stat30.count).append("次）");
-
-        showStatsDetailDialog("学习历程（分钟）", sb.toString());
+        List<SleepReportStore.SleepReport> history = SleepReportStore.loadHistory();
+        for (SleepReportStore.SleepReport report : history) {
+            if (report == null || report.startAt <= 0) continue;
+            String key = TimeUtils.date2String(new Date(report.startAt), "yyyy-MM-dd");
+            if (!keys.contains(key)) continue;
+            if (!map.containsKey(key)) {
+                map.put(key, report);
+            }
+        }
+        return map;
     }
 
     private void showWeeksChartDetail() {
-        Calendar now = Calendar.getInstance();
-        Calendar w0 = getWeekStart(now, 0);
-        Calendar w1 = getWeekStart(now, -1);
-        Calendar w2 = getWeekStart(now, -2);
-        Calendar w3 = getWeekStart(now, -3);
-
-        Stat s0 = calcStat(w0, getWeekStart(now, 1));
-        Stat s1 = calcStat(w1, w0);
-        Stat s2 = calcStat(w2, w1);
-        Stat s3 = calcStat(w3, w2);
+        List<DayBucket> buckets = buildRecentDayBuckets(7);
+        int total = 0;
+        int daysWith = 0;
+        int max = 0;
+        String maxLabel = "无";
+        for (DayBucket b : buckets) {
+            int minutes = calcHomeworkMinutes(b.start, b.end);
+            total += minutes;
+            if (minutes > 0) daysWith++;
+            if (minutes > max) {
+                max = minutes;
+                maxLabel = b.label;
+            }
+        }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("本周（").append(formatDate(w0)).append(" ~ ").append(formatDate(getWeekStart(now, 1))).append("）：")
-                .append(formatDuration(s0.totalMs)).append("（").append(s0.count).append("次）\n");
-        sb.append("上周（").append(formatDate(w1)).append(" ~ ").append(formatDate(w0)).append("）：")
-                .append(formatDuration(s1.totalMs)).append("（").append(s1.count).append("次）\n");
-        sb.append("上上周（").append(formatDate(w2)).append(" ~ ").append(formatDate(w1)).append("）：")
-                .append(formatDuration(s2.totalMs)).append("（").append(s2.count).append("次）\n");
-        sb.append("再上一周（").append(formatDate(w3)).append(" ~ ").append(formatDate(w2)).append("）：")
-                .append(formatDuration(s3.totalMs)).append("（").append(s3.count).append("次）");
+        sb.append("近7天作业专注：").append(total).append(" 分钟\n");
+        sb.append("日均作业专注：").append(total / 7).append(" 分钟\n");
+        sb.append("有作业专注的天数：").append(daysWith).append("/7\n");
+        sb.append("最长单日：").append(maxLabel).append("（").append(max).append(" 分钟）");
 
-        showStatsDetailDialog("最近三周对比（分钟）", sb.toString());
+        showStatsDetailDialog("作业专注趋势", sb.toString());
     }
 
     private void showProjectChartDetail() {
         List<StudyProjectRecord> records = lnm2file.getStudyProjectRecords();
         String unit = projectUnitInMinutes ? "分钟" : "秒";
         if (records == null || records.isEmpty()) {
-            showStatsDetailDialog("学习项目分布（" + unit + "）", "暂无学习项目统计");
+            showStatsDetailDialog("学科分布（" + unit + "）", "暂无学科统计");
             return;
         }
         java.util.LinkedHashMap<String, Long> totals = new java.util.LinkedHashMap<>();
@@ -741,7 +862,7 @@ public class LnmTJFragment extends LazyFragment {
             totals.put(name, (prev == null ? 0L : prev) + duration);
         }
         if (totals.isEmpty() || totalMs <= 0) {
-            showStatsDetailDialog("学习项目分布（" + unit + "）", "暂无学习项目统计");
+            showStatsDetailDialog("学科分布（" + unit + "）", "暂无学科统计");
             return;
         }
         List<Map.Entry<String, Long>> list = new ArrayList<>(totals.entrySet());
@@ -760,54 +881,77 @@ public class LnmTJFragment extends LazyFragment {
             if (i < limit - 1) sb.append("\n");
         }
 
-        showStatsDetailDialog("学习项目分布（" + unit + "）", sb.toString());
+        showStatsDetailDialog("学科分布（" + unit + "）", sb.toString());
     }
 
     private void showRecordTrendDetail() {
-        List<Lnm> list = lnmDBUtils.findByTimeAsc();
-        if (list == null || list.isEmpty()) {
-            showStatsDetailDialog("学习记录趋势（分钟）", "暂无学习记录");
-            return;
-        }
-        Map<String, Long> daily = new HashMap<>();
-        for (Lnm l : list) {
-            if (l == null || l.createdDate == null) continue;
-            long endMs = l.endTime != null ? l.endTime.getTime() : l.schedule.getTime();
-            long dur = Math.max(0, endMs - l.createdDate.getTime());
-            String key = TimeUtils.date2String(l.createdDate, "M月d日");
-            daily.put(key, daily.getOrDefault(key, 0L) + dur);
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        cal.add(Calendar.DAY_OF_YEAR, -29);
-
-        long totalMs = 0;
-        String maxDay = "";
-        long maxMs = 0;
-        for (int i = 0; i < 30; i++) {
-            String key = TimeUtils.date2String(cal.getTime(), "M月d日");
-            long ms = daily.getOrDefault(key, 0L);
-            totalMs += ms;
-            if (ms > maxMs) {
-                maxMs = ms;
-                maxDay = key;
+        List<DayBucket> buckets = buildRecentDayBuckets(7);
+        Map<String, SleepReportStore.SleepReport> map = buildSleepReportMap(buckets);
+        int total = 0;
+        int daysWith = 0;
+        int max = 0;
+        String maxLabel = "无";
+        for (DayBucket b : buckets) {
+            SleepReportStore.SleepReport report = map.get(b.key);
+            int count = report == null ? 0 : Math.max(0, report.attemptCount);
+            total += count;
+            if (count > 0) daysWith++;
+            if (count > max) {
+                max = count;
+                maxLabel = b.label;
             }
-            cal.add(Calendar.DAY_OF_YEAR, 1);
         }
-        long avg = totalMs / 30;
 
         StringBuilder sb = new StringBuilder();
-        sb.append("统计单位：分钟\n");
-        sb.append("近30天总时长：").append(formatDuration(totalMs)).append("\n");
-        sb.append("日均时长：").append(formatDuration(avg)).append("\n");
-        if (!TextUtils.isEmpty(maxDay)) {
-            sb.append("最高日：").append(maxDay).append("（").append(formatDuration(maxMs)).append("）");
+        sb.append("近7天尝试玩手机：").append(total).append(" 次\n");
+        sb.append("有尝试的天数：").append(daysWith).append("/7\n");
+        sb.append("最高尝试日：").append(maxLabel).append("（").append(max).append(" 次）");
+
+        showStatsDetailDialog("睡眠尝试玩手机", sb.toString());
+    }
+
+    private void showRewardTrendDetail() {
+        RewardPrefs.RewardConfig cfg = RewardPrefs.loadConfig();
+        List<DayBucket> buckets = buildRecentDayBuckets(7);
+        Map<String, SleepReportStore.SleepReport> sleepMap = buildSleepReportMap(buckets);
+        Map<String, Integer> usageMap = buildRewardUsageMap();
+
+        int earnedTotal = 0;
+        int usedTotal = 0;
+        int maxEarn = 0;
+        String maxEarnLabel = "无";
+        int maxUse = 0;
+        String maxUseLabel = "无";
+
+        for (DayBucket b : buckets) {
+            int homework = calcHomeworkMinutes(b.start, b.end);
+            int blocked = calcBlockedAttempts(b.start, b.end);
+            int sleepAttempts = 0;
+            SleepReportStore.SleepReport report = sleepMap.get(b.key);
+            if (report != null) sleepAttempts = Math.max(0, report.attemptCount);
+
+            int earned = calcRewardMinutes(cfg, homework, blocked, sleepAttempts);
+            int used = usageMap.getOrDefault(b.key, 0);
+
+            earnedTotal += earned;
+            usedTotal += used;
+            if (earned > maxEarn) {
+                maxEarn = earned;
+                maxEarnLabel = b.label;
+            }
+            if (used > maxUse) {
+                maxUse = used;
+                maxUseLabel = b.label;
+            }
         }
 
-        showStatsDetailDialog("学习记录趋势（分钟）", sb.toString());
+        StringBuilder sb = new StringBuilder();
+        sb.append("近7天奖励获得：").append(earnedTotal).append(" 分钟\n");
+        sb.append("近7天兑换使用：").append(usedTotal).append(" 分钟\n");
+        sb.append("最高奖励日：").append(maxEarnLabel).append("（").append(maxEarn).append(" 分钟）\n");
+        sb.append("最高兑换日：").append(maxUseLabel).append("（").append(maxUse).append(" 分钟）");
+
+        showStatsDetailDialog("奖励/兑换趋势", sb.toString());
     }
 
     private String formatProjectValue(long ms) {
@@ -840,12 +984,194 @@ public class LnmTJFragment extends LazyFragment {
         binding.includeImportantBanner.getRoot().setOnClickListener(v -> showImportantActionDialog(important));
     }
 
+    private void updatePrimaryCharts() {
+        updateHomeworkChart();
+        updateSleepAttemptChart();
+        updateRewardTrendChart();
+    }
+
+    private void updateHomeworkChart() {
+        if (binding == null || binding.chartLnmWeeks == null) return;
+        List<DayBucket> buckets = buildRecentDayBuckets(7);
+        List<Entry> entries = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        int idx = 0;
+        for (DayBucket b : buckets) {
+            int minutes = calcHomeworkMinutes(b.start, b.end);
+            entries.add(new Entry(idx, minutes));
+            labels.add(b.label);
+            idx++;
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "作业专注(分钟)");
+        dataSet.setColor(ContextCompat.getColor(mContext, R.color.spring_green));
+        dataSet.setCircleColor(ContextCompat.getColor(mContext, R.color.spring_green));
+        dataSet.setLineWidth(1.6f);
+        dataSet.setCircleRadius(3f);
+        dataSet.setDrawValues(false);
+        LineData data = new LineData(dataSet);
+        binding.chartLnmWeeks.setData(data);
+        binding.chartLnmWeeks.getDescription().setEnabled(false);
+        binding.chartLnmWeeks.getAxisRight().setEnabled(false);
+
+        XAxis xAxis = binding.chartLnmWeeks.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                int i = (int) value;
+                if (i >= 0 && i < labels.size()) {
+                    return labels.get(i);
+                }
+                return "";
+            }
+        });
+        weeksLabels = new ArrayList<>(labels);
+        binding.chartLnmWeeks.invalidate();
+    }
+
+    private void updateSleepAttemptChart() {
+        if (binding == null || binding.chartRecordTrend == null) return;
+        List<DayBucket> buckets = buildRecentDayBuckets(7);
+        Map<String, SleepReportStore.SleepReport> map = buildSleepReportMap(buckets);
+        List<Entry> entries = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        int idx = 0;
+        for (DayBucket b : buckets) {
+            SleepReportStore.SleepReport report = map.get(b.key);
+            int count = report == null ? 0 : Math.max(0, report.attemptCount);
+            entries.add(new Entry(idx, count));
+            labels.add(b.label);
+            idx++;
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "尝试玩手机(次)");
+        dataSet.setColor(ContextCompat.getColor(mContext, R.color.yellow));
+        dataSet.setCircleColor(ContextCompat.getColor(mContext, R.color.yellow));
+        dataSet.setLineWidth(1.6f);
+        dataSet.setCircleRadius(3f);
+        dataSet.setDrawValues(false);
+        LineData data = new LineData(dataSet);
+        binding.chartRecordTrend.setData(data);
+        binding.chartRecordTrend.getDescription().setEnabled(false);
+        binding.chartRecordTrend.getAxisRight().setEnabled(false);
+
+        XAxis xAxis = binding.chartRecordTrend.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                int i = (int) value;
+                if (i >= 0 && i < labels.size()) {
+                    return labels.get(i);
+                }
+                return "";
+            }
+        });
+        recordLabels = new ArrayList<>(labels);
+        binding.chartRecordTrend.invalidate();
+    }
+
+    private void updateRewardTrendChart() {
+        if (binding == null || binding.chartRewardTrend == null) return;
+        RewardEngine.settleDailyIfNeeded();
+        RewardPrefs.RewardConfig cfg = RewardPrefs.loadConfig();
+
+        List<DayBucket> buckets = buildRecentDayBuckets(7);
+        Map<String, SleepReportStore.SleepReport> sleepMap = buildSleepReportMap(buckets);
+        Map<String, Integer> usageMap = buildRewardUsageMap();
+
+        List<Entry> earnEntries = new ArrayList<>();
+        List<Entry> useEntries = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        boolean hasUse = false;
+        boolean hasEarn = false;
+
+        int idx = 0;
+        for (DayBucket b : buckets) {
+            int homework = calcHomeworkMinutes(b.start, b.end);
+            int blocked = calcBlockedAttempts(b.start, b.end);
+            int sleepAttempts = 0;
+            SleepReportStore.SleepReport report = sleepMap.get(b.key);
+            if (report != null) sleepAttempts = Math.max(0, report.attemptCount);
+
+            int earned = calcRewardMinutes(cfg, homework, blocked, sleepAttempts);
+            int used = usageMap.getOrDefault(b.key, 0);
+
+            earnEntries.add(new Entry(idx, earned));
+            useEntries.add(new Entry(idx, used));
+            if (earned > 0) hasEarn = true;
+            if (used > 0) hasUse = true;
+            labels.add(b.label);
+            idx++;
+        }
+
+        LineData data = new LineData();
+        LineDataSet earnSet = new LineDataSet(earnEntries, "奖励获得(分钟)");
+        earnSet.setColor(ContextCompat.getColor(mContext, R.color.spring_green));
+        earnSet.setCircleColor(ContextCompat.getColor(mContext, R.color.spring_green));
+        earnSet.setLineWidth(1.6f);
+        earnSet.setCircleRadius(3f);
+        earnSet.setDrawValues(false);
+        data.addDataSet(earnSet);
+
+        if (hasUse) {
+            LineDataSet useSet = new LineDataSet(useEntries, "兑换使用(分钟)");
+            useSet.setColor(ContextCompat.getColor(mContext, R.color.colorAccent));
+            useSet.setCircleColor(ContextCompat.getColor(mContext, R.color.colorAccent));
+            useSet.setLineWidth(1.6f);
+            useSet.setCircleRadius(3f);
+            useSet.setDrawValues(false);
+            data.addDataSet(useSet);
+        }
+        binding.chartRewardTrend.setData(data);
+        binding.chartRewardTrend.getDescription().setEnabled(false);
+        binding.chartRewardTrend.getAxisRight().setEnabled(false);
+
+        XAxis xAxis = binding.chartRewardTrend.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                int i = (int) value;
+                if (i >= 0 && i < labels.size()) {
+                    return labels.get(i);
+                }
+                return "";
+            }
+        });
+        rewardLabels = new ArrayList<>(labels);
+        binding.chartRewardTrend.invalidate();
+    }
+
+    private int calcRewardMinutes(RewardPrefs.RewardConfig cfg, int homeworkMinutes, int blockedAttempts, int sleepAttempts) {
+        if (cfg == null || !cfg.enabled) return 0;
+        if (cfg.exchangeBaseMinutes <= 0 || cfg.exchangeRewardMinutes <= 0) return 0;
+        boolean ruleOk = blockedAttempts <= cfg.violationLimit;
+        boolean focusOk = homeworkMinutes >= cfg.exchangeBaseMinutes;
+        boolean sleepOk = sleepAttempts == 0;
+        if (!ruleOk || !focusOk || !sleepOk) return 0;
+        int blocks = homeworkMinutes / cfg.exchangeBaseMinutes;
+        return blocks * cfg.exchangeRewardMinutes;
+    }
+
+    private Map<String, Integer> buildRewardUsageMap() {
+        Map<String, Integer> map = new HashMap<>();
+        List<RewardPrefs.RewardUsage> list = RewardPrefs.loadUsage();
+        for (RewardPrefs.RewardUsage u : list) {
+            if (u == null || u.date == null) continue;
+            int prev = map.getOrDefault(u.date, 0);
+            map.put(u.date, prev + Math.max(0, u.usedMinutes));
+        }
+        return map;
+    }
+
     private void updateProjectCharts() {
         if (binding == null || binding.chartProjectPie == null || binding.chartProjectBar == null) return;
         List<StudyProjectRecord> records = lnm2file.getStudyProjectRecords();
         if (records == null || records.isEmpty()) {
-            binding.chartProjectPie.setNoDataText("暂无学习项目统计");
-            binding.chartProjectBar.setNoDataText("暂无学习项目统计");
+            binding.chartProjectPie.setNoDataText("暂无学科统计");
+            binding.chartProjectBar.setNoDataText("暂无学科统计");
             return;
         }
         java.util.LinkedHashMap<String, Long> totals = new java.util.LinkedHashMap<>();
@@ -862,8 +1188,8 @@ public class LnmTJFragment extends LazyFragment {
             totals.put(name, (prev == null ? 0L : prev) + duration);
         }
         if (totals.isEmpty()) {
-            binding.chartProjectPie.setNoDataText("暂无学习项目统计");
-            binding.chartProjectBar.setNoDataText("暂无学习项目统计");
+            binding.chartProjectPie.setNoDataText("暂无学科统计");
+            binding.chartProjectBar.setNoDataText("暂无学科统计");
             binding.chartProjectPie.invalidate();
             binding.chartProjectBar.invalidate();
             return;
@@ -891,7 +1217,7 @@ public class LnmTJFragment extends LazyFragment {
         PieData pieData = new PieData(pieSet);
         binding.chartProjectPie.setData(pieData);
         binding.chartProjectPie.getDescription().setEnabled(false);
-        binding.chartProjectPie.setCenterText(projectUnitInMinutes ? "学习项目(分钟)" : "学习项目(秒钟)");
+        binding.chartProjectPie.setCenterText(projectUnitInMinutes ? "学科(分钟)" : "学科(秒钟)");
         binding.chartProjectPie.setUsePercentValues(false);
         binding.chartProjectPie.setExtraOffsets(16f, 16f, 16f, 16f);
         binding.chartProjectPie.setDrawHoleEnabled(true);
@@ -927,19 +1253,22 @@ public class LnmTJFragment extends LazyFragment {
         if (binding == null || binding.chartRecordTrend == null) return;
         List<Lnm> list = lnmDBUtils.findByTimeAsc();
         if (list == null || list.isEmpty()) {
-            binding.chartRecordTrend.setNoDataText("暂无学习记录");
+            binding.chartRecordTrend.setNoDataText("暂无专注记录");
             return;
         }
         Map<String, Long> daily = new HashMap<>();
+        Map<String, Integer> blockedDaily = new HashMap<>();
         for (Lnm l : list) {
             if (l == null || l.createdDate == null) continue;
             long endMs = l.endTime != null ? l.endTime.getTime() : l.schedule.getTime();
             long dur = Math.max(0, endMs - l.createdDate.getTime());
             String key = TimeUtils.date2String(l.createdDate, "M月d日");
             daily.put(key, daily.getOrDefault(key, 0L) + dur);
+            blockedDaily.put(key, blockedDaily.getOrDefault(key, 0) + lnm2file.getScreenOnCount(l.id));
         }
 
         List<Entry> entries = new ArrayList<>();
+        List<Entry> blockedEntries = new ArrayList<>();
         List<String> labels = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -952,6 +1281,8 @@ public class LnmTJFragment extends LazyFragment {
             long ms = daily.getOrDefault(key, 0L);
             float mins = ms / 60000f;
             entries.add(new Entry(i, mins));
+            int blocked = blockedDaily.getOrDefault(key, 0);
+            blockedEntries.add(new Entry(i, blocked));
             labels.add(key);
             cal.add(Calendar.DAY_OF_YEAR, 1);
         }
@@ -961,7 +1292,12 @@ public class LnmTJFragment extends LazyFragment {
         dataSet.setLineWidth(1.6f);
         dataSet.setCircleRadius(2.5f);
         dataSet.setDrawValues(false);
-        LineData data = new LineData(dataSet);
+        LineDataSet blockedSet = new LineDataSet(blockedEntries, "未允许应用(次)");
+        blockedSet.setColor(ContextCompat.getColor(mContext, R.color.colorAccent));
+        blockedSet.setLineWidth(1.6f);
+        blockedSet.setCircleRadius(2.5f);
+        blockedSet.setDrawValues(false);
+        LineData data = new LineData(dataSet, blockedSet);
         binding.chartRecordTrend.setData(data);
         binding.chartRecordTrend.getDescription().setEnabled(false);
         binding.chartRecordTrend.getAxisRight().setEnabled(false);
@@ -997,77 +1333,15 @@ public class LnmTJFragment extends LazyFragment {
     public void onResume() {
         super.onResume();
         setupProjectUnitToggle();
+        updateStatsHeader();
+        updatePrimaryCharts();
         updateProjectCharts();
-        updateRecordTrendChart();
-        maybeShowWeeklyReport();
+        updateSleepReportHint();
     }
 
     private void showChart() {
-//        Long aLong = System.currentTimeMillis();
-
-        Observable.create((ObservableOnSubscribe<CombinedData>) emitter -> {
-                    emitter.onNext(setBarData());
-                    emitter.onComplete();
-
-                }).compose(schedulersTransformer())
-                // 指定 Subscriber 的回调发生在主线程
-                .to(autoDisposable(AndroidLifecycleScopeProvider.from(this)))
-                .subscribe(new Observer<>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                    }
-
-                    @Override
-                    public void onNext(CombinedData data) {
-                        binding.chartLnm.setData(data);//这个不要放在子线程，会内存泄漏
-                        binding.chartLnm.setVisibleXRangeMaximum(12);
-                        int num = data.getBarData().getEntryCount();
-                        LogUtils.i(num + "=================");
-                        if (num > 12) binding.chartLnm.moveViewToX(num - 6);
-                        binding.chartLnm.invalidate(); // refresh
-//                        LogUtils.i("====" + (System.currentTimeMillis()-aLong));
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        SimToast.toastEe("错误！");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                    }
-                });
-
-        Observable.create((ObservableOnSubscribe<LineData>) emitter -> {
-                    emitter.onNext(getLcData());
-                    emitter.onComplete();
-                }).compose(schedulersTransformer())
-                // 指定 Subscriber 的回调发生在主线程
-                .to(autoDisposable(AndroidLifecycleScopeProvider.from(this)))
-                .subscribe(new Observer<LineData>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                    }
-
-                    @Override
-                    public void onNext(LineData lineData) {
-                        binding.chartLnmWeeks.setData(lineData);
-                        binding.chartLnmWeeks.invalidate(); // refresh
-//                        LogUtils.i("====" + (System.currentTimeMillis()-aLong));
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        SimToast.toastEe("错误！");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                    }
-                });
-
-        toastSe("不显示计划时间小于30秒的 ~");
-
+        updatePrimaryCharts();
+        updateProjectCharts();
     }
 
     private void maybeShowWeeklyReport() {
@@ -1164,12 +1438,13 @@ public class LnmTJFragment extends LazyFragment {
     private void showSeedDataDialog() {
         new AlertDialog.Builder(mContext)
                 .setTitle("生成三周测试数据")
-                .setMessage("将写入近三周的锁机记录与学习项目统计数据，是否继续？")
+                .setMessage("将写入近三周的专注记录、学科统计、睡眠报告与奖励使用数据，是否继续？")
                 .setNegativeButton("取消", null)
                 .setPositiveButton("生成", (d, w) -> {
                     seedThreeWeeks();
                     getMyAll();
                     updateProjectCharts();
+                    updateSleepReportHint();
                     toastSe("已生成三周测试数据");
                 })
                 .show();
@@ -1202,22 +1477,49 @@ public class LnmTJFragment extends LazyFragment {
         for (int d = 0; d < 21; d++) {
             Calendar day = (Calendar) start.clone();
             day.add(Calendar.DAY_OF_YEAR, d);
-            int sessions = 1 + random.nextInt(3);
-            for (int s = 0; s < sessions; s++) {
-                Calendar begin = (Calendar) day.clone();
-                begin.set(Calendar.HOUR_OF_DAY, 7 + random.nextInt(13));
-                begin.set(Calendar.MINUTE, random.nextInt(60));
-                long durationMin = 20 + random.nextInt(71);
-                Calendar plan = (Calendar) begin.clone();
-                plan.add(Calendar.MINUTE, (int) durationMin);
+            int dow = day.get(Calendar.DAY_OF_WEEK);
+            boolean weekend = (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY);
 
-                boolean success = random.nextInt(100) < 70;
+            int dayTotalMin = 90 + random.nextInt(210); // 90-300 min
+            int sessions = weekend ? (1 + random.nextInt(2)) : (2 + random.nextInt(2));
+            sessions = Math.min(sessions, Math.max(1, dayTotalMin / 30));
+
+            List<Integer> durations = new ArrayList<>();
+            int remaining = dayTotalMin;
+            for (int s = 0; s < sessions; s++) {
+                int leftSessions = sessions - s;
+                int minForThis = 30;
+                int maxForThis = Math.min(120, remaining - (leftSessions - 1) * 30);
+                if (maxForThis < minForThis) {
+                    maxForThis = minForThis;
+                }
+                int dur = (leftSessions == 1) ? Math.max(30, remaining) : (minForThis + random.nextInt(maxForThis - minForThis + 1));
+                durations.add(dur);
+                remaining -= dur;
+            }
+
+            int startHour = weekend ? 9 : 17;
+            int endHour = weekend ? 21 : 22;
+            int hourWindow = Math.max(1, endHour - startHour);
+
+            for (int s = 0; s < durations.size(); s++) {
+                int durMin = durations.get(s);
+                Calendar begin = (Calendar) day.clone();
+                begin.set(Calendar.HOUR_OF_DAY, startHour + random.nextInt(hourWindow));
+                begin.set(Calendar.MINUTE, random.nextInt(60));
+                Calendar plan = (Calendar) begin.clone();
+                plan.add(Calendar.MINUTE, durMin);
+
+                boolean success = random.nextInt(100) < (weekend ? 75 : 80);
                 Calendar end = (Calendar) plan.clone();
                 if (success) {
-                    end.add(Calendar.MINUTE, random.nextInt(3));
+                    end.add(Calendar.MINUTE, Math.min(2, random.nextInt(3)));
                 } else {
-                    end.add(Calendar.MINUTE, -5 - random.nextInt(20));
+                    end.add(Calendar.MINUTE, -1 * (2 + random.nextInt(8)));
                 }
+
+                long actualMin = Math.max(30, (end.getTimeInMillis() - begin.getTimeInMillis()) / 60000L);
+                end.setTimeInMillis(begin.getTimeInMillis() + actualMin * 60000L);
 
                 Lnm lnm = new Lnm();
                 lnm.id = baseId + idx++;
@@ -1240,26 +1542,29 @@ public class LnmTJFragment extends LazyFragment {
         }
         lnmDBUtils.insert(list);
         seedTodoAndScreenOn(list);
+        seedSleepReports(now);
+        seedRewardUsage(now);
     }
 
     private void seedTodoAndScreenOn(List<Lnm> list) {
         if (list != null && !list.isEmpty()) {
             java.util.Random random = new java.util.Random();
             for (Lnm l : list) {
-                int count = random.nextInt(5);
+                int base = l.finish ? 0 : 2;
+                int count = base + random.nextInt(5);
                 lnm2file.saveScreenOnCount(l.id, count);
             }
         }
 
         List<TodoGroup> groups = new ArrayList<>();
-        TodoGroup g1 = new TodoGroup("g_study", "学习");
+        TodoGroup g1 = new TodoGroup("g_study", "作业");
         TodoGroup g2 = new TodoGroup("g_life", "生活");
         TodoGroup g3 = new TodoGroup("g_other", "其他");
 
         long now = System.currentTimeMillis();
-        g1.getItems().add(buildSeedTodo("t1", "背单词 30 分钟", "学习", now + TimeConstants.HOUR * 6, false, null));
-        g1.getItems().add(buildSeedTodo("t2", "刷题 20 道", "学习", now + TimeConstants.DAY * 1, false, null));
-        g1.getItems().add(buildSeedTodo("t3", "整理错题", "学习", now + TimeConstants.DAY * 2, true, "天"));
+        g1.getItems().add(buildSeedTodo("t1", "背单词 30 分钟", "作业", now + TimeConstants.HOUR * 6, false, null));
+        g1.getItems().add(buildSeedTodo("t2", "刷题 20 道", "作业", now + TimeConstants.DAY * 1, false, null));
+        g1.getItems().add(buildSeedTodo("t3", "整理错题", "作业", now + TimeConstants.DAY * 2, true, "天"));
 
         g2.getItems().add(buildSeedTodo("t4", "喝水打卡", "生活", now + TimeConstants.HOUR * 2, true, "天"));
         g2.getItems().add(buildSeedTodo("t5", "整理书桌", "生活", now + TimeConstants.DAY * 3, false, null));
@@ -1271,9 +1576,79 @@ public class LnmTJFragment extends LazyFragment {
         groups.add(g3);
         TodoPrefs.saveGroups(groups);
 
-        TodoItem important = buildSeedTodo("t_imp", "四级倒计时", "学习", now + TimeConstants.DAY * 15, false, null);
+        TodoItem important = buildSeedTodo("t_imp", "期末倒计时", "作业", now + TimeConstants.DAY * 15, false, null);
         important.setImportant(true);
         TodoPrefs.saveImportant(important);
+    }
+
+    private void seedSleepReports(Calendar now) {
+        List<SleepReportStore.SleepReport> history = new ArrayList<>();
+        Calendar day = (Calendar) now.clone();
+        day.add(Calendar.DAY_OF_YEAR, -21);
+        day.set(Calendar.HOUR_OF_DAY, 0);
+        day.set(Calendar.MINUTE, 0);
+        day.set(Calendar.SECOND, 0);
+        day.set(Calendar.MILLISECOND, 0);
+
+        java.util.Random random = new java.util.Random();
+        for (int d = 0; d < 21; d++) {
+            Calendar startSleep = (Calendar) day.clone();
+            startSleep.add(Calendar.DAY_OF_YEAR, d);
+            startSleep.set(Calendar.HOUR_OF_DAY, 22);
+            startSleep.set(Calendar.MINUTE, 0);
+
+            Calendar endSleep = (Calendar) startSleep.clone();
+            endSleep.add(Calendar.DAY_OF_YEAR, 1);
+            endSleep.set(Calendar.HOUR_OF_DAY, 6);
+            endSleep.set(Calendar.MINUTE, 30);
+
+            SleepReportStore.SleepReport report = new SleepReportStore.SleepReport();
+            report.startAt = startSleep.getTimeInMillis();
+            report.endAt = endSleep.getTimeInMillis();
+            report.attemptTimes = new ArrayList<>();
+
+            int dow = startSleep.get(Calendar.DAY_OF_WEEK);
+            boolean weekend = (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY);
+            int attempts = weekend ? random.nextInt(3) : random.nextInt(2);
+            report.attemptCount = attempts;
+            for (int i = 0; i < attempts; i++) {
+                Calendar attempt = (Calendar) startSleep.clone();
+                int minuteOffset = 30 + random.nextInt(7 * 60); // between 22:30 and ~05:30
+                attempt.add(Calendar.MINUTE, minuteOffset);
+                report.attemptTimes.add(attempt.getTimeInMillis());
+            }
+            history.add(0, report);
+        }
+        SleepReportStore.overwriteHistory(history);
+        SleepReportStore.clearCurrent();
+    }
+
+    private void seedRewardUsage(Calendar now) {
+        RewardPrefs.RewardConfig cfg = RewardPrefs.loadConfig();
+        int maxDaily = Math.max(0, cfg.dailyMaxMinutes);
+        List<RewardPrefs.RewardUsage> list = new ArrayList<>();
+        Calendar day = (Calendar) now.clone();
+        day.add(Calendar.DAY_OF_YEAR, -21);
+        day.set(Calendar.HOUR_OF_DAY, 0);
+        day.set(Calendar.MINUTE, 0);
+        day.set(Calendar.SECOND, 0);
+        day.set(Calendar.MILLISECOND, 0);
+
+        java.util.Random random = new java.util.Random();
+        for (int d = 0; d < 21; d++) {
+            int dow = day.get(Calendar.DAY_OF_WEEK);
+            boolean weekend = (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY);
+            int cap = weekend ? maxDaily : Math.max(0, maxDaily / 2);
+            int used = cap == 0 ? 0 : random.nextInt(cap + 1);
+
+            RewardPrefs.RewardUsage usage = new RewardPrefs.RewardUsage();
+            usage.date = TimeUtils.date2String(day.getTime(), "yyyy-MM-dd");
+            usage.usedMinutes = used;
+            list.add(0, usage);
+
+            day.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        RewardPrefs.saveUsage(list);
     }
 
     private TodoItem buildSeedTodo(String id, String title, String category, long dueAt, boolean repeat, String unit) {
@@ -1315,6 +1690,7 @@ public class LnmTJFragment extends LazyFragment {
         TextView count = view.findViewById(R.id.tv_weekly_count);
         TextView rate = view.findViewById(R.id.tv_weekly_rate);
         TextView compare = view.findViewById(R.id.tv_weekly_compare);
+        TextView blocked = view.findViewById(R.id.tv_weekly_blocked);
         TextView avg = view.findViewById(R.id.tv_weekly_avg);
         TextView deep = view.findViewById(R.id.tv_weekly_deep);
         TextView streak = view.findViewById(R.id.tv_weekly_streak);
@@ -1324,7 +1700,7 @@ public class LnmTJFragment extends LazyFragment {
         TextView body = view.findViewById(R.id.tv_weekly_report);
         RadarChart radar = view.findViewById(R.id.chart_weekly_radar);
 
-        title.setText("锁机周报（" + formatDate(start) + " ~ " + formatDate(end) + "）");
+        title.setText("使用周报（" + formatDate(start) + " ~ " + formatDate(end) + "）");
         range.setText(formatDate(start) + " ~ " + formatDate(end));
 
         WeeklyMetrics metrics = buildWeeklyMetrics(start, end);
@@ -1332,18 +1708,81 @@ public class LnmTJFragment extends LazyFragment {
         count.setText("次数 " + metrics.count);
         rate.setText("完成率 " + String.format(Locale.CHINA, "%.0f", metrics.finishRate) + "%");
         compare.setText("较前两周：时长" + metrics.diffTime + "，次数" + metrics.diffCount + "，完成率" + metrics.diffRate);
+        blocked.setText("未允许应用 " + metrics.blockedCount + " 次");
         avg.setText("日均 " + formatDuration(metrics.avgPerDay) + " · 单次均值 " + formatDuration(metrics.avgPerSession));
-        deep.setText("深度学习块 ≥45分钟：" + metrics.deepCount + "次（" + String.format(Locale.CHINA, "%.0f", metrics.deepShare) + "%）");
-        streak.setText("最长连续学习：" + metrics.streak + "天");
+        deep.setText("深度专注块 ≥45分钟：" + metrics.deepCount + "次（" + String.format(Locale.CHINA, "%.0f", metrics.deepShare) + "%）");
+        streak.setText("最长连续专注：" + metrics.streak + "天");
         peak.setText("高峰日：" + metrics.peakDay);
         low.setText("低谷日：" + metrics.lowDay);
-        project.setText("项目偏向：" + metrics.projectSummary);
+        project.setText("学科偏向：" + metrics.projectSummary);
         body.setText(report);
         setupWeeklyRadar(radar, start, end);
 
         new AlertDialog.Builder(mContext)
                 .setView(view)
                 .setPositiveButton("知道了", (d, w) -> SPUtils.getInstance().put(WEEKLY_REPORT_KEY, weekKey))
+                .show();
+    }
+
+    private void updateSleepReportHint() {
+        if (binding == null || binding.tvSleepReportHint == null) return;
+        List<SleepReportStore.SleepReport> history = SleepReportStore.loadHistory();
+        if (history.isEmpty()) {
+            binding.tvSleepReportHint.setText("暂无睡眠报告");
+            return;
+        }
+        int abnormal = 0;
+        int count = Math.min(7, history.size());
+        for (int i = 0; i < count; i++) {
+            SleepReportStore.SleepReport r = history.get(i);
+            if (r != null && r.attemptCount > 0) abnormal++;
+        }
+        SleepReportStore.SleepReport latest = history.get(0);
+        String time = TimeUtils.date2String(new Date(latest.startAt), "MM-dd HH:mm");
+        binding.tvSleepReportHint.setText("最近一次：" + time + " · 尝试 " + latest.attemptCount + " 次 · 近7天异常 " + abnormal + " 次");
+    }
+
+    private void showSleepReportHistory() {
+        List<SleepReportStore.SleepReport> history = SleepReportStore.loadHistory();
+        if (history.isEmpty()) {
+            toastSe("暂无睡眠报告");
+            return;
+        }
+        List<String> items = new ArrayList<>();
+        for (SleepReportStore.SleepReport report : history) {
+            String start = TimeUtils.date2String(new Date(report.startAt), "MM-dd HH:mm");
+            String end = report.endAt > 0 ? TimeUtils.date2String(new Date(report.endAt), "HH:mm") : "未结束";
+            items.add(start + " - " + end + " · 尝试 " + report.attemptCount + " 次");
+        }
+        new AlertDialog.Builder(mContext)
+                .setTitle("历史睡眠报告")
+                .setItems(items.toArray(new String[0]), (dialog, which) -> {
+                    SleepReportStore.SleepReport report = history.get(which);
+                    showSleepReportDetail(report);
+                })
+                .setNegativeButton("关闭", null)
+                .show();
+    }
+
+    private void showSleepReportDetail(SleepReportStore.SleepReport report) {
+        if (report == null) return;
+        String start = TimeUtils.date2String(new Date(report.startAt), "yyyy-MM-dd HH:mm");
+        String end = report.endAt > 0 ? TimeUtils.date2String(new Date(report.endAt), "yyyy-MM-dd HH:mm") : "未结束";
+        long durationMin = report.endAt > 0 ? Math.max(0, (report.endAt - report.startAt) / 60000L) : 0;
+        String times = SleepReportStore.formatAttemptTimes(report, 12);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("时间范围：").append(start).append(" - ").append(end).append("\n");
+        if (report.endAt > 0) {
+            sb.append("睡眠时长：").append(durationMin).append(" 分钟\n");
+        }
+        sb.append("尝试次数：").append(report.attemptCount).append(" 次\n");
+        sb.append("尝试时间点：").append(times);
+
+        new MessageDialog.Builder(mContext)
+                .setTitle("睡眠报告详情")
+                .setMessage(sb.toString())
+                .setConfirm("知道了")
                 .show();
     }
 
@@ -1362,6 +1801,7 @@ public class LnmTJFragment extends LazyFragment {
         String peakDay;
         String lowDay;
         String projectSummary;
+        int blockedCount;
     }
 
     private WeeklyMetrics buildWeeklyMetrics(Calendar start, Calendar end) {
@@ -1381,6 +1821,7 @@ public class LnmTJFragment extends LazyFragment {
             if (dur > longestMs) longestMs = dur;
             String dayKey = TimeUtils.date2String(l.createdDate, "M月d日");
             dailyTotals.put(dayKey, dailyTotals.getOrDefault(dayKey, 0L) + dur);
+            m.blockedCount += lnm2file.getScreenOnCount(l.id);
         }
         long avgPrevMs = calcPrevTwoWeeksAvgMs(start);
         PrevStats prev = calcPrevTwoWeeksStats(start);
@@ -1421,7 +1862,7 @@ public class LnmTJFragment extends LazyFragment {
         radar.getLegend().setEnabled(false);
         radar.getXAxis().setValueFormatter(new ValueFormatter() {
             private final String[] labels = new String[]{
-                    "专注总量", "节奏稳定", "计划完成", "项目聚焦", "坚持频次", "效率倾向"
+                    "专注总量", "节奏稳定", "计划完成", "项目聚焦", "坚持频次", "效率倾向", "规则遵守"
             };
 
             @Override
@@ -1461,7 +1902,21 @@ public class LnmTJFragment extends LazyFragment {
         float totalScore = clampScore(calcVolumeScore(totalMs, start, end));
         float planScore = clampScore(finishRate);
 
-        return new float[]{totalScore, stability, planScore, focus, consistency, efficiency};
+        float compliance = clampScore(calcComplianceScore(list));
+
+        return new float[]{totalScore, stability, planScore, focus, consistency, efficiency, compliance};
+    }
+
+    private float calcComplianceScore(List<Lnm> list) {
+        if (list.isEmpty()) return 0f;
+        int blockedTotal = 0;
+        for (Lnm l : list) {
+            if (l == null) continue;
+            blockedTotal += lnm2file.getScreenOnCount(l.id);
+        }
+        float perSession = blockedTotal / (float) list.size();
+        float score = 100f - perSession * 25f;
+        return clampScore(score);
     }
 
     private float calcVolumeScore(long totalMs, Calendar start, Calendar end) {
@@ -1552,6 +2007,7 @@ public class LnmTJFragment extends LazyFragment {
         Map<String, Long> dailyTotals = new HashMap<>();
         Map<String, Integer> dailyCounts = new HashMap<>();
         long longestMs = 0;
+        int blockedTotal = 0;
         for (Lnm l : list) {
             if (l == null || l.createdDate == null) continue;
             long endMs = l.endTime != null ? l.endTime.getTime() : l.schedule.getTime();
@@ -1559,6 +2015,7 @@ public class LnmTJFragment extends LazyFragment {
             totalMs += dur;
             if (l.finish) success++;
             if (dur > longestMs) longestMs = dur;
+            blockedTotal += lnm2file.getScreenOnCount(l.id);
 
             String dayKey = TimeUtils.date2String(l.createdDate, "M月d日");
             dailyTotals.put(dayKey, dailyTotals.getOrDefault(dayKey, 0L) + dur);
@@ -1583,20 +2040,21 @@ public class LnmTJFragment extends LazyFragment {
         int streak = calcMaxStreak(dailyTotals);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("锁机周报（").append(range).append(")\n");
+        sb.append("使用周报（").append(range).append(")\n");
         sb.append("总时长：").append(formatDuration(totalMs)).append("（较前两周均值 ").append(diffStr).append("）\n");
         sb.append("总次数：").append(count).append(" 次（较前两周 ").append(countDiff).append("）\n");
         sb.append("完成率：").append(String.format(Locale.CHINA, "%.0f", finishRate)).append("%（较前两周 ").append(rateDiff).append("）\n");
         sb.append("活跃天数：").append(activeDays).append("/7，日均 ").append(formatDuration(avgPerDay)).append("，单次均值 ").append(formatDuration(avgPerSession)).append("\n");
+        sb.append("未允许应用尝试：").append(blockedTotal).append(" 次\n");
         sb.append("最长单次：").append(formatDuration(longestMs)).append("，深度块 ≥45min：").append(deepCount).append(" 次（")
                 .append(String.format(Locale.CHINA, "%.0f", deepShare)).append("%）\n\n");
 
-        sb.append("节奏分布：高峰日 ").append(peakDay).append("，低谷日 ").append(lowDay).append("，最长连续学习 ")
+        sb.append("节奏分布：高峰日 ").append(peakDay).append("，低谷日 ").append(lowDay).append("，最长连续专注 ")
                 .append(streak).append(" 天\n");
-        sb.append("项目偏向：").append(buildProjectSummary(start, end)).append("\n\n");
+        sb.append("学科偏向：").append(buildProjectSummary(start, end)).append("\n\n");
 
         sb.append("结论：").append(diffMs >= 0 ? "本周投入上升，强度更稳。" : "本周投入下降，强度波动偏大。").append("\n");
-        sb.append("建议：").append(deepCount >= 2 ? "保持每周≥2次深度学习块，优化低谷日安排。" : "补足深度块（每周≥2次），固定两个高质量学习时段。");
+        sb.append("建议：").append(deepCount >= 2 ? "保持每周≥2次深度专注块，优化低谷日安排。" : "补足深度块（每周≥2次），固定两个高质量专注时段。");
         return sb.toString();
     }
 
@@ -1761,111 +2219,6 @@ public class LnmTJFragment extends LazyFragment {
         return mins + "分钟";
     }
 
-private CombinedData setBarData() {
-
-        List<Lnm> learnNoMobiles = lnmDBUtils.findByTimeAsc();
-        List<Entry> entries = new ArrayList<>();
-        List<BarEntry> barEntriesS = new ArrayList<>();//成功的
-        List<BarEntry> barEntries = new ArrayList<>();
-
-        int mm = 0;
-
-        int allNum = learnNoMobiles.size();
-
-        int success = 0;
-        long star = 0;
-        List<String> xTime = new ArrayList<>();
-        xTime.add("0");
-        for (Lnm learnNoMobile : learnNoMobiles) {
-
-            if (learnNoMobile.finish) {
-                success = success + 1;
-                long min = TimeUtils.getTimeSpan(learnNoMobile.endTime, learnNoMobile.createdDate, TimeConstants.MIN);
-                star = star + min;
-            } else {
-                long min = TimeUtils.getTimeSpan(learnNoMobile.schedule, learnNoMobile.endTime, TimeConstants.MIN);
-                star = star - min;
-            }
-
-
-            float span2 = (float) (TimeUtils.getTimeSpan(learnNoMobile.endTime, learnNoMobile.createdDate, TimeConstants.SEC) / 60.0);
-            float span = (float) Math.round(TimeUtils.getTimeSpan(learnNoMobile.schedule, learnNoMobile.createdDate, TimeConstants.SEC) / 60.0);
-
-            if (span > 60 * 4) continue;
-
-            mm = mm + 1;
-
-            entries.add(new Entry((float) mm, span2));
-            if (learnNoMobile.finish) {
-                barEntriesS.add(new BarEntry((float) mm, span2));
-            } else {
-                barEntries.add(new BarEntry((float) mm, span));
-            }
-            xTime.add(TimeUtils.date2String(learnNoMobile.createdDate, "M月d日"));
-
-        }
-
-        String ss = ((float) success / (float) allNum) * 100.0 + "";
-        if (ss.length() > 5) ss = ss.substring(0, 5);
-
-        String finalSs = ss;
-        long finalStar = star;
-        ThreadUtils.runOnUiThread(() -> {
-            binding.tvLnmCount.setText("完成率：" + finalSs + "%    积分：" + finalStar);
-        });
-
-        LineData lineData = new LineData();
-
-        LineDataSet lineDataSet = new LineDataSet(entries, "实际"); // add entries to dataset
-        lineDataSet.setColor(ContextCompat.getColor(mContext, R.color.yellow));
-        lineDataSet.setValueTextSize(10f);
-        lineDataSet.setLineWidth(1.5f);
-        lineDataSet.setValueTextColor(ContextCompat.getColor(mContext, R.color.yellow)); // styling, ...
-        lineDataSet.setDrawValues(true);
-        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-
-        lineData.addDataSet(lineDataSet);
-
-        BarDataSet barDataSetS = new BarDataSet(barEntriesS, "计划（成功）"); // add entries to dataset
-        barDataSetS.setColor(ContextCompat.getColor(mContext, R.color.spring_green));
-        barDataSetS.setValueTextSize(10f);
-        barDataSetS.setValueTextColor(ContextCompat.getColor(mContext, R.color.spring_green)); // styling, ...
-
-        BarDataSet barDataSet = new BarDataSet(barEntries, "计划（失败）"); // add entries to dataset
-        barDataSet.setColor(ContextCompat.getColor(mContext, R.color.pink));
-        barDataSet.setValueTextSize(10f);
-        barDataSet.setValueTextColor(ContextCompat.getColor(mContext, R.color.pink)); // styling, ...
-
-        BarData barData = new BarData(barDataSetS, barDataSet);
-
-        CombinedData data = new CombinedData();
-        data.setData(lineData);
-        data.setData(barData);
-
-
-        ValueFormatter formatter = new ValueFormatter() {
-            @Override
-            public String getAxisLabel(float value, AxisBase axis) {
-                try {
-                    return xTime.get((int) value);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return String.valueOf(value);
-                }
-            }
-        };
-
-
-        binding.chartLnm.getXAxis().setValueFormatter(formatter);
-        overviewLabels = new ArrayList<>(xTime);
-
-
-        return data;
-
-
-    }
-
-    //
     private LineData getLcData() {
 
         //*****最近三周对比
@@ -1966,13 +2319,11 @@ private CombinedData setBarData() {
         binding.SwipeRefreshLayoutLnmTg.finishRefresh();
         long count = lnmDBUtils.count();
         if (count <= 0) {
-            toastEL("本地还没有学习记录……");
+            toastEL("本地还没有专注记录……");
             return;
         }
         updateStatsHeader();
         showChart();
-        updateProjectCharts();
-        updateRecordTrendChart();
         toastSe("已按本地记录刷新统计");
 
     }
@@ -1983,7 +2334,7 @@ private CombinedData setBarData() {
         if (important == null) return;
         String[] items = new String[]{"编辑", "删除"};
         new AlertDialog.Builder(mContext)
-                .setTitle("重要待办")
+                .setTitle("重要目标")
                 .setItems(items, (d, which) -> {
                     if (which == 0) {
                         showEditImportantDialog(important);
@@ -2077,7 +2428,7 @@ private CombinedData setBarData() {
         });
 
         AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑重要待办")
+                .setTitle("编辑重要目标")
                 .setView(view)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", null)
@@ -2086,7 +2437,7 @@ private CombinedData setBarData() {
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入待办名称");
+                SimToast.toastEL("请输入作业名称");
                 return;
             }
             boolean repeat = rbRepeatYes.isChecked();

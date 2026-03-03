@@ -32,6 +32,9 @@ import io.github.yuzhiang.qxb.model.User;
 public class UsrMsgUtils {
 
     public static String fileName = "UsrMsg";
+    public static final String KEY_FOCUS_EXIT_PW = "focus_exit_password";
+    public static final String KEY_FOCUS_EXIT_Q = "focus_exit_question";
+    public static final String KEY_FOCUS_EXIT_A = "focus_exit_answer";
 
     public static String encryptUserFile(String s) {
         return encrypt(s, ldr_user_file_key);
@@ -45,6 +48,30 @@ public class UsrMsgUtils {
 
     public static String decryptUserFile(String s) {
         return decrypt(s, ldr_user_file_key);
+    }
+
+    public static String getFocusExitPassword() {
+        return SPUtils.getInstance(fileName).getString(KEY_FOCUS_EXIT_PW, "");
+    }
+
+    public static void setFocusExitPassword(String pw) {
+        SPUtils.getInstance(fileName).put(KEY_FOCUS_EXIT_PW, pw == null ? "" : pw.trim());
+    }
+
+    public static String getFocusExitQuestion() {
+        return SPUtils.getInstance(fileName).getString(KEY_FOCUS_EXIT_Q, "");
+    }
+
+    public static void setFocusExitQuestion(String q) {
+        SPUtils.getInstance(fileName).put(KEY_FOCUS_EXIT_Q, q == null ? "" : q.trim());
+    }
+
+    public static String getFocusExitAnswer() {
+        return SPUtils.getInstance(fileName).getString(KEY_FOCUS_EXIT_A, "");
+    }
+
+    public static void setFocusExitAnswer(String a) {
+        SPUtils.getInstance(fileName).put(KEY_FOCUS_EXIT_A, a == null ? "" : a.trim());
     }
 
     private static String decrypt(String s, String key) {

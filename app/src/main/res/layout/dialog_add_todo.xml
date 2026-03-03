@@ -12,14 +12,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="待办名称"
+            android:text="作业名称"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/et_todo_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="输入名称"
+            android:hint="输入作业名称"
             android:inputType="text" />
 
         <TextView
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="分类"
+            android:text="科目"
             android:textStyle="bold" />
 
         <RadioGroup
@@ -41,21 +41,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="不选" />
+                android:text="不选择" />
 
             <RadioButton
                 android:id="@+id/rb_category_exist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="选择已有" />
+                android:text="选择已有科目" />
 
             <RadioButton
                 android:id="@+id/rb_category_new"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="新建" />
+                android:text="新建科目" />
         </RadioGroup>
 
         <Spinner
@@ -70,14 +70,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:hint="输入新分类"
+            android:hint="输入新科目"
             android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="提醒频率"
+            android:text="提醒方式"
             android:textStyle="bold" />
 
         <RadioGroup
@@ -222,7 +222,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="唯一重要待办"
+                android:text="唯一重要目标"
                 android:textStyle="bold" />
 
             <Switch

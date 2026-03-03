@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="作业兑换奖励"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="含义：在作业时段完成专注达到指定分钟数，可兑换相应娱乐时长"
+        android:textSize="12sp"
+        android:textColor="@color/colorTextAssistant" />
+
+    <EditText
+        android:id="@+id/et_reward_base"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_todo_item"
+        android:hint="作业分钟数（默认45）"
+        android:inputType="number"
+        android:padding="12dp"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/et_reward_gain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_todo_item"
+        android:hint="奖励分钟数（默认10）"
+        android:inputType="number"
+        android:padding="12dp"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/et_reward_daily_max"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_todo_item"
+        android:hint="每日上限（默认30）"
+        android:inputType="number"
+        android:padding="12dp"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/et_reward_violation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_todo_item"
+        android:hint="违规阈值（默认5）"
+        android:inputType="number"
+        android:padding="12dp"
+        android:textSize="14sp" />
+</LinearLayout>

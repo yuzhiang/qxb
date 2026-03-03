@@ -104,7 +104,18 @@ public class LnmAllFragment extends LazyFragment {
             public void onItemCheckedChanged(int position, TodoListEntry entry, boolean checked) {
                 TodoItem item = entry.getItem();
                 if (item == null) return;
-                item.setCompleted(checked);
+                long now = System.currentTimeMillis();
+                if (checked) {
+                    item.setCompleted(true);
+                    item.setStudentCheckedAt(now);
+                    item.setParentConfirmed(false);
+                    item.setParentConfirmedAt(0L);
+                } else {
+                    item.setCompleted(false);
+                    item.setStudentCheckedAt(0L);
+                    item.setParentConfirmed(false);
+                    item.setParentConfirmedAt(0L);
+                }
                 saveGroups();
                 rebuildList();
             }
@@ -131,6 +142,14 @@ public class LnmAllFragment extends LazyFragment {
     protected void initData() {
         super.initData();
         EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadGroups();
+        updateImportantBanner();
+        rebuildList();
     }
 
 
@@ -161,8 +180,8 @@ public class LnmAllFragment extends LazyFragment {
                         return;
                     }
                     new AlertDialog.Builder(mContext)
-                            .setTitle("删除分类")
-                            .setMessage("删除分类后，该分类内待办会移到未分类")
+                            .setTitle("删除科目")
+                            .setMessage("删除科目后，该科目内作业会移到未分类")
                             .setNegativeButton("取消", (d, w) -> rebuildList())
                             .setPositiveButton("删除", (d, w) -> {
                                 moveGroupToDefault(group);
@@ -177,8 +196,8 @@ public class LnmAllFragment extends LazyFragment {
                         return;
                     }
                     new AlertDialog.Builder(mContext)
-                            .setTitle("删除待办")
-                            .setMessage("确定删除该待办？")
+                            .setTitle("删除作业")
+                            .setMessage("确定删除该作业？")
                             .setNegativeButton("取消", (d, w) -> rebuildList())
                             .setPositiveButton("删除", (d, w) -> {
                                 removeTodoItem(entry.getGroup(), item);
@@ -198,8 +217,8 @@ public class LnmAllFragment extends LazyFragment {
         boolean pinned = stickyGroups.contains(group.getId());
         options.add(pinned ? "取消置顶" : "置顶");
         if (!DEFAULT_GROUP_NAME.equals(group.getName())) {
-            options.add("编辑分类");
-            options.add("删除分类");
+            options.add("编辑科目");
+            options.add("删除科目");
         }
         String[] items = options.toArray(new String[0]);
         new AlertDialog.Builder(mContext)
@@ -217,12 +236,12 @@ public class LnmAllFragment extends LazyFragment {
                         }
                         TodoPrefs.saveStickyGroups(stickyGroups);
                         rebuildList();
-                    } else if ("编辑分类".equals(action)) {
+                    } else if ("编辑科目".equals(action)) {
                         showEditGroupDialog(group);
-                    } else if ("删除分类".equals(action)) {
+                    } else if ("删除科目".equals(action)) {
                         new AlertDialog.Builder(mContext)
-                                .setTitle("删除分类")
-                                .setMessage("删除分类后，该分类内待办会移到未分类")
+                                .setTitle("删除科目")
+                                .setMessage("删除科目后，该科目内作业会移到未分类")
                                 .setNegativeButton("取消", null)
                                 .setPositiveButton("删除", (d2, w2) -> {
                                     moveGroupToDefault(group);
@@ -241,13 +260,13 @@ public class LnmAllFragment extends LazyFragment {
         input.setText(group.getName());
         input.setSelection(input.getText().length());
         new AlertDialog.Builder(mContext)
-                .setTitle("编辑分类")
+                .setTitle("编辑科目")
                 .setView(input)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", (d, w) -> {
                     String name = input.getText().toString().trim();
                     if (name.isEmpty()) {
-                        SimToast.toastEL("分类名不能为空");
+                        SimToast.toastEL("科目名不能为空");
                         return;
                     }
                     if (DEFAULT_GROUP_NAME.equals(name)) {
@@ -407,7 +426,7 @@ public class LnmAllFragment extends LazyFragment {
         });
 
         AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑待办")
+                .setTitle("编辑作业")
                 .setView(view)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", null)
@@ -416,7 +435,7 @@ public class LnmAllFragment extends LazyFragment {
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入待办名称");
+                SimToast.toastEL("请输入作业名称");
                 return;
             }
 
@@ -482,7 +501,7 @@ public class LnmAllFragment extends LazyFragment {
         if (important == null) return;
         String[] items = new String[]{"编辑", "删除"};
         new AlertDialog.Builder(mContext)
-                .setTitle("重要待办")
+                .setTitle("重要目标")
                 .setItems(items, (d, which) -> {
                     if (which == 0) {
                         showEditImportantDialog(important);
@@ -576,7 +595,7 @@ public class LnmAllFragment extends LazyFragment {
         });
 
         AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑重要待办")
+                .setTitle("编辑重要目标")
                 .setView(view)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", null)
@@ -585,7 +604,7 @@ public class LnmAllFragment extends LazyFragment {
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入待办名称");
+                SimToast.toastEL("请输入作业名称");
                 return;
             }
             boolean repeat = rbRepeatYes.isChecked();
@@ -810,7 +829,7 @@ public class LnmAllFragment extends LazyFragment {
         });
 
         AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("添加待办")
+                .setTitle("添加作业")
                 .setView(view)
                 .setNegativeButton("取消", null)
                 .setPositiveButton("保存", null)
@@ -819,7 +838,7 @@ public class LnmAllFragment extends LazyFragment {
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入待办名称");
+                SimToast.toastEL("请输入作业名称");
                 return;
             }
 
@@ -868,8 +887,8 @@ public class LnmAllFragment extends LazyFragment {
 
 
             if (swImportant.isChecked() && TodoPrefs.loadImportant() != null) {
-                SimToast.toastEL("先专心把之前保存的事情做完吧");
-                return;
+                TodoPrefs.saveImportant(null);
+                SimToast.toastSe("已替换之前的目标");
             }
 
             TodoItem item = new TodoItem(UUID.randomUUID().toString(), title);
@@ -968,9 +987,9 @@ public class LnmAllFragment extends LazyFragment {
 
     private List<TodoGroup> buildDemoGroups() {
         List<TodoGroup> list = new ArrayList<>();
-        TodoGroup group1 = new TodoGroup("study", "学习");
-        group1.getItems().add(buildDemoItem("背单词 30 分钟", "学习", 2 * 60 * 60));
-        group1.getItems().add(buildDemoItem("刷题一套", "学习", 5 * 60 * 60));
+        TodoGroup group1 = new TodoGroup("study", "作业");
+        group1.getItems().add(buildDemoItem("背单词 30 分钟", "作业", 2 * 60 * 60));
+        group1.getItems().add(buildDemoItem("刷题一套", "作业", 5 * 60 * 60));
         TodoGroup group2 = new TodoGroup("life", "生活");
         group2.getItems().add(buildDemoItem("健身 45 分钟", "生活", 3 * 60 * 60));
         TodoGroup group3 = new TodoGroup(DEFAULT_GROUP_NAME, DEFAULT_GROUP_NAME);

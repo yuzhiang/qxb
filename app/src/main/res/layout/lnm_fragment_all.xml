@@ -35,7 +35,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
-                        android:text="待办"
+                        android:text="作业"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -48,7 +48,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:background="@android:color/transparent"
-                        android:contentDescription="添加待办"
+                        android:contentDescription="添加作业"
                         android:src="@android:drawable/ic_input_add"
                         android:tint="@android:color/white" />
                 </RelativeLayout>
@@ -76,7 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="暂无待办，点击右下角添加"
+        android:text="暂无作业，点击右下角添加"
         android:textColor="@android:color/darker_gray"
         android:textSize="14sp"
         android:visibility="gone" />

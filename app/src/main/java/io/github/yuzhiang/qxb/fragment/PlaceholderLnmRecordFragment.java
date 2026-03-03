@@ -153,7 +153,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
 
                     xn.add(date);
                 }
-                binding.lcLnmRecord.getDescription().setText("每周学习记录");
+                binding.lcLnmRecord.getDescription().setText("每周专注记录");
 
                 break;
 
@@ -184,7 +184,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
                 xn.add(c1.getTime());
                 xTime.add(TimeUtils.date2String(c1.getTime(), "dd"));
 
-                binding.lcLnmRecord.getDescription().setText("每月学习记录");
+                binding.lcLnmRecord.getDescription().setText("每月专注记录");
 
                 break;
 
@@ -207,7 +207,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
                 xTime.add(12 + "月");
 
                 xn.add(date);
-                binding.lcLnmRecord.getDescription().setText("每年学习记录");
+                binding.lcLnmRecord.getDescription().setText("每年专注记录");
 
                 break;
 
@@ -224,7 +224,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
                     if (m < 7 - 1) xTime.add(String.valueOf(thisYear - 7 + m + 2));
                 }
 
-                binding.lcLnmRecord.getDescription().setText("总学习记录");
+                binding.lcLnmRecord.getDescription().setText("总专注记录");
 
                 break;
 
@@ -308,7 +308,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
 
         BarData lineDataDay = new BarData();
 
-        BarDataSet lineDataSetDay = new BarDataSet(entries, "每日学习时间"); // add entries to dataset
+        BarDataSet lineDataSetDay = new BarDataSet(entries, "每日专注时间"); // add entries to dataset
         lineDataSetDay.setColor(ContextCompat.getColor(mContext, UsrMsgUtils.getThemeColor()));
         lineDataSetDay.setValueTextSize(10f);
         lineDataSetDay.setValueTextColor(ContextCompat.getColor(mContext, UsrMsgUtils.getThemeColor())); // styling, ...
@@ -405,10 +405,10 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
             String end = TimeUtils.date2String(lnm.endTime != null ? lnm.endTime : lnm.schedule, "HH:mm");
             long endMs = lnm.endTime != null ? lnm.endTime.getTime() : lnm.schedule.getTime();
             long durMin = Math.max(0, TimeUtils.getTimeSpan(endMs, lnm.createdDate.getTime(), TimeConstants.MIN));
-            int screenOn = lnm2file.getScreenOnCount(lnm.id);
+            int blocked = lnm2file.getScreenOnCount(lnm.id);
             String status = lnm.finish ? "成功" : "失败";
             holder.title.setText(start + " ~ " + end);
-            holder.sub.setText("时长 " + durMin + "m · " + status + " · 亮屏 " + screenOn + " 次");
+            holder.sub.setText("时长 " + durMin + "m · " + status + " · 未允许应用 " + blocked + " 次");
         }
 
         @Override

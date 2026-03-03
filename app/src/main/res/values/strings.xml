@@ -9,10 +9,12 @@
     <string name="main_tab_4">我的</string>
 
 
-    <string name="main_tab_lnm1">待办</string>
-    <string name="main_tab_lnm2">学习</string>
-    <string name="main_tab_lnm3">统计</string>
+    <string name="main_tab_lnm1">作业</string>
+    <string name="main_tab_lnm2">专注</string>
+    <string name="main_tab_lnm4">激励</string>
+    <string name="main_tab_lnm3">周报</string>
     <string name="main_tab_lnm5">我的</string>
+    <string name="main_tab_lnm6">统计</string>
 
     <string name="main_tab_bill1">统计</string>
     <string name="main_tab_bill2">记账</string>
@@ -29,7 +31,7 @@
     <string name="error_original">大小不超过 %1$sM。</string>
 
     <string name="et_user">校园卡号</string>
-    <string name="description">嗯~，不管以后能不能坚持，首先要有一颗想变成强者的心\n\n额，不废话了，防止学习时玩手机，开启轻学伴模式后，如果打开白名单以外的软件，将会拦截后返回轻学伴，大学加油！</string>
+    <string name="description">帮助中小学生减少手机干扰，培养专注与健康使用习惯。\n\n开启专注模式后，若打开允许列表以外的应用，将会被拦截并返回专注模式。</string>
     <string name="et_password">教务系统登录密码</string>
     <string name="bt_sign_in">登    录</string>
     <string name="et_Captcha">验证码</string>
@@ -750,5 +752,4 @@
     <string name="common_step_complete">完    成</string>
     <string name="common_step_commit">提    交</string>
     <string name="common_step_commit_ldr">提  交  审  核</string>
-    <string name="main_tab_lnm4">排行</string>
 </resources>

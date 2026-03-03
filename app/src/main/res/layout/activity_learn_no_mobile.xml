@@ -4,6 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/tv_rule_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_tag"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:text="当前时段："
+        android:textColor="@color/colorPrimary"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/lnm_vp"
         android:layout_width="match_parent"

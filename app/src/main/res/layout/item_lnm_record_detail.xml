@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="时长 60m · 成功 · 亮屏 2 次"
+        android:text="时长 60m · 成功 · 未允许应用 2 次"
         android:textSize="12sp"
         android:textColor="@color/colorTextAssistant" />
 </LinearLayout>

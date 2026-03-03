@@ -15,7 +15,7 @@
             android:id="@+id/tv_todo_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="待办标题"
+            android:text="作业标题"
             android:textColor="@android:color/black"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -58,6 +58,15 @@
         android:layout_marginTop="8dp"
         android:text="剩余 2天 5小时 10分钟"
         android:textColor="@color/colorPrimaryDark"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_todo_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="未打卡"
+        android:textColor="@color/colorTextAssistant"
         android:textSize="12sp" />
 
 </LinearLayout>

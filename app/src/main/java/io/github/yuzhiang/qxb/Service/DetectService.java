@@ -9,6 +9,8 @@ import static io.github.yuzhiang.qxb.common.Constant.Constant.lnmState;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
@@ -24,6 +26,8 @@ import io.github.yuzhiang.qxb.BuildConfig;
 import io.github.yuzhiang.qxb.activity.StartLearnActivity;
 import io.github.yuzhiang.qxb.activity.LearnNoMobileActivity;
 import io.github.yuzhiang.qxb.model.lnm2file;
+import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
+import io.github.yuzhiang.qxb.model.focus.SleepReportStore;
 import io.github.yuzhiang.qxb.base.MyApplication;
 import io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
@@ -32,6 +36,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -44,6 +49,8 @@ public class DetectService extends AccessibilityService {
     public List<String> lnmBai = new ArrayList<>();
 
     long last_data = -1;
+    private Handler sleepHandler;
+    private Runnable sleepCheck;
 
     public DetectService() {
         lnmBai.clear();
@@ -109,7 +116,14 @@ public class DetectService extends AccessibilityService {
             intent0.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent0);
         }
+        startSleepCheck();
         super.onServiceConnected();
+    }
+
+    @Override
+    public void onDestroy() {
+        stopSleepCheck();
+        super.onDestroy();
     }
 
     /**
@@ -125,6 +139,11 @@ public class DetectService extends AccessibilityService {
             if (System.currentTimeMillis() - last_data > 500) {
                 last_data = System.currentTimeMillis();
 
+                FocusRulePrefs.RuleConfig cfgRule = FocusRulePrefs.load();
+                if (cfgRule != null && cfgRule.enabled) {
+                    checkSleepAuto(cfgRule);
+                }
+
                 if (isInterceptLearningActive()) {
 
                     mForegroundPackageName = event.getPackageName().toString();
@@ -136,8 +155,33 @@ public class DetectService extends AccessibilityService {
                         List<String> stringList = lnm2file.getEnableApp();
                         String s = mForegroundPackageName;
 
+                        FocusRulePrefs.RuleConfig cfgStrict = FocusRulePrefs.load();
+                        boolean sleepStrict = cfgStrict != null && cfgStrict.enabled
+                                && FocusRulePrefs.isSleepAutoActive()
+                                && isInSleepWindow(cfgStrict);
 
-                        if (!stringList.contains(mForegroundPackageName)) {
+                        if (!stringList.contains(mForegroundPackageName) || sleepStrict) {
+                            if (sleepStrict) {
+                                SleepReportStore.recordAttempt(System.currentTimeMillis());
+                            }
+
+                            FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
+                            if (!sleepStrict && cfg != null && cfg.enabled && System.currentTimeMillis() < cfg.tempPassUntil) {
+                                return;
+                            }
+                            if (cfg != null && cfg.enabled) {
+                                if (isInSleepWindow(cfg)) {
+                                    try {
+                                        Intent intent = new Intent(getApplicationContext(), StartLearnActivity.class);
+                                        intent.putExtra(lnmState, lnmStart);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                    } catch (Exception ignored) {
+                                    }
+                                    saveLnmLogs(TimeUtils.getNowString() + "：睡眠时段拦截\n    -->  " + AppUtils.getAppName(mForegroundPackageName) + "（" + mForegroundPackageName + "）");
+                                    return;
+                                }
+                            }
 
                             try {
 
@@ -151,6 +195,12 @@ public class DetectService extends AccessibilityService {
                                 LogUtils.file("\n\n正在学习，拦截非白名单应用：" + s);
 
                                 saveLnmLogs(TimeUtils.getNowString() + "：拦截成功\n    -->  " + AppUtils.getAppName(mForegroundPackageName) + "（" + mForegroundPackageName + "）");
+                                long currentId = lnm2file.getThisId();
+                                if (currentId > 0) {
+                                    lnm2file.incrementScreenOnCount((int) currentId);
+                                }
+
+                                // Category quota feature removed.
 
                             } catch (Exception e) {
                                 LogUtils.file("\n\n正在学习，拦截非白名单应用失败：" + s + "\n" + e.toString());
@@ -192,6 +242,122 @@ public class DetectService extends AccessibilityService {
     private boolean isInterceptLearningActive() {
         return getLearning() && lnmDBUtils.countPending() > 0;
     }
+
+    private void startSleepCheck() {
+        if (sleepHandler == null) {
+            sleepHandler = new Handler(Looper.getMainLooper());
+        }
+        if (sleepCheck == null) {
+            sleepCheck = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
+                        if (cfg != null && cfg.enabled) {
+                            checkSleepAuto(cfg);
+                        }
+                    } catch (Exception ignored) {
+                    } finally {
+                        if (sleepHandler != null) {
+                            sleepHandler.postDelayed(this, 60_000L);
+                        }
+                    }
+                }
+            };
+        }
+        sleepHandler.removeCallbacks(sleepCheck);
+        sleepHandler.postDelayed(sleepCheck, 5_000L);
+    }
+
+    private void stopSleepCheck() {
+        if (sleepHandler != null && sleepCheck != null) {
+            sleepHandler.removeCallbacks(sleepCheck);
+        }
+    }
+
+    private void checkSleepAuto(FocusRulePrefs.RuleConfig cfgRule) {
+        boolean inSleep = isInSleepWindow(cfgRule);
+        if (inSleep && !getLearning() && FocusRulePrefs.isSleepAutoActive()) {
+            FocusRulePrefs.setSleepAutoActive(false);
+        }
+        if (inSleep && !getLearning() && !FocusRulePrefs.isSleepAutoActive()) {
+            try {
+                long endAt = calcSleepEndAtMs(cfgRule);
+                long sleepSpan = endAt > 0 ? Math.max(60_000L, endAt - System.currentTimeMillis()) : 0L;
+                if (sleepSpan > 0) {
+                    lnm2file.savePlanSpan(sleepSpan);
+                }
+                if (cfgRule != null) {
+                    cfgRule.tempPassUntil = 0L;
+                    FocusRulePrefs.save(cfgRule);
+                }
+                SleepReportStore.startSession(System.currentTimeMillis(), endAt);
+                Intent intent = new Intent(getApplicationContext(), StartLearnActivity.class);
+                intent.putExtra(lnmState, lnmStart);
+                intent.putExtra(StartLearnActivity.EXTRA_SLEEP_AUTO, true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                FocusRulePrefs.setSleepAutoActive(true);
+                saveLnmLogs(TimeUtils.getNowString() + "：睡眠时段自动开启专注");
+            } catch (Exception ignored) {
+            }
+        } else if (!inSleep && getLearning() && FocusRulePrefs.isSleepAutoActive()) {
+            try {
+                Intent intent = new Intent(getApplicationContext(), StartLearnActivity.class);
+                intent.putExtra(lnmState, io.github.yuzhiang.qxb.common.Constant.Constant.lnmFinish);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                FocusRulePrefs.setSleepAutoActive(false);
+                saveLnmLogs(TimeUtils.getNowString() + "：睡眠结束自动结束专注");
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private boolean isInSleepWindow(FocusRulePrefs.RuleConfig cfg) {
+        if (cfg == null) return false;
+        Calendar cal = Calendar.getInstance();
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        boolean weekend = (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
+        int nowMin = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
+        FocusRulePrefs.TimeWindow w = weekend ? cfg.weekendSleep : cfg.schoolSleep;
+        return w != null && w.contains(nowMin);
+    }
+
+    private long calcSleepSpanMs(FocusRulePrefs.RuleConfig cfg) {
+        long endAt = calcSleepEndAtMs(cfg);
+        if (endAt <= 0) return 0L;
+        long span = endAt - System.currentTimeMillis();
+        return Math.max(60_000L, span);
+    }
+
+    private long calcSleepEndAtMs(FocusRulePrefs.RuleConfig cfg) {
+        if (cfg == null) return 0L;
+        Calendar now = Calendar.getInstance();
+        int day = now.get(Calendar.DAY_OF_WEEK);
+        boolean weekend = (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
+        FocusRulePrefs.TimeWindow w = weekend ? cfg.weekendSleep : cfg.schoolSleep;
+        if (w == null) return 0L;
+        int nowMin = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
+        if (!w.contains(nowMin)) return 0L;
+        int endMin = w.endMin;
+        Calendar end = (Calendar) now.clone();
+        if (w.startMin < w.endMin) {
+            end.set(Calendar.HOUR_OF_DAY, endMin / 60);
+            end.set(Calendar.MINUTE, endMin % 60);
+        } else {
+            if (nowMin >= w.startMin) {
+                end.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            end.set(Calendar.HOUR_OF_DAY, endMin / 60);
+            end.set(Calendar.MINUTE, endMin % 60);
+        }
+        end.set(Calendar.SECOND, 0);
+        end.set(Calendar.MILLISECOND, 0);
+        return end.getTimeInMillis();
+    }
+
+    // Category quota feature removed.
 
 
     /**

@@ -81,6 +81,14 @@
         <activity
             android:name=".activity.LearnNoMobileActivity"
             android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/AppThemeNormal"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".activity.StudentEntryActivity"
+            android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/AppThemeNormal"
@@ -90,6 +98,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/AppThemeNormal" />
 
         <meta-data
             android:name="android.notch_support"

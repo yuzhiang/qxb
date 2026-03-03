@@ -10,6 +10,9 @@ public class TodoItem {
     private boolean pinned;
     private boolean important;
     private boolean completed;
+    private boolean parentConfirmed;
+    private long studentCheckedAt;
+    private long parentConfirmedAt;
     private long createdAt;
 
     public TodoItem() {
@@ -90,6 +93,30 @@ public class TodoItem {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public boolean isParentConfirmed() {
+        return parentConfirmed;
+    }
+
+    public void setParentConfirmed(boolean parentConfirmed) {
+        this.parentConfirmed = parentConfirmed;
+    }
+
+    public long getStudentCheckedAt() {
+        return studentCheckedAt;
+    }
+
+    public void setStudentCheckedAt(long studentCheckedAt) {
+        this.studentCheckedAt = studentCheckedAt;
+    }
+
+    public long getParentConfirmedAt() {
+        return parentConfirmedAt;
+    }
+
+    public void setParentConfirmedAt(long parentConfirmedAt) {
+        this.parentConfirmedAt = parentConfirmedAt;
     }
 
     public long getCreatedAt() {

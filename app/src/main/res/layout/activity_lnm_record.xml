@@ -37,7 +37,7 @@
                     android:id="@+id/tv_lnm_record_title"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="学习统计"
+                    android:text="专注统计"
                     android:textColor="@android:color/white"
                     android:textSize="18sp" />
 

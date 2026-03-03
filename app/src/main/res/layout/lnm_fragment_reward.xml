@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_page_white"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_reward_title"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/primary_red"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="激励与习惯"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_todo_item"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_reward_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="奖励时长：0 分钟"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_reward_ratio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="兑换规则：--"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_reward_explain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="说明：作业时段完成专注，可兑换娱乐时长"
+            android:textSize="11sp"
+            android:textColor="@color/colorTextAssistant" />
+
+        <TextView
+            android:id="@+id/tv_reward_today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="今日已使用：0 分钟"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_reward_use"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="使用10分钟奖励" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_todo_item"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_reward_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="连续专注：0 天 · 连续早睡：0 天"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_reward_yesterday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="昨日达标：--"
+            android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_todo_item"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tv_reward_milestone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="阶段里程碑：0 个"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_reward_milestone_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="最近达成：暂无"
+            android:textSize="12sp" />
+        </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

@@ -271,6 +271,16 @@ public class lnm2file {
         SPUtils.getInstance(file_name).put(screenOnCountKey, new Gson().toJson(map), true);
     }
 
+    public static int incrementScreenOnCount(int lnmId) {
+        if (lnmId <= 0) return 0;
+        Map<String, Integer> map = getAllScreenOnCounts();
+        String key = String.valueOf(lnmId);
+        int next = (map.containsKey(key) ? map.get(key) : 0) + 1;
+        map.put(key, next);
+        SPUtils.getInstance(file_name).put(screenOnCountKey, new Gson().toJson(map), true);
+        return next;
+    }
+
     public static int getScreenOnCount(int lnmId) {
         if (lnmId <= 0) return 0;
         Map<String, Integer> map = getAllScreenOnCounts();
