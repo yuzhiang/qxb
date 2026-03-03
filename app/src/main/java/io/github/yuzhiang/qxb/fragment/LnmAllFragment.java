@@ -399,7 +399,7 @@ public class LnmAllFragment extends LazyFragment {
         tvPickTime.setText(String.format(Locale.CHINA, "%02d:%02d", selected.get(Calendar.HOUR_OF_DAY), selected.get(Calendar.MINUTE)));
 
         tvPickDate.setOnClickListener(v -> {
-            DatePickerDialog dialog = new DatePickerDialog(mContext,
+            DatePickerDialog dialog = new DatePickerDialog(mContext, R.style.DatePickerDialogTheme,
                     (view1, year, month, dayOfMonth) -> {
                         selected.set(Calendar.YEAR, year);
                         selected.set(Calendar.MONTH, month);
@@ -412,7 +412,7 @@ public class LnmAllFragment extends LazyFragment {
             dialog.show();
         });
         tvPickTime.setOnClickListener(v -> {
-            TimePickerDialog dialog = new TimePickerDialog(mContext,
+            TimePickerDialog dialog = new TimePickerDialog(mContext, R.style.TimePickerDialogTheme,
                     (view12, hourOfDay, minute) -> {
                         selected.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         selected.set(Calendar.MINUTE, minute);
@@ -568,7 +568,7 @@ public class LnmAllFragment extends LazyFragment {
         tvPickTime.setText(String.format(Locale.CHINA, "%02d:%02d", selected.get(Calendar.HOUR_OF_DAY), selected.get(Calendar.MINUTE)));
 
         tvPickDate.setOnClickListener(v -> {
-            DatePickerDialog dialog = new DatePickerDialog(mContext,
+            DatePickerDialog dialog = new DatePickerDialog(mContext, R.style.DatePickerDialogTheme,
                     (view1, year, month, dayOfMonth) -> {
                         selected.set(Calendar.YEAR, year);
                         selected.set(Calendar.MONTH, month);
@@ -581,7 +581,7 @@ public class LnmAllFragment extends LazyFragment {
             dialog.show();
         });
         tvPickTime.setOnClickListener(v -> {
-            TimePickerDialog dialog = new TimePickerDialog(mContext,
+            TimePickerDialog dialog = new TimePickerDialog(mContext, R.style.TimePickerDialogTheme,
                     (view12, hourOfDay, minute) -> {
                         selected.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         selected.set(Calendar.MINUTE, minute);
@@ -802,7 +802,7 @@ public class LnmAllFragment extends LazyFragment {
 
         Calendar selected = Calendar.getInstance();
         tvPickDate.setOnClickListener(v -> {
-            DatePickerDialog dialog = new DatePickerDialog(mContext,
+            DatePickerDialog dialog = new DatePickerDialog(mContext, R.style.DatePickerDialogTheme,
                     (view1, year, month, dayOfMonth) -> {
                         selected.set(Calendar.YEAR, year);
                         selected.set(Calendar.MONTH, month);
@@ -815,7 +815,7 @@ public class LnmAllFragment extends LazyFragment {
             dialog.show();
         });
         tvPickTime.setOnClickListener(v -> {
-            TimePickerDialog dialog = new TimePickerDialog(mContext,
+            TimePickerDialog dialog = new TimePickerDialog(mContext, R.style.TimePickerDialogTheme,
                     (view12, hourOfDay, minute) -> {
                         selected.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         selected.set(Calendar.MINUTE, minute);

@@ -821,9 +821,9 @@ public class LnmMyFragment extends LazyFragment {
         int startM = window.startMin % 60;
         int endH = (window.endMin / 60) % 24;
         int endM = window.endMin % 60;
-        android.app.TimePickerDialog startPicker = new android.app.TimePickerDialog(getContext(),
+        android.app.TimePickerDialog startPicker = new android.app.TimePickerDialog(getContext(), R.style.TimePickerDialogTheme,
                 (v, h, m) -> {
-                    android.app.TimePickerDialog endPicker = new android.app.TimePickerDialog(getContext(),
+                    android.app.TimePickerDialog endPicker = new android.app.TimePickerDialog(getContext(), R.style.TimePickerDialogTheme,
                             (v2, h2, m2) -> {
                                 FocusRulePrefs.TimeWindow w = new FocusRulePrefs.TimeWindow(h * 60 + m, h2 * 60 + m2);
                                 cb.onPicked(w);

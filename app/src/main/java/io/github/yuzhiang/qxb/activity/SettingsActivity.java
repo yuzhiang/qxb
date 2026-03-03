@@ -473,9 +473,9 @@ public class SettingsActivity extends AppCompatActivity {
         int startM = window.startMin % 60;
         int endH = (window.endMin / 60) % 24;
         int endM = window.endMin % 60;
-        android.app.TimePickerDialog startPicker = new android.app.TimePickerDialog(this,
+        android.app.TimePickerDialog startPicker = new android.app.TimePickerDialog(this, R.style.TimePickerDialogTheme,
                 (v, h, m) -> {
-                    android.app.TimePickerDialog endPicker = new android.app.TimePickerDialog(this,
+                    android.app.TimePickerDialog endPicker = new android.app.TimePickerDialog(this, R.style.TimePickerDialogTheme,
                             (v1, h1, m1) -> {
                                 FocusRulePrefs.TimeWindow w = new FocusRulePrefs.TimeWindow(h * 60 + m, h1 * 60 + m1);
                                 cb.onPicked(w);

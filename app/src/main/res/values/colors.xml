@@ -12,7 +12,7 @@
     <color name="prize3">#F8CB86</color>
     <color name="normal">#ff828282</color>
     <color name="normal8">#50828282</color>
-    <color name="normalBackground">#fafafa</color>
+    <color name="normalBackground">#F8F6F3</color>
 
     <color name="colorPrimary">#E8505B</color>
     <!--    <color name ="colorPrimary">#4876FF</color>-->
@@ -21,7 +21,7 @@
     <color name="colorAccent">#FF6B6B</color>
     <color name="colorWarning">#FF6B6B</color>
 
-    <color name="app_color_f6">#f6f6f6</color>
+    <color name="app_color_f6">#F3F1EE</color>
 
 
     <color name="colorAccent1">#FF8A80</color>
@@ -50,7 +50,7 @@
     <color name="CH6">#FF5C6C</color>
     <color name="CH7">#FFA3A3</color>
 
-    <color name="line">#ffeaeaea</color>
+    <color name="line">#E6E1DD</color>
 
 
     <color name="main1">#E8505B</color>
@@ -79,7 +79,7 @@
 
     <color name="color_8">#32cd32</color>
 
-    <color name="item_divider">#EFEFEF</color>
+    <color name="item_divider">#E6E1DD</color>
     <color name="white0">#00ffffff</color>
     <color name="transparent">#00000000</color>
     <color name="gray_very_light">#e0e0e0</color>
@@ -153,26 +153,26 @@
     <!-- theme color -->
 
 
-    <color name="colorTextTitle">#333333</color>
-    <color name="navigation_color">#F7F7F7</color>
-    <color name="navigation_color50">#80F7F7F7</color>
+    <color name="colorTextTitle">#2B2B2B</color>
+    <color name="navigation_color">#F8F6F3</color>
+    <color name="navigation_color50">#80F8F6F3</color>
     <!--    <color name="navigation_color">#747474</color>-->
-    <color name="colorTextContent">#444444</color>
+    <color name="colorTextContent">#3E3E3E</color>
     <color name="colorAnonymous">#1f1f1f</color>
     <color name="ldr_content">#ff181a25</color>
     <color name="ldr_content80">#CC181a25</color>
     <color name="ldr_content60">#99181a25</color>
-    <color name="background_color">#ffffff</color>
-    <color name="background_normal">#fafafa</color>
-    <color name="background_normal2">#fafafa</color>
+    <color name="background_color">#F8F6F3</color>
+    <color name="background_normal">#F8F6F3</color>
+    <color name="background_normal2">#F8F6F3</color>
 
     <color name="main_background_color">#E8505B</color>
 
-    <color name="colorTextAssistant">#888888</color>
+    <color name="colorTextAssistant">#8C8C8C</color>
 
-    <color name="colorBackground">#FFFFFF</color>
-    <color name="colorBackgroundDark">#f2f2f2</color>
-    <color name="colorDivision">#33aaaaaa</color>
+    <color name="colorBackground">#F8F6F3</color>
+    <color name="colorBackgroundDark">#F1EEEB</color>
+    <color name="colorDivision">#26D8D2CE</color>
 
     <color name="usr_colorPrimary">#E8505B</color>
     <color name="usr_colorPrimaryDark">#D6454E</color>
@@ -230,7 +230,7 @@
     <!-- 按钮禁用时的颜色 -->
     <color name="colorButtonDisable">#BBBBBB</color>
     <!-- 分割线的颜色 -->
-    <color name="colorLine">#ECECEC</color>
+    <color name="colorLine">#E6E1DD</color>
     <!-- 图标颜色 -->
     <color name="colorIcon">#7C7C7C</color>
 
@@ -239,7 +239,7 @@
     <!-- 对话框取消按钮文本颜色 -->
     <color name="colorCancel">#C62828</color>
 
-    <color name="msgContent">#333333</color>
+    <color name="msgContent">#2F2F2F</color>
 
 
     <!-- 矢量图标的颜色 -->
@@ -260,6 +260,6 @@
     <color name="blue_light">#FF6B6B</color>
 
     <!-- red theme surfaces -->
-    <color name="card_red_bg">#FFFDF4F4</color>
+    <color name="card_red_bg">#FFF9F5F4</color>
 
 </resources>
