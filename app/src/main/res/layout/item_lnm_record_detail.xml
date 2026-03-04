@@ -2,26 +2,62 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/bg_todo_item"
-    android:padding="10dp"
-    android:layout_marginBottom="8dp">
+    android:orientation="horizontal"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp">
 
-    <TextView
-        android:id="@+id/tv_record_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="2026-03-02 09:00 ~ 10:00"
-        android:textStyle="bold"
-        android:textSize="13sp"
-        android:textColor="@android:color/black" />
+    <FrameLayout
+        android:layout_width="24dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="6dp">
 
-    <TextView
-        android:id="@+id/tv_record_sub"
-        android:layout_width="match_parent"
+        <View
+            android:id="@+id/v_record_line_top"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorDivision" />
+
+        <View
+            android:id="@+id/v_record_dot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_record_timeline_dot" />
+
+        <View
+            android:id="@+id/v_record_line_bottom"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorDivision" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="时长 60m · 成功 · 未允许应用 2 次"
-        android:textSize="12sp"
-        android:textColor="@color/colorTextAssistant" />
+        android:layout_weight="1"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_todo_item"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_record_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2026-03-02 09:00 ~ 10:00"
+            android:textColor="@android:color/black"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_record_sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="时长 60m · 成功 · 未允许应用 2 次"
+            android:textColor="@color/colorTextAssistant"
+            android:textSize="12sp" />
+    </LinearLayout>
 </LinearLayout>

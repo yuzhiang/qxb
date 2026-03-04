@@ -215,7 +215,7 @@ public class LnmTJFragment extends LazyFragment {
         if (binding == null) return;
         applyStatsCardOrder();
         setCardLongPress(binding.cardStatSummary);
-        setCardLongPress(binding.cardStatToggle);
+//        setCardLongPress(binding.cardStatToggle);
         setCardLongPress(binding.cardStatWeeks);
         setCardLongPress(binding.cardStatProject);
         setCardLongPress(binding.cardStatRecord);
@@ -231,9 +231,6 @@ public class LnmTJFragment extends LazyFragment {
             setAdvancedExpanded(nowExpanded);
             SPUtils.getInstance().put(STATS_ADVANCED_EXPANDED_KEY, nowExpanded);
         });
-        {
-            binding.cardStatToggle.setOnClickListener(v -> binding.tvStatToggle.performClick());
-        }
     }
 
     private void setAdvancedExpanded(boolean expanded) {
@@ -1190,7 +1187,7 @@ public class LnmTJFragment extends LazyFragment {
         binding.chartProjectPie.getDescription().setEnabled(false);
         binding.chartProjectPie.setCenterText(projectUnitInMinutes ? "学科(分钟)" : "学科(秒钟)");
         binding.chartProjectPie.setUsePercentValues(false);
-        binding.chartProjectPie.setExtraOffsets(16f, 16f, 16f, 16f);
+//        binding.chartProjectPie.setExtraOffsets(16f, 16f, 16f, 16f);
         binding.chartProjectPie.setDrawHoleEnabled(true);
         binding.chartProjectPie.setHoleRadius(45f);
         binding.chartProjectPie.setTransparentCircleRadius(50f);
