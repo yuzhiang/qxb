@@ -63,6 +63,8 @@ import io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils;
 import io.github.yuzhiang.qxb.model.LnmApp;
 import io.github.yuzhiang.qxb.model.eventbus.EBLnmBai;
 import io.github.yuzhiang.qxb.model.eventbus.MeLnmShowChart;
+import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
+import io.github.yuzhiang.qxb.model.focus.SleepReportStore;
 
 import io.github.yuzhiang.qxb.model.eventbus.TodoImportantChanged;
 import io.github.yuzhiang.qxb.model.todo.TodoItem;
@@ -216,6 +218,11 @@ public class LnmMainFragment extends LazyFragment {
 //                startActivity(new Intent(mContext, MangeUserActivity.class));
 //                return;
 //            }
+            if (!hasStartPermissions()) {
+                SimToast.toastSL("请先授予相关的权限");
+                startActivity(new Intent(mContext, PermissionActivity.class));
+                return;
+            }
 
             long id = getThisId();
             if (id > 0) {
@@ -230,6 +237,9 @@ public class LnmMainFragment extends LazyFragment {
                     findLastLearn(id);
                     return;
                 }
+            }
+            if (tryStartSleepModeDirectly()) {
+                return;
             }
 
             showStudyProjectSelector(this::startLearnAfterProjectSelected);
@@ -654,11 +664,16 @@ public class LnmMainFragment extends LazyFragment {
     }
 
     private void startLearnAfterProjectSelected() {
-        //辅助权限，手机时间都没问题
-        LogUtils.i(DetectService.isAccessibilitySettingsOn(mContext), Math.abs(spanTime) <= okSpan);
-        if (DetectService.isAccessibilitySettingsOn(mContext) && Math.abs(spanTime) <= okSpan) {
+        if (!hasStartPermissions()) {
+            SimToast.toastSL("请先授予相关的权限");
+            startActivity(new Intent(mContext, PermissionActivity.class));
+            return;
+        }
+        if (tryStartSleepModeDirectly()) {
+            return;
+        }
 
-            new TimePickerDialog(mContext, R.style.TimePickerDialogTheme, (view, hourOfDay, minute) -> {
+        new TimePickerDialog(mContext, R.style.TimePickerDialogTheme, (view, hourOfDay, minute) -> {
 
                 long inputTime = hourOfDay * 60 * 60 * 1000 + minute * 60 * 1000;
                 if (inputTime > 4 * 60 * 60 * 1000) {
@@ -698,14 +713,74 @@ public class LnmMainFragment extends LazyFragment {
 
                 }
 
-            }, lnm2file.getHourOfDay(), lnm2file.getMinute(), true)
-                    .show();
+        }, lnm2file.getHourOfDay(), lnm2file.getMinute(), true)
+                .show();
+    }
 
-        } else {
-            SimToast.toastSL("请先授予相关的权限");
-            startActivity(new Intent(mContext, PermissionActivity.class));
+    private boolean hasStartPermissions() {
+        boolean access = DetectService.isAccessibilitySettingsOn(mContext);
+        boolean timeOk = Math.abs(spanTime) <= okSpan;
+        LogUtils.i(access, timeOk);
+        return access && timeOk;
+    }
 
+    private boolean tryStartSleepModeDirectly() {
+        FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
+        if (cfg == null || !cfg.enabled || !isInSleepWindow(cfg)) {
+            return false;
         }
+        long now = System.currentTimeMillis();
+        long endAt = calcSleepEndAtMs(cfg);
+        long span = endAt > 0 ? Math.max(60_000L, endAt - now) : 0L;
+        if (span > 0) {
+            lnm2file.savePlanSpan(span);
+        }
+        cfg.tempPassUntil = 0L;
+        FocusRulePrefs.save(cfg);
+        FocusRulePrefs.setSleepAutoActive(true);
+        SleepReportStore.startSession(now, endAt);
+
+        Intent intent = new Intent(mContext, StartLearnActivity.class);
+        intent.putExtra(lnmState, lnmStart);
+        intent.putExtra(StartLearnActivity.EXTRA_SLEEP_AUTO, true);
+        startActivity(intent);
+        return true;
+    }
+
+    private boolean isInSleepWindow(FocusRulePrefs.RuleConfig cfg) {
+        if (cfg == null || !cfg.enabled) return false;
+        Calendar cal = Calendar.getInstance();
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        boolean weekend = (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
+        int nowMin = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
+        FocusRulePrefs.TimeWindow w = weekend ? cfg.weekendSleep : cfg.schoolSleep;
+        return w != null && w.contains(nowMin);
+    }
+
+    private long calcSleepEndAtMs(FocusRulePrefs.RuleConfig cfg) {
+        if (cfg == null || !cfg.enabled) return 0L;
+        Calendar now = Calendar.getInstance();
+        int day = now.get(Calendar.DAY_OF_WEEK);
+        boolean weekend = (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
+        FocusRulePrefs.TimeWindow w = weekend ? cfg.weekendSleep : cfg.schoolSleep;
+        if (w == null) return 0L;
+        int nowMin = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
+        if (!w.contains(nowMin)) return 0L;
+        int endMin = w.endMin;
+        Calendar end = (Calendar) now.clone();
+        if (w.startMin < w.endMin) {
+            end.set(Calendar.HOUR_OF_DAY, endMin / 60);
+            end.set(Calendar.MINUTE, endMin % 60);
+        } else {
+            if (nowMin >= w.startMin) {
+                end.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            end.set(Calendar.HOUR_OF_DAY, endMin / 60);
+            end.set(Calendar.MINUTE, endMin % 60);
+        }
+        end.set(Calendar.SECOND, 0);
+        end.set(Calendar.MILLISECOND, 0);
+        return end.getTimeInMillis();
     }
 
     private void updateApps() {

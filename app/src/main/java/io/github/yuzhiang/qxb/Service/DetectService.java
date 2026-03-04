@@ -45,6 +45,8 @@ import java.util.List;
  */
 public class DetectService extends AccessibilityService {
     private static final long MANUAL_EXIT_SUPPRESS_MS = 30_000L;
+    private static final long SLEEP_CHECK_INITIAL_DELAY_MS = 2_000L;
+    private static final long SLEEP_CHECK_INTERVAL_MS = 15_000L;
 
     private static String mForegroundPackageName;
     private static DetectService mInstance = null;
@@ -113,6 +115,13 @@ public class DetectService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
+        try {
+            FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
+            if (cfg != null && cfg.enabled) {
+                checkSleepAuto(cfg);
+            }
+        } catch (Exception ignored) {
+        }
         if (isInterceptLearningActive()) {
             Intent intent0 = new Intent(getApplicationContext(), LearnNoMobileActivity.class);
             intent0.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -266,14 +275,14 @@ public class DetectService extends AccessibilityService {
                     } catch (Exception ignored) {
                     } finally {
                         if (sleepHandler != null) {
-                            sleepHandler.postDelayed(this, 60_000L);
+                            sleepHandler.postDelayed(this, SLEEP_CHECK_INTERVAL_MS);
                         }
                     }
                 }
             };
         }
         sleepHandler.removeCallbacks(sleepCheck);
-        sleepHandler.postDelayed(sleepCheck, 5_000L);
+        sleepHandler.postDelayed(sleepCheck, SLEEP_CHECK_INITIAL_DELAY_MS);
     }
 
     private void stopSleepCheck() {

@@ -114,7 +114,6 @@ public class StartLearnActivity extends AppCompatActivity {
     private int exitPwFailCount = 0;
     private long exitPwLockUntil = 0L;
     private boolean sleepAutoMode = false;
-    private boolean sleepAutoSwitchGuard = false;
     private boolean leftByHome = false;
     private long lastRestEndAt = 0L;
     private long lastRestRemindAt = 0L;
@@ -141,6 +140,7 @@ public class StartLearnActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateTempPassStatus();
         if (!getLearning()) {
             leftByHome = false;
             return;
@@ -173,42 +173,28 @@ public class StartLearnActivity extends AppCompatActivity {
             binding.btnTempPass10.setOnClickListener(v -> {
                 new MessageDialog.Builder(StartLearnActivity.this)
                         .setTitle("临时通行")
-                        .setMessage("确认开启10分钟临时通行？")
+                        .setMessage("确认开启1分钟临时通行？")
                         .setConfirm("开启")
                         .setCancel("取消")
-                        .setListener(new MessageDialog.OnListener() {
-                            @Override
-                            public void onConfirm(BaseDialog dialog) {
-                                FocusRulePrefs.setTempPassUntil(System.currentTimeMillis() + 10 * 60 * 1000L);
-                                updateTempPassStatus();
-                                toastSL("已开启10分钟临时通行");
-                            }
-
-                            @Override
-                            public void onCancel(BaseDialog dialog) {
-                            }
+                        .setListener(dialog -> {
+                            FocusRulePrefs.setTempPassUntil(System.currentTimeMillis() + 1 * 60 * 1000L);
+                            updateTempPassStatus();
+                            toastSL("已开启1分钟临时通行");
                         }).show();
             });
         }
         {
             binding.btnTempPass30.setOnClickListener(v -> {
-                new MessageDialog.Builder(StartLearnActivity.this)
+                requestExitWithPassword(() -> new MessageDialog.Builder(StartLearnActivity.this)
                         .setTitle("临时通行")
-                        .setMessage("确认开启30分钟临时通行？")
+                        .setMessage("确认开启10分钟临时通行？")
                         .setConfirm("开启")
                         .setCancel("取消")
-                        .setListener(new MessageDialog.OnListener() {
-                            @Override
-                            public void onConfirm(BaseDialog dialog) {
-                                FocusRulePrefs.setTempPassUntil(System.currentTimeMillis() + 30 * 60 * 1000L);
-                                updateTempPassStatus();
-                                toastSL("已开启30分钟临时通行");
-                            }
-
-                            @Override
-                            public void onCancel(BaseDialog dialog) {
-                            }
-                        }).show();
+                        .setListener(dialog -> {
+                            FocusRulePrefs.setTempPassUntil(System.currentTimeMillis() + 10 * 60 * 1000L);
+                            updateTempPassStatus();
+                            toastSL("已开启10分钟临时通行");
+                        }).show());
             });
         }
         {
@@ -218,17 +204,10 @@ public class StartLearnActivity extends AppCompatActivity {
                         .setMessage("确认结束临时通行？")
                         .setConfirm("结束")
                         .setCancel("取消")
-                        .setListener(new MessageDialog.OnListener() {
-                            @Override
-                            public void onConfirm(BaseDialog dialog) {
-                                FocusRulePrefs.setTempPassUntil(0L);
-                                updateTempPassStatus();
-                                toastSL("已结束临时通行");
-                            }
-
-                            @Override
-                            public void onCancel(BaseDialog dialog) {
-                            }
+                        .setListener(dialog -> {
+                            FocusRulePrefs.setTempPassUntil(0L);
+                            updateTempPassStatus();
+                            toastSL("已结束临时通行");
                         }).show();
             });
         }
@@ -236,7 +215,7 @@ public class StartLearnActivity extends AppCompatActivity {
             @Override
             public void handleOnBackPressed() {
                 if (getLearning()) {
-                    ShowDialog();
+                    // Intercept back key while focusing: no dialog, no exit.
                     return;
                 }
                 setEnabled(false);
@@ -247,7 +226,6 @@ public class StartLearnActivity extends AppCompatActivity {
 
         hideBottomUIMenu();
         updateTempPassStatus();
-        initSleepAutoSwitch();
         applySleepAutoUi(sleepAutoMode);
         if (sleepAutoMode && SleepReportStore.loadCurrent() == null) {
             SleepReportStore.startSession(System.currentTimeMillis(), calcSleepEndAtMs());
@@ -255,30 +233,14 @@ public class StartLearnActivity extends AppCompatActivity {
 
         LogUtils.i("=====开始");
 
-/*      与预期行为不同
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Snackbar snackbar = Snackbar
-                    .make(binding.rlStartLearn, "请在10秒内退出分屏模式否则将视为专注失败", Snackbar.LENGTH_INDEFINITE )
-                    .setAction("立即结束专注", v1 -> postFinishLearn());
 
-            if (isInMultiWindowMode() && getLearning()) {
-                snackbar.show();
-                MultiWindowModeWarning();
-                if(!isInMultiWindowMode()){
-                    snackbar.dismiss();
-                }
-            }
-        }*/
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (isInMultiWindowMode() && getLearning()) {
-                Snackbar
-                        .make(binding.rlStartLearn, "请在10秒内退出分屏模式否则将视为专注失败", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("结束专注", v1 -> postUserStopLearn())
-                        .setDuration((int) TimeUnit.SECONDS.toMillis(10))
-                        .show();
-                MultiWindowModeWarning();
-            }
+        if (isInMultiWindowMode() && getLearning()) {
+            Snackbar
+                    .make(binding.rlStartLearn, "请在10秒内退出分屏模式否则将视为专注失败", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("结束专注", v1 -> postUserStopLearn())
+                    .setDuration((int) TimeUnit.SECONDS.toMillis(10))
+                    .show();
+            MultiWindowModeWarning();
         }
 
         switch (getIntent().getIntExtra(lnmState, lnmStart)) {
@@ -354,10 +316,8 @@ public class StartLearnActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    if (isInMultiWindowMode()) {
-                        postFinishLearn();
-                    }
+                if (isInMultiWindowMode()) {
+                    postFinishLearn();
                 }
             }
         }.start();
@@ -383,7 +343,7 @@ public class StartLearnActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io()) // 指定 subscribe() 发生在 IO 线程
                 .observeOn(AndroidSchedulers.mainThread()) // 指定 Subscriber 的回调发生在主线程
                 .to(autoDisposable(AndroidLifecycleScopeProvider.from(this)))
-                .subscribe(new Observer<Drawable>() {
+                .subscribe(new Observer<>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                     }
@@ -408,20 +368,9 @@ public class StartLearnActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if ((keyCode == KeyEvent.KEYCODE_BACK || isInMultiWindowMode() || keyCode == KeyEvent.KEYCODE_HOME) && getLearning()) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && getLearning()) {
+            return true;
 
-                ShowDialog();
-                return true;
-
-            }
-        } else {
-            if ((keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_HOME) && getLearning()) {
-
-                ShowDialog();
-                return true;
-
-            }
         }
         return super.onKeyDown(keyCode, event);
 
@@ -431,63 +380,11 @@ public class StartLearnActivity extends AppCompatActivity {
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN && getLearning()) {
             int keyCode = event.getKeyCode();
-            if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_APP_SWITCH) {
-                ShowDialog();
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
                 return true;
             }
         }
         return super.dispatchKeyEvent(event);
-    }
-
-
-    public void ShowDialog() {
-        if (restActive) {
-            toastEL("休息中，暂不可操作");
-            return;
-        }
-        if (sleepAutoMode) {
-            new MessageDialog.Builder(StartLearnActivity.this)
-                    .setTitle("睡眠专注")
-                    .setMessage("现在是睡眠时间，家长可输入密码退出睡眠专注")
-                    .setTextGravity(Gravity.CENTER)
-                    .setConfirm("家长退出")
-                    .setCancel("继续睡眠")
-                    .setCancelable(false)
-                    .setListener(new MessageDialog.OnListener() {
-                        @Override
-                        public void onConfirm(BaseDialog dialog) {
-                            requestExitWithPassword(StartLearnActivity.this::finishSleepAutoSilently);
-                        }
-
-                        @Override
-                        public void onCancel(BaseDialog dialog) {
-                        }
-                    }).show();
-            return;
-        }
-        long now = System.currentTimeMillis();
-        if (now - lastPromptAt < 5000L) {
-            return;
-        }
-        lastPromptAt = now;
-        new MessageDialog.Builder(StartLearnActivity.this)
-                .setTitle("开始专注！")
-                .setMessage("先完成作业任务，暂时不要使用手机")
-                .setTextGravity(Gravity.CENTER)
-                .setConfirm("开始专注")
-                .setCancel("先休息")
-                .setCancelable(false)
-                .setListener(new MessageDialog.OnListener() {
-                    @Override
-                    public void onConfirm(BaseDialog dialog) {
-                    }
-
-                    @Override
-                    public void onCancel(BaseDialog dialog) {
-                        requestExitWithPassword(StartLearnActivity.this::postUserStopLearn);
-                    }
-                }).show();
-
     }
 
     private void requestExitWithPassword(Runnable onPass) {
@@ -508,22 +405,19 @@ public class StartLearnActivity extends AppCompatActivity {
                 .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
                 .setCancel("取消")
                 .setConfirm("确认")
-                .setListener(new InputDialog.OnListener() {
-                    @Override
-                    public void onConfirm(BaseDialog dialog, String content) {
-                        String in = content == null ? "" : content.trim();
-                        if (pw.equals(in)) {
+                .setListener((dialog, content) -> {
+                    String in = content == null ? "" : content.trim();
+                    if (pw.equals(in)) {
+                        exitPwFailCount = 0;
+                        onPass.run();
+                    } else {
+                        exitPwFailCount++;
+                        if (exitPwFailCount >= 3) {
+                            exitPwLockUntil = System.currentTimeMillis() + 30_000L;
                             exitPwFailCount = 0;
-                            onPass.run();
+                            toastEL("错误次数过多，已锁定30秒");
                         } else {
-                            exitPwFailCount++;
-                            if (exitPwFailCount >= 3) {
-                                exitPwLockUntil = System.currentTimeMillis() + 30_000L;
-                                exitPwFailCount = 0;
-                                toastEL("错误次数过多，已锁定30秒");
-                            } else {
-                                toastEL("密码错误（还可尝试 " + (3 - exitPwFailCount) + " 次）");
-                            }
+                            toastEL("密码错误（还可尝试 " + (3 - exitPwFailCount) + " 次）");
                         }
                     }
                 })
@@ -551,8 +445,14 @@ public class StartLearnActivity extends AppCompatActivity {
         if (cfg.tempPassUntil <= now) {
             binding.tvTempPassStatus.setText("临时通行：未开启");
         } else {
-            long leftMin = Math.max(0, (cfg.tempPassUntil - now) / 60000);
-            binding.tvTempPassStatus.setText("临时通行：剩余" + leftMin + "分钟");
+            long leftMs = Math.max(0, cfg.tempPassUntil - now);
+            if (leftMs < 60_000L) {
+                long leftSec = Math.max(1, leftMs / 1000);
+                binding.tvTempPassStatus.setText("临时通行：剩余" + leftSec + "秒");
+            } else {
+                long leftMin = Math.max(1, leftMs / 60000);
+                binding.tvTempPassStatus.setText("临时通行：剩余" + leftMin + "分钟");
+            }
         }
     }
 
@@ -596,11 +496,8 @@ public class StartLearnActivity extends AppCompatActivity {
         if (enableAppAdapter != null)
             enableAppAdapter.submitList(new ArrayList<>());
 
-        binding.tvStartLearnCal.setVisibility(View.VISIBLE);
-        binding.tvStartLearnCalMsg.setVisibility(View.VISIBLE);
-        binding.tvStartLearnCal.setClickable(true);
+        binding.layoutTempPass.setVisibility(View.GONE);
 
-        binding.tvStartLearnCal.setText("查看努力记录");
         binding.tvStartLearnCalMsg.setText("让努力不只以成绩衡量，还有付出的精力与时间");
         calAction = CAL_ACTION_RECORD;
     }
@@ -789,111 +686,33 @@ public class StartLearnActivity extends AppCompatActivity {
         lnmDBUtils.deletePendingAll();
         SleepReportStore.finishSession(System.currentTimeMillis());
         FocusRulePrefs.setSleepAutoActive(false);
+        if (isTaskRoot()) {
+            Intent intent = new Intent(StartLearnActivity.this, LearnNoMobileActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        }
         finish();
-    }
-
-    private void initSleepAutoSwitch() {
-        updateSleepAutoSwitchState();
-        binding.switchSleepAuto.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (sleepAutoSwitchGuard) return;
-            if (!isChecked && sleepAutoMode) {
-                sleepAutoSwitchGuard = true;
-                buttonView.setChecked(true);
-                sleepAutoSwitchGuard = false;
-                new MessageDialog.Builder(StartLearnActivity.this)
-                        .setTitle("退出睡眠专注")
-                        .setMessage("请输入家长密码退出睡眠专注")
-                        .setConfirm("家长退出")
-                        .setCancel("取消")
-                        .setListener(new MessageDialog.OnListener() {
-                            @Override
-                            public void onConfirm(BaseDialog dialog) {
-                                requestExitWithPassword(StartLearnActivity.this::finishSleepAutoSilently);
-                            }
-
-                            @Override
-                            public void onCancel(BaseDialog dialog) {
-                            }
-                        }).show();
-                return;
-            }
-            if (isChecked && !sleepAutoMode) {
-                if (!isInSleepWindow()) {
-                    toastEL("不在睡眠时间段，无法开启睡眠专注");
-                    sleepAutoSwitchGuard = true;
-                    buttonView.setChecked(false);
-                    sleepAutoSwitchGuard = false;
-                    return;
-                }
-                enableSleepAutoNow();
-            }
-        });
-    }
-
-    private void updateSleepAutoSwitchState() {
-        if (!isInSleepWindow()) {
-            binding.layoutSleepAuto.setVisibility(View.GONE);
-            return;
-        }
-        binding.layoutSleepAuto.setVisibility(View.VISIBLE);
-        sleepAutoSwitchGuard = true;
-        binding.switchSleepAuto.setChecked(sleepAutoMode || FocusRulePrefs.isSleepAutoActive());
-        sleepAutoSwitchGuard = false;
-    }
-
-    private void enableSleepAutoNow() {
-        long endAt = calcSleepEndAtMs();
-        long now = System.currentTimeMillis();
-        long span = endAt > 0 ? Math.max(60_000L, endAt - now) : 0L;
-        if (span > 0) {
-            lnm2file.savePlanSpan(span);
-        }
-        FocusRulePrefs.setSleepAutoActive(true);
-        SleepReportStore.startSession(now, endAt);
-        sleepAutoMode = true;
-        applySleepAutoUi(true);
-        if (getIntent() != null) {
-            getIntent().putExtra(EXTRA_SLEEP_AUTO, true);
-        }
-        postStartLearn();
     }
 
     private void applySleepAutoUi(boolean enabled) {
         if (enabled) {
             binding.layoutTempPass.setVisibility(View.GONE);
             binding.tvStartLearnHistory.setVisibility(View.GONE);
-            binding.tvStartLearnCal.setVisibility(View.GONE);
-            {
-                binding.tvStartLearnCalMsg.setVisibility(View.VISIBLE);
-                binding.tvStartLearnCalMsg.setText("睡眠时间，请放下手机好好休息\n睡眠专注不计入统计");
-            }
-            {
-                binding.wlStartLearn.setTopTitle("睡眠中");
-                binding.wlStartLearn.setCenterTitle("请休息");
-                binding.wlStartLearn.setBottomTitle("自动睡眠专注");
-            }
+            binding.tvStartLearnCalMsg.setText("睡眠时间，请放下手机好好休息\n睡眠专注不计入统计");
+
+            binding.wlStartLearn.setTopTitle("睡眠中");
+            binding.wlStartLearn.setCenterTitle("请休息");
+            binding.wlStartLearn.setBottomTitle("自动睡眠专注");
+
         } else {
             binding.layoutTempPass.setVisibility(View.VISIBLE);
             binding.tvStartLearnHistory.setVisibility(View.VISIBLE);
-            binding.tvStartLearnCal.setVisibility(View.VISIBLE);
         }
-        updateSleepAutoSwitchState();
-    }
-
-    private boolean isInSleepWindow() {
-        FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
-        if (cfg == null || !cfg.enabled) return false;
-        Calendar cal = Calendar.getInstance();
-        int day = cal.get(Calendar.DAY_OF_WEEK);
-        boolean weekend = (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
-        int nowMin = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE);
-        FocusRulePrefs.TimeWindow w = weekend ? cfg.weekendSleep : cfg.schoolSleep;
-        return w != null && w.contains(nowMin);
     }
 
     private long calcSleepEndAtMs() {
         FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
-        if (cfg == null || !cfg.enabled) return 0L;
+        if (!cfg.enabled) return 0L;
         Calendar now = Calendar.getInstance();
         int day = now.get(Calendar.DAY_OF_WEEK);
         boolean weekend = (day == Calendar.SATURDAY || day == Calendar.SUNDAY);
@@ -942,10 +761,6 @@ public class StartLearnActivity extends AppCompatActivity {
         VibrateUtils.vibrate(200);
 
 
-        binding.tvStartLearnCal.setVisibility(View.GONE);
-        binding.tvStartLearnCalMsg.setVisibility(View.GONE);
-
-
         EventBus.getDefault().post(new MeLnmShowChart(true));
 
 
@@ -964,14 +779,7 @@ public class StartLearnActivity extends AppCompatActivity {
         lastRestEndAt = System.currentTimeMillis();
         lastRestRemindAt = 0L;
 
-        if (showCal) {
-            binding.tvStartLearnCal.setClickable(true);
-            calAction = CAL_ACTION_CANCEL;
-        } else {
-            // Clear any previous "view record" click handler while learning is active.
-            binding.tvStartLearnCal.setClickable(false);
-            calAction = CAL_ACTION_NONE;
-        }
+        calAction = CAL_ACTION_CANCEL;
         // 移除底部提示文本
 
         binding.wlStartLearn.setAnimDuration(3000);
@@ -979,9 +787,6 @@ public class StartLearnActivity extends AppCompatActivity {
         binding.wlStartLearn.resumeAnimation();
         binding.wlStartLearn.cancelAnimation();
         binding.wlStartLearn.startAnimation();
-
-        binding.tvStartLearnCal.setVisibility(View.VISIBLE);
-        binding.tvStartLearnCalMsg.setVisibility(View.VISIBLE);
 
         timeOff();
 
@@ -1015,15 +820,14 @@ public class StartLearnActivity extends AppCompatActivity {
     private void updateUI(long number) {
 
         try {
+            updateTempPassStatus();
 
-            if (number < 10 && showCal) {
-                binding.tvStartLearnCalMsg.setText((10 - number) + "s");
-                binding.tvStartLearnCal.setText("取消");
-                calAction = CAL_ACTION_CANCEL;
+            binding.tvStartLearnCal.setText("取消");
+            calAction = CAL_ACTION_CANCEL;
+            if (showCal && number < 10) {
+                binding.tvStartLearnCalMsg.setText((10 - number) + "s 内取消免密码");
             } else {
-                binding.tvStartLearnCalMsg.setVisibility(View.GONE);
-                binding.tvStartLearnCal.setVisibility(View.GONE);
-                if (calAction == CAL_ACTION_CANCEL) calAction = CAL_ACTION_NONE;
+                binding.tvStartLearnCalMsg.setText("取消视为失败，且需密码");
             }
 
             Date date = new Date();
@@ -1176,7 +980,6 @@ public class StartLearnActivity extends AppCompatActivity {
         binding.btnTempPass30.setEnabled(enabled);
         binding.btnTempPassEnd.setEnabled(enabled);
         binding.tvStartLearnHistory.setEnabled(enabled);
-        binding.tvStartLearnCal.setEnabled(enabled);
         binding.tvStartLearnCalMsg.setEnabled(enabled);
     }
 
@@ -1228,10 +1031,14 @@ public class StartLearnActivity extends AppCompatActivity {
                 toastEL("休息中，暂不可操作");
                 return;
             }
-            requestExitWithPassword(() -> {
+            if (canCancelAsNoRecord()) {
                 binding.tvStartLearnCalMsg.setText("取消中……");
-                binding.tvStartLearnCal.setClickable(false);
                 postCancelLearn();
+                return;
+            }
+            requestExitWithPassword(() -> {
+                binding.tvStartLearnCalMsg.setText("结束中（记为失败）……");
+                postUserStopLearn();
             });
             return;
         }
