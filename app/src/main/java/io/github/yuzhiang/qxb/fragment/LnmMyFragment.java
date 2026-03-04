@@ -36,6 +36,7 @@ import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
 import io.github.yuzhiang.qxb.model.lnm2file;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
 import io.github.yuzhiang.qxb.view.dialog.InputDialog;
+import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
 import io.github.yuzhiang.qxb.view.pickpic.ImageCropEngine;
 import io.github.yuzhiang.qxb.view.pickpic.ImageFileCompressEngine;
@@ -437,18 +438,21 @@ public class LnmMyFragment extends LazyFragment {
             long durMin = Math.max(0, TimeUtils.getTimeSpan(endMs, l.createdDate.getTime(), com.blankj.utilcode.constant.TimeConstants.MIN));
             String status = l.finish ? "成功" : "失败";
             int blocked = lnm2file.getScreenOnCount(l.id);
-            rows.add(s + " ~ " + e + " · " + durMin + "分钟 · " + status + " · 未允许应用" + blocked + "次");
+            rows.add(s + " ~ " + e + "(" + durMin + "分钟)\n" + status + " · 未允许应用" + blocked + "次\n");
         }
         String title = String.format(Locale.CHINA, "%d年%02d月%02d日",
                 start.get(Calendar.YEAR),
                 start.get(Calendar.MONTH) + 1,
                 start.get(Calendar.DAY_OF_MONTH));
-        new SelectDialog.Builder(getContext())
+        if (rows.isEmpty()) {
+            SimToast.toastEL("当天没有专注记录");
+            return;
+        }
+        String message = String.join("\n", rows);
+        new MessageDialog.Builder(getContext())
                 .setTitle(title)
-                .setList(rows)
-                .setMinSelect(0)
-                .setListener((dialog, data) -> {
-                })
+                .setTextGravity(android.view.Gravity.START)
+                .setMessage(message)
                 .show();
     }
 

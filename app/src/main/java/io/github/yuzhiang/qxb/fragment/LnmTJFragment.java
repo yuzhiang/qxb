@@ -135,12 +135,10 @@ public class LnmTJFragment extends LazyFragment {
 
         updateImportantBanner();
         updateSleepReportHint();
-        {
-            binding.btnSleepReportHistory.setOnClickListener(v -> showSleepReportHistory());
-        }
-        {
-            binding.tvSeedData.setOnClickListener(v -> showSeedDataDialog());
-        }
+        binding.btnSleepReportHistory.setOnClickListener(v -> showSleepReportHistory());
+
+        binding.tvSeedData.setOnClickListener(v -> showSeedDataDialog());
+
 
         int textColor = ContextCompat.getColor(mContext, R.color.colorTextContent);
 
@@ -158,28 +156,26 @@ public class LnmTJFragment extends LazyFragment {
         yrAxisWeek.setTextColor(textColor);
         yrAxisWeek.setDrawGridLines(false);
 
-        {
-            XAxis xAxisRecord = binding.chartRecordTrend.getXAxis();
-            xAxisRecord.setTextColor(textColor);
-            xAxisRecord.setPosition(XAxis.XAxisPosition.BOTTOM);
-            YAxis ylAxisRecord = binding.chartRecordTrend.getAxisLeft();
-            ylAxisRecord.setTextColor(textColor);
-            ylAxisRecord.enableGridDashedLine(10f, 10f, 0f);
-            YAxis yrAxisRecord = binding.chartRecordTrend.getAxisRight();
-            yrAxisRecord.setTextColor(textColor);
-            yrAxisRecord.setDrawGridLines(false);
-        }
-        {
-            XAxis xAxisReward = binding.chartRewardTrend.getXAxis();
-            xAxisReward.setTextColor(textColor);
-            xAxisReward.setPosition(XAxis.XAxisPosition.BOTTOM);
-            YAxis ylAxisReward = binding.chartRewardTrend.getAxisLeft();
-            ylAxisReward.setTextColor(textColor);
-            ylAxisReward.enableGridDashedLine(10f, 10f, 0f);
-            YAxis yrAxisReward = binding.chartRewardTrend.getAxisRight();
-            yrAxisReward.setTextColor(textColor);
-            yrAxisReward.setDrawGridLines(false);
-        }
+        XAxis xAxisRecord = binding.chartRecordTrend.getXAxis();
+        xAxisRecord.setTextColor(textColor);
+        xAxisRecord.setPosition(XAxis.XAxisPosition.BOTTOM);
+        YAxis ylAxisRecord = binding.chartRecordTrend.getAxisLeft();
+        ylAxisRecord.setTextColor(textColor);
+        ylAxisRecord.enableGridDashedLine(10f, 10f, 0f);
+        YAxis yrAxisRecord = binding.chartRecordTrend.getAxisRight();
+        yrAxisRecord.setTextColor(textColor);
+        yrAxisRecord.setDrawGridLines(false);
+
+
+        XAxis xAxisReward = binding.chartRewardTrend.getXAxis();
+        xAxisReward.setTextColor(textColor);
+        xAxisReward.setPosition(XAxis.XAxisPosition.BOTTOM);
+        YAxis ylAxisReward = binding.chartRewardTrend.getAxisLeft();
+        ylAxisReward.setTextColor(textColor);
+        ylAxisReward.enableGridDashedLine(10f, 10f, 0f);
+        YAxis yrAxisReward = binding.chartRewardTrend.getAxisRight();
+        yrAxisReward.setTextColor(textColor);
+        yrAxisReward.setDrawGridLines(false);
 
         setupProjectUnitToggle();
         setupChartClickDetails();
@@ -187,23 +183,22 @@ public class LnmTJFragment extends LazyFragment {
         binding.chartLnmWeeks.getDescription().setText("作业专注趋势（近7天）");
         binding.chartLnmWeeks.getDescription().setTextColor(textColor);
         binding.chartLnmWeeks.setNoDataText("暂无作业专注数据");
-        {
-            binding.chartRecordTrend.getDescription().setText("睡眠尝试玩手机（近7天）");
-            binding.chartRecordTrend.getDescription().setTextColor(textColor);
-            binding.chartRecordTrend.setNoDataText("暂无睡眠报告数据");
-        }
-        {
+
+
+        binding.chartRecordTrend.getDescription().setText("睡眠尝试玩手机（近7天）");
+        binding.chartRecordTrend.getDescription().setTextColor(textColor);
+        binding.chartRecordTrend.setNoDataText("暂无睡眠报告数据");
+
             binding.chartRewardTrend.getDescription().setText("奖励/兑换趋势（近7天）");
             binding.chartRewardTrend.getDescription().setTextColor(textColor);
             binding.chartRewardTrend.setNoDataText("暂无奖励数据");
-        }
+
         binding.chartLnmWeeks.getXAxis().setGranularity(1f); // minimum axis-step (interval) is 1
-        {
+
             binding.chartRecordTrend.getXAxis().setGranularity(1f);
-        }
-        {
+
             binding.chartRewardTrend.getXAxis().setGranularity(1f);
-        }
+
 
         initAdvancedToggle();
         setupStatsCardReorder();
@@ -234,12 +229,11 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void setAdvancedExpanded(boolean expanded) {
-        {
-            binding.cardStatProject.setVisibility(expanded ? View.VISIBLE : View.GONE);
-        }
-        {
-            binding.tvStatToggle.setText(expanded ? "隐藏学科统计" : "显示学科统计");
-        }
+
+        binding.cardStatProject.setVisibility(expanded ? View.VISIBLE : View.GONE);
+
+        binding.tvStatToggle.setText(expanded ? "隐藏学科统计" : "显示学科统计");
+
     }
 
     private void setCardLongPress(View card) {
@@ -933,10 +927,10 @@ public class LnmTJFragment extends LazyFragment {
 
     private void showStatsDetailDialog(String title, String message) {
         if (mContext == null) return;
-        new AlertDialog.Builder(mContext)
+        new MessageDialog.Builder(mContext)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("知道了", null)
+                .setConfirm("知道了")
                 .show();
     }
 
@@ -1633,17 +1627,12 @@ public class LnmTJFragment extends LazyFragment {
             String end = report.endAt > 0 ? TimeUtils.date2String(new Date(report.endAt), "HH:mm") : "未结束";
             items.add(start + " - " + end + " · 尝试 " + report.attemptCount + " 次");
         }
-        new SelectDialog.Builder(mContext)
+        String message = String.join("\n", items);
+        new MessageDialog.Builder(mContext)
                 .setTitle("历史睡眠报告")
-                .setList(items)
-                .setSingleSelect()
-                .setListener((dialog, data) -> {
-                    if (data == null || data.isEmpty()) return;
-                    Object selectedKey = data.keySet().iterator().next();
-                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
-                    SleepReportStore.SleepReport report = history.get(which);
-                    showSleepReportDetail(report);
-                })
+                .setTextGravity(android.view.Gravity.START)
+                .setMessage(message)
+                .setConfirm("知道了")
                 .show();
     }
 

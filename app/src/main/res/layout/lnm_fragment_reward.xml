@@ -72,14 +72,14 @@
             android:text="今日已使用：0 分钟"
             android:textSize="12sp" />
 
-        <Button
-            android:id="@+id/btn_reward_use"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="使用10分钟奖励" />
         </LinearLayout>
 
+            <Button
+                android:id="@+id/btn_reward_use"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="使用10分钟奖励" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
