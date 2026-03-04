@@ -99,9 +99,6 @@ public class LnmMyFragment extends LazyFragment {
         applyStudentModeUi();
 
         binding.tvMySettings.setOnClickListener(v -> openSettingsActivity());
-        if (binding.layoutParentEntry != null) {
-            binding.layoutParentEntry.setOnClickListener(v -> openModeEntry());
-        }
         if (binding.tvParentEntryAction != null) {
             binding.tvParentEntryAction.setOnClickListener(v -> openModeEntry());
         }
@@ -208,11 +205,11 @@ public class LnmMyFragment extends LazyFragment {
         if (studentMode) {
             if (binding.tvMySettings != null) binding.tvMySettings.setVisibility(View.GONE);
             if (binding.layoutMyShortcuts != null) binding.layoutMyShortcuts.setVisibility(View.GONE);
-            if (binding.layoutParentEntry != null) binding.layoutParentEntry.setVisibility(View.VISIBLE);
+            if (binding.tvParentEntryAction != null) binding.tvParentEntryAction.setVisibility(View.VISIBLE);
         } else {
             if (binding.tvMySettings != null) binding.tvMySettings.setVisibility(View.VISIBLE);
             if (binding.layoutMyShortcuts != null) binding.layoutMyShortcuts.setVisibility(View.VISIBLE);
-            if (binding.layoutParentEntry != null) binding.layoutParentEntry.setVisibility(View.VISIBLE);
+            if (binding.tvParentEntryAction != null) binding.tvParentEntryAction.setVisibility(View.VISIBLE);
         }
     }
 
