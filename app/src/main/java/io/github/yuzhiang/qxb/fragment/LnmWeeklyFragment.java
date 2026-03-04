@@ -53,7 +53,7 @@ public class LnmWeeklyFragment extends LazyFragment {
         binding = LnmFragmentWeeklyBinding.bind(view);
         StatusBarUtil.setPaddingSmart(getContext(), binding.ablWeekly);
 
-        if (binding.tvWeeklyHistory != null) {
+        {
             binding.tvWeeklyHistory.setOnClickListener(v -> showWeekSelector());
         }
         setupTodayCard();
@@ -113,13 +113,13 @@ public class LnmWeeklyFragment extends LazyFragment {
     private void setupTodayCard() {
         if (binding == null) return;
         View.OnClickListener toggle = v -> toggleTodayCard();
-        if (binding.layoutWeeklyTodayHeader != null) {
+        {
             binding.layoutWeeklyTodayHeader.setOnClickListener(toggle);
         }
-        if (binding.tvWeeklyTodayToggle != null) {
+        {
             binding.tvWeeklyTodayToggle.setOnClickListener(toggle);
         }
-        if (binding.cardWeeklyToday != null) {
+        {
             binding.cardWeeklyToday.setOnClickListener(toggle);
         }
         applyTodayExpanded(false);
@@ -132,10 +132,10 @@ public class LnmWeeklyFragment extends LazyFragment {
 
     private void applyTodayExpanded(boolean expanded) {
         if (binding == null) return;
-        if (binding.layoutWeeklyTodayBody != null) {
+        {
             binding.layoutWeeklyTodayBody.setVisibility(expanded ? View.VISIBLE : View.GONE);
         }
-        if (binding.tvWeeklyTodayToggle != null) {
+        {
             binding.tvWeeklyTodayToggle.setText(expanded ? "收起" : "展开");
         }
     }
@@ -143,25 +143,25 @@ public class LnmWeeklyFragment extends LazyFragment {
     private void updateTodayCard() {
         if (binding == null) return;
         ParentTodayReport.TodayStats stats = ParentTodayReport.buildTodayStats();
-        if (binding.tvWeeklyTodaySummary != null) {
+        {
             binding.tvWeeklyTodaySummary.setText(ParentTodayReport.buildSummaryLine(stats));
         }
-        if (binding.tvWeeklyTodayFocus != null) {
+        {
             binding.tvWeeklyTodayFocus.setText("今日专注：" + ParentTodayReport.formatDurationMs(stats.focusMs));
         }
-        if (binding.tvWeeklyTodayBlocked != null) {
+        {
             binding.tvWeeklyTodayBlocked.setText("未允许应用：" + stats.blockedAttempts + "次");
         }
-        if (binding.tvWeeklyTodaySleep != null) {
+        {
             binding.tvWeeklyTodaySleep.setText("睡眠尝试：" + stats.sleepAttempts + "次");
         }
-        if (binding.tvWeeklyTodayHomework != null) {
+        {
             binding.tvWeeklyTodayHomework.setText("作业打卡：" + stats.checkedToday + "项");
         }
-        if (binding.tvWeeklyTodayPending != null) {
+        {
             binding.tvWeeklyTodayPending.setText("待确认：" + stats.pendingConfirm + "项");
         }
-        if (binding.btnWeeklyTodayConfirm != null) {
+        {
             boolean enabled = stats.pendingConfirm > 0;
             binding.btnWeeklyTodayConfirm.setEnabled(enabled);
             binding.btnWeeklyTodayConfirm.setAlpha(enabled ? 1f : 0.5f);

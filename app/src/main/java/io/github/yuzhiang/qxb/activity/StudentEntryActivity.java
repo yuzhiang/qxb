@@ -112,7 +112,6 @@ public class StudentEntryActivity extends BaseActivity {
     }
 
     private void initRuleHint() {
-        if (binding.tvRuleHint == null) return;
         binding.tvRuleHint.setVisibility(View.VISIBLE);
         updateRuleHint();
         if (ruleHandler == null) {
@@ -134,7 +133,6 @@ public class StudentEntryActivity extends BaseActivity {
     }
 
     private void updateRuleHint() {
-        if (binding.tvRuleHint == null) return;
         FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
         if (cfg == null || !cfg.enabled) {
             binding.tvRuleHint.setText("当前时段：未开启规则");

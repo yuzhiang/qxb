@@ -63,7 +63,7 @@ public class LearnNoMobileActivity extends BaseActivity {
 
         binding.lnmVp.setOffscreenPageLimit(mFragments.size());
         binding.lnmVp.setUserInputEnabled(false);
-        if (binding.tvRuleHint != null) {
+        {
             binding.tvRuleHint.setVisibility(View.GONE);
         }
 

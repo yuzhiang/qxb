@@ -135,10 +135,10 @@ public class LnmTJFragment extends LazyFragment {
 
         updateImportantBanner();
         updateSleepReportHint();
-        if (binding.btnSleepReportHistory != null) {
+        {
             binding.btnSleepReportHistory.setOnClickListener(v -> showSleepReportHistory());
         }
-        if (binding.tvSeedData != null) {
+        {
             binding.tvSeedData.setOnClickListener(v -> showSeedDataDialog());
         }
 
@@ -158,7 +158,7 @@ public class LnmTJFragment extends LazyFragment {
         yrAxisWeek.setTextColor(textColor);
         yrAxisWeek.setDrawGridLines(false);
 
-        if (binding.chartRecordTrend != null) {
+        {
             XAxis xAxisRecord = binding.chartRecordTrend.getXAxis();
             xAxisRecord.setTextColor(textColor);
             xAxisRecord.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -169,7 +169,7 @@ public class LnmTJFragment extends LazyFragment {
             yrAxisRecord.setTextColor(textColor);
             yrAxisRecord.setDrawGridLines(false);
         }
-        if (binding.chartRewardTrend != null) {
+        {
             XAxis xAxisReward = binding.chartRewardTrend.getXAxis();
             xAxisReward.setTextColor(textColor);
             xAxisReward.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -187,21 +187,21 @@ public class LnmTJFragment extends LazyFragment {
         binding.chartLnmWeeks.getDescription().setText("作业专注趋势（近7天）");
         binding.chartLnmWeeks.getDescription().setTextColor(textColor);
         binding.chartLnmWeeks.setNoDataText("暂无作业专注数据");
-        if (binding.chartRecordTrend != null) {
+        {
             binding.chartRecordTrend.getDescription().setText("睡眠尝试玩手机（近7天）");
             binding.chartRecordTrend.getDescription().setTextColor(textColor);
             binding.chartRecordTrend.setNoDataText("暂无睡眠报告数据");
         }
-        if (binding.chartRewardTrend != null) {
+        {
             binding.chartRewardTrend.getDescription().setText("奖励/兑换趋势（近7天）");
             binding.chartRewardTrend.getDescription().setTextColor(textColor);
             binding.chartRewardTrend.setNoDataText("暂无奖励数据");
         }
         binding.chartLnmWeeks.getXAxis().setGranularity(1f); // minimum axis-step (interval) is 1
-        if (binding.chartRecordTrend != null) {
+        {
             binding.chartRecordTrend.getXAxis().setGranularity(1f);
         }
-        if (binding.chartRewardTrend != null) {
+        {
             binding.chartRewardTrend.getXAxis().setGranularity(1f);
         }
 
@@ -212,7 +212,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void setupStatsCardReorder() {
-        if (binding == null || binding.layoutStatsCards == null) return;
+        if (binding == null) return;
         applyStatsCardOrder();
         setCardLongPress(binding.cardStatSummary);
         setCardLongPress(binding.cardStatToggle);
@@ -223,24 +223,24 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void initAdvancedToggle() {
-        if (binding == null || binding.tvStatToggle == null) return;
+        if (binding == null) return;
         boolean expanded = SPUtils.getInstance().getBoolean(STATS_ADVANCED_EXPANDED_KEY, false);
         setAdvancedExpanded(expanded);
         binding.tvStatToggle.setOnClickListener(v -> {
-            boolean nowExpanded = binding.cardStatProject != null && binding.cardStatProject.getVisibility() != View.VISIBLE;
+            boolean nowExpanded = binding.cardStatProject.getVisibility() != View.VISIBLE;
             setAdvancedExpanded(nowExpanded);
             SPUtils.getInstance().put(STATS_ADVANCED_EXPANDED_KEY, nowExpanded);
         });
-        if (binding.cardStatToggle != null) {
+        {
             binding.cardStatToggle.setOnClickListener(v -> binding.tvStatToggle.performClick());
         }
     }
 
     private void setAdvancedExpanded(boolean expanded) {
-        if (binding.cardStatProject != null) {
+        {
             binding.cardStatProject.setVisibility(expanded ? View.VISIBLE : View.GONE);
         }
-        if (binding.tvStatToggle != null) {
+        {
             binding.tvStatToggle.setText(expanded ? "隐藏学科统计" : "显示学科统计");
         }
     }
@@ -254,7 +254,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void showCardOrderDialog(View card) {
-        if (binding == null || binding.layoutStatsCards == null || card == null) return;
+        if (binding == null || card == null) return;
         String[] items = new String[]{"上移", "下移", "置顶", "置底"};
         new SelectDialog.Builder(mContext)
                 .setTitle("调整顺序")
@@ -286,7 +286,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void moveCard(View card, int delta) {
-        if (binding == null || binding.layoutStatsCards == null) return;
+        if (binding == null) return;
         int index = binding.layoutStatsCards.indexOfChild(card);
         if (index < 0) return;
         int newIndex = Math.max(0, Math.min(binding.layoutStatsCards.getChildCount() - 1, index + delta));
@@ -295,7 +295,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void moveCardTo(View card, int index) {
-        if (binding == null || binding.layoutStatsCards == null) return;
+        if (binding == null) return;
         int count = binding.layoutStatsCards.getChildCount();
         if (index < 0 || index >= count) return;
         binding.layoutStatsCards.removeView(card);
@@ -303,7 +303,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void saveStatsCardOrder() {
-        if (binding == null || binding.layoutStatsCards == null) return;
+        if (binding == null) return;
         StringBuilder sb = new StringBuilder();
         int count = binding.layoutStatsCards.getChildCount();
         for (int i = 0; i < count; i++) {
@@ -321,7 +321,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void applyStatsCardOrder() {
-        if (binding == null || binding.layoutStatsCards == null) return;
+        if (binding == null) return;
         String saved = SPUtils.getInstance().getString(STATS_CARD_ORDER_KEY, "");
         if (saved == null || saved.trim().isEmpty()) return;
         String[] names = saved.split(",");
@@ -380,7 +380,7 @@ public class LnmTJFragment extends LazyFragment {
 
 
     private void setupProjectUnitToggle() {
-        if (binding == null || binding.tvProjectUnitMin == null || binding.tvProjectUnitSec == null) return;
+        if (binding == null) return;
         binding.tvProjectUnitMin.setOnClickListener(v -> {
             projectUnitInMinutes = true;
             updateProjectUnitUI();
@@ -395,7 +395,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void updateProjectUnitUI() {
-        if (binding == null || binding.tvProjectUnitMin == null || binding.tvProjectUnitSec == null) return;
+        if (binding == null) return;
         if (projectUnitInMinutes) {
             binding.tvProjectUnitMin.setTextColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
             binding.tvProjectUnitSec.setTextColor(ContextCompat.getColor(mContext, R.color.colorTextContent));
@@ -409,10 +409,10 @@ public class LnmTJFragment extends LazyFragment {
     private void updateProjectUnitTitle() {
         if (binding == null) return;
         String unit = projectUnitInMinutes ? "分钟" : "秒";
-        if (binding.tvProjectTitle != null) {
+        {
             binding.tvProjectTitle.setText("学科分布（" + unit + "）");
         }
-        if (binding.tvProjectBarTitle != null) {
+        {
             binding.tvProjectBarTitle.setText("学科时长（" + unit + "）");
         }
     }
@@ -425,23 +425,23 @@ public class LnmTJFragment extends LazyFragment {
         View.OnClickListener rewardListener = v -> showRewardTrendDetail();
 
         // Chart clicks show point detail; avoid duplicate dialogs from chart click + point selection.
-        if (binding.tvLnmCount3 != null) binding.tvLnmCount3.setOnClickListener(weeksListener);
+        binding.tvLnmCount3.setOnClickListener(weeksListener);
 
-        if (binding.chartProjectPie != null) binding.chartProjectPie.setOnClickListener(projectListener);
-        if (binding.chartProjectBar != null) binding.chartProjectBar.setOnClickListener(projectListener);
-        if (binding.tvProjectTitle != null) binding.tvProjectTitle.setOnClickListener(projectListener);
-        if (binding.tvProjectBarTitle != null) binding.tvProjectBarTitle.setOnClickListener(projectListener);
+        binding.chartProjectPie.setOnClickListener(projectListener);
+        binding.chartProjectBar.setOnClickListener(projectListener);
+        binding.tvProjectTitle.setOnClickListener(projectListener);
+        binding.tvProjectBarTitle.setOnClickListener(projectListener);
 
         // Chart clicks show point detail; avoid duplicate dialogs from chart click + point selection.
-        if (binding.tvRecordTitle != null) binding.tvRecordTitle.setOnClickListener(recordListener);
-        if (binding.tvRewardTrendTitle != null) binding.tvRewardTrendTitle.setOnClickListener(rewardListener);
+        binding.tvRecordTitle.setOnClickListener(recordListener);
+        binding.tvRewardTrendTitle.setOnClickListener(rewardListener);
 
         setupChartValueListeners();
     }
 
     private void setupChartValueListeners() {
         if (binding == null) return;
-        if (binding.chartLnmWeeks != null) {
+        {
             binding.chartLnmWeeks.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
@@ -455,7 +455,7 @@ public class LnmTJFragment extends LazyFragment {
                 }
             });
         }
-        if (binding.chartRecordTrend != null) {
+        {
             binding.chartRecordTrend.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
@@ -469,7 +469,7 @@ public class LnmTJFragment extends LazyFragment {
                 }
             });
         }
-        if (binding.chartRewardTrend != null) {
+        {
             binding.chartRewardTrend.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
                 @Override
                 public void onValueSelected(Entry e, Highlight h) {
@@ -567,16 +567,16 @@ public class LnmTJFragment extends LazyFragment {
         RewardEngine.settleDailyIfNeeded();
         RewardPrefs.RewardState st = RewardPrefs.loadState();
 
-        if (binding.tvStatTodayTime != null) {
+        {
             binding.tvStatTodayTime.setText("规则遵守：今日违规 " + blockedToday + " 次 · 近7天 " + blockedWeek + " 次");
         }
-        if (binding.tvStatTodayCount != null) {
+        {
             binding.tvStatTodayCount.setText("作业专注：今日 " + formatMinutesText(homeworkToday) + " · 近7天 " + formatMinutesText(homeworkWeek));
         }
-        if (binding.tvStatWeek != null) {
+        {
             binding.tvStatWeek.setText("早睡达标：" + sleepOkDays + "/7 天");
         }
-        if (binding.tvStatMonth != null) {
+        {
             binding.tvStatMonth.setText("连续打卡：专注 " + st.focusStreakDays + " 天 · 早睡 " + st.sleepStreakDays + " 天");
         }
     }
@@ -962,7 +962,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void updateHomeworkChart() {
-        if (binding == null || binding.chartLnmWeeks == null) return;
+        if (binding == null) return;
         List<DayBucket> buckets = buildRecentDayBuckets(7);
         List<Entry> entries = new ArrayList<>();
         List<String> labels = new ArrayList<>();
@@ -1002,7 +1002,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void updateSleepAttemptChart() {
-        if (binding == null || binding.chartRecordTrend == null) return;
+        if (binding == null) return;
         List<DayBucket> buckets = buildRecentDayBuckets(7);
         Map<String, SleepReportStore.SleepReport> map = buildSleepReportMap(buckets);
         List<Entry> entries = new ArrayList<>();
@@ -1044,7 +1044,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void updateRewardTrendChart() {
-        if (binding == null || binding.chartRewardTrend == null) return;
+        if (binding == null) return;
         RewardEngine.settleDailyIfNeeded();
         RewardPrefs.RewardConfig cfg = RewardPrefs.loadConfig();
 
@@ -1138,7 +1138,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void updateProjectCharts() {
-        if (binding == null || binding.chartProjectPie == null || binding.chartProjectBar == null) return;
+        if (binding == null) return;
         List<StudyProjectRecord> records = lnm2file.getStudyProjectRecords();
         if (records == null || records.isEmpty()) {
             binding.chartProjectPie.setNoDataText("暂无学科统计");
@@ -1221,7 +1221,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void updateRecordTrendChart() {
-        if (binding == null || binding.chartRecordTrend == null) return;
+        if (binding == null) return;
         List<Lnm> list = lnmDBUtils.findByTimeAsc();
         if (list == null || list.isEmpty()) {
             binding.chartRecordTrend.setNoDataText("暂无专注记录");
@@ -1607,7 +1607,7 @@ public class LnmTJFragment extends LazyFragment {
     }
 
     private void updateSleepReportHint() {
-        if (binding == null || binding.tvSleepReportHint == null) return;
+        if (binding == null) return;
         List<SleepReportStore.SleepReport> history = SleepReportStore.loadHistory();
         if (history.isEmpty()) {
             binding.tvSleepReportHint.setText("暂无睡眠报告");

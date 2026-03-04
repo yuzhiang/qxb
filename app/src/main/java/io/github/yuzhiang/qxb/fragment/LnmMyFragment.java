@@ -102,26 +102,26 @@ public class LnmMyFragment extends LazyFragment {
         applyStudentModeUi();
 
         binding.tvMySettings.setOnClickListener(v -> openSettingsActivity());
-        if (binding.tvParentEntryAction != null) {
+        {
             binding.tvParentEntryAction.setOnClickListener(v -> openModeEntry());
         }
         binding.ivMyAvatar.setOnClickListener(v -> changeAvatar());
-        if (binding.tvMyVow != null) {
+        {
             binding.tvMyVow.setOnClickListener(v -> showVowDialog());
         }
         binding.tvMyHistory.setOnClickListener(v ->
                 startActivity(new android.content.Intent(getContext(), LnmRecordActivity.class)));
-        if (binding.tvMyWeekly != null) {
+        {
             binding.tvMyWeekly.setOnClickListener(v -> {
                 if (getActivity() instanceof LearnNoMobileActivity) {
                     ((LearnNoMobileActivity) getActivity()).switchToTab(0);
                 }
             });
         }
-        if (binding.tvMyCalendarPrev != null) {
+        {
             binding.tvMyCalendarPrev.setOnClickListener(v -> shiftMonth(-1));
         }
-        if (binding.tvMyCalendarNext != null) {
+        {
             binding.tvMyCalendarNext.setOnClickListener(v -> shiftMonth(1));
         }
     }
@@ -144,12 +144,12 @@ public class LnmMyFragment extends LazyFragment {
     }
 
     private void updateNick() {
-        if (binding == null || binding.tvMyNick == null) return;
+        if (binding == null) return;
         binding.tvMyNick.setText(UsrMsgUtils.getNickName());
     }
 
     private void updateModeEntry() {
-        if (binding == null || binding.tvParentEntryAction == null) return;
+        if (binding == null) return;
         if (!studentMode) {
             binding.tvParentEntryAction.setText("学生入口");
             return;
@@ -207,18 +207,18 @@ public class LnmMyFragment extends LazyFragment {
     private void applyStudentModeUi() {
         if (binding == null) return;
         if (studentMode) {
-            if (binding.tvMySettings != null) binding.tvMySettings.setVisibility(View.GONE);
-            if (binding.layoutMyShortcuts != null) binding.layoutMyShortcuts.setVisibility(View.GONE);
-            if (binding.tvParentEntryAction != null) binding.tvParentEntryAction.setVisibility(View.VISIBLE);
+            binding.tvMySettings.setVisibility(View.GONE);
+            binding.layoutMyShortcuts.setVisibility(View.GONE);
+            binding.tvParentEntryAction.setVisibility(View.VISIBLE);
         } else {
-            if (binding.tvMySettings != null) binding.tvMySettings.setVisibility(View.VISIBLE);
-            if (binding.layoutMyShortcuts != null) binding.layoutMyShortcuts.setVisibility(View.VISIBLE);
-            if (binding.tvParentEntryAction != null) binding.tvParentEntryAction.setVisibility(View.VISIBLE);
+            binding.tvMySettings.setVisibility(View.VISIBLE);
+            binding.layoutMyShortcuts.setVisibility(View.VISIBLE);
+            binding.tvParentEntryAction.setVisibility(View.VISIBLE);
         }
     }
 
     private void updateVow() {
-        if (binding == null || binding.tvMyVow == null) return;
+        if (binding == null) return;
         String vow = UsrMsgUtils.getSignature();
         if (vow == null || vow.trim().isEmpty()) {
             vow = "写一句誓言吧";

@@ -169,7 +169,7 @@ public class StartLearnActivity extends AppCompatActivity {
         binding.tvStartLearnHistory.setOnClickListener(v -> {
             startActivity(new Intent(StartLearnActivity.this, LnmRecordActivity.class));
         });
-        if (binding.btnTempPass10 != null) {
+        {
             binding.btnTempPass10.setOnClickListener(v -> {
                 new MessageDialog.Builder(StartLearnActivity.this)
                         .setTitle("临时通行")
@@ -190,7 +190,7 @@ public class StartLearnActivity extends AppCompatActivity {
                         }).show();
             });
         }
-        if (binding.btnTempPass30 != null) {
+        {
             binding.btnTempPass30.setOnClickListener(v -> {
                 new MessageDialog.Builder(StartLearnActivity.this)
                         .setTitle("临时通行")
@@ -211,7 +211,7 @@ public class StartLearnActivity extends AppCompatActivity {
                         }).show();
             });
         }
-        if (binding.btnTempPassEnd != null) {
+        {
             binding.btnTempPassEnd.setOnClickListener(v -> {
                 new MessageDialog.Builder(StartLearnActivity.this)
                         .setTitle("临时通行")
@@ -545,7 +545,7 @@ public class StartLearnActivity extends AppCompatActivity {
     }
 
     private void updateTempPassStatus() {
-        if (binding == null || binding.tvTempPassStatus == null) return;
+        if (binding == null) return;
         FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
         if (cfg == null) {
             binding.tvTempPassStatus.setText("临时通行：未开启");
@@ -782,7 +782,6 @@ public class StartLearnActivity extends AppCompatActivity {
     }
 
     private void initSleepAutoSwitch() {
-        if (binding.layoutSleepAuto == null || binding.switchSleepAuto == null) return;
         updateSleepAutoSwitchState();
         binding.switchSleepAuto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (sleepAutoSwitchGuard) return;
@@ -821,7 +820,6 @@ public class StartLearnActivity extends AppCompatActivity {
     }
 
     private void updateSleepAutoSwitchState() {
-        if (binding.layoutSleepAuto == null || binding.switchSleepAuto == null) return;
         if (!isInSleepWindow()) {
             binding.layoutSleepAuto.setVisibility(View.GONE);
             return;
@@ -851,22 +849,22 @@ public class StartLearnActivity extends AppCompatActivity {
 
     private void applySleepAutoUi(boolean enabled) {
         if (enabled) {
-            if (binding.layoutTempPass != null) binding.layoutTempPass.setVisibility(View.GONE);
-            if (binding.tvStartLearnHistory != null) binding.tvStartLearnHistory.setVisibility(View.GONE);
-            if (binding.tvStartLearnCal != null) binding.tvStartLearnCal.setVisibility(View.GONE);
-            if (binding.tvStartLearnCalMsg != null) {
+            binding.layoutTempPass.setVisibility(View.GONE);
+            binding.tvStartLearnHistory.setVisibility(View.GONE);
+            binding.tvStartLearnCal.setVisibility(View.GONE);
+            {
                 binding.tvStartLearnCalMsg.setVisibility(View.VISIBLE);
                 binding.tvStartLearnCalMsg.setText("睡眠时间，请放下手机好好休息\n睡眠专注不计入统计");
             }
-            if (binding.wlStartLearn != null) {
+            {
                 binding.wlStartLearn.setTopTitle("睡眠中");
                 binding.wlStartLearn.setCenterTitle("请休息");
                 binding.wlStartLearn.setBottomTitle("自动睡眠专注");
             }
         } else {
-            if (binding.layoutTempPass != null) binding.layoutTempPass.setVisibility(View.VISIBLE);
-            if (binding.tvStartLearnHistory != null) binding.tvStartLearnHistory.setVisibility(View.VISIBLE);
-            if (binding.tvStartLearnCal != null) binding.tvStartLearnCal.setVisibility(View.VISIBLE);
+            binding.layoutTempPass.setVisibility(View.VISIBLE);
+            binding.tvStartLearnHistory.setVisibility(View.VISIBLE);
+            binding.tvStartLearnCal.setVisibility(View.VISIBLE);
         }
         updateSleepAutoSwitchState();
     }
@@ -1157,13 +1155,13 @@ public class StartLearnActivity extends AppCompatActivity {
 
     private void setRestUiEnabled(boolean enabled) {
         if (binding == null) return;
-        if (binding.layoutTempPass != null) binding.layoutTempPass.setEnabled(enabled);
-        if (binding.btnTempPass10 != null) binding.btnTempPass10.setEnabled(enabled);
-        if (binding.btnTempPass30 != null) binding.btnTempPass30.setEnabled(enabled);
-        if (binding.btnTempPassEnd != null) binding.btnTempPassEnd.setEnabled(enabled);
-        if (binding.tvStartLearnHistory != null) binding.tvStartLearnHistory.setEnabled(enabled);
-        if (binding.tvStartLearnCal != null) binding.tvStartLearnCal.setEnabled(enabled);
-        if (binding.tvStartLearnCalMsg != null) binding.tvStartLearnCalMsg.setEnabled(enabled);
+        binding.layoutTempPass.setEnabled(enabled);
+        binding.btnTempPass10.setEnabled(enabled);
+        binding.btnTempPass30.setEnabled(enabled);
+        binding.btnTempPassEnd.setEnabled(enabled);
+        binding.tvStartLearnHistory.setEnabled(enabled);
+        binding.tvStartLearnCal.setEnabled(enabled);
+        binding.tvStartLearnCalMsg.setEnabled(enabled);
     }
 
     private void timeOff() {
