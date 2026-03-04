@@ -106,9 +106,6 @@ public class LnmMyFragment extends LazyFragment {
             binding.tvParentEntryAction.setOnClickListener(v -> openModeEntry());
         }
         binding.ivMyAvatar.setOnClickListener(v -> changeAvatar());
-        if (binding.tvMyAvatarEdit != null) {
-            binding.tvMyAvatarEdit.setOnClickListener(v -> changeAvatar());
-        }
         if (binding.tvMyVow != null) {
             binding.tvMyVow.setOnClickListener(v -> showVowDialog());
         }
