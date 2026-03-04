@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -74,6 +75,7 @@ public class LearnNoMobileActivity extends BaseActivity {
         });
 
         menu();
+        applyBottomNavInset();
         if (savedInstanceState == null) {
             binding.getRoot().post(this::showParentTodayDialog);
         }
@@ -102,6 +104,19 @@ public class LearnNoMobileActivity extends BaseActivity {
 
         binding.bottomNavigationLnm.setCurrentItem(0);
 
+    }
+
+    private void applyBottomNavInset() {
+        binding.bottomNavigationLnm.post(() -> {
+            ViewGroup.LayoutParams lp = binding.lnmVp.getLayoutParams();
+            if (!(lp instanceof ViewGroup.MarginLayoutParams)) return;
+            int navHeight = binding.bottomNavigationLnm.getHeight();
+            if (navHeight <= 0) return;
+            ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) lp;
+            if (mlp.bottomMargin == navHeight) return;
+            mlp.bottomMargin = navHeight;
+            binding.lnmVp.setLayoutParams(mlp);
+        });
     }
 
     public void switchToTab(int index) {

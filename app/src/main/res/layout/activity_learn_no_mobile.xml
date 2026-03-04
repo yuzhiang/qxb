@@ -23,7 +23,8 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/lnm_vp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp" />
 
     <com.aurelhubert.ahbottomnavigation.AHBottomNavigation
         android:id="@+id/bottom_navigation_lnm"

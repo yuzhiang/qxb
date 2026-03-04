@@ -11,6 +11,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.ViewGroup;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -71,6 +72,7 @@ public class StudentEntryActivity extends BaseActivity {
         });
 
         menu();
+        applyBottomNavInset();
         initRuleHint();
         RewardEngine.settleDailyIfNeeded();
         RewardEngine.resetDailyUsageIfNeeded();
@@ -94,6 +96,19 @@ public class StudentEntryActivity extends BaseActivity {
             return true;
         });
         binding.bottomNavigationLnm.setCurrentItem(0);
+    }
+
+    private void applyBottomNavInset() {
+        binding.bottomNavigationLnm.post(() -> {
+            ViewGroup.LayoutParams lp = binding.lnmVp.getLayoutParams();
+            if (!(lp instanceof ViewGroup.MarginLayoutParams)) return;
+            int navHeight = binding.bottomNavigationLnm.getHeight();
+            if (navHeight <= 0) return;
+            ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) lp;
+            if (mlp.bottomMargin == navHeight) return;
+            mlp.bottomMargin = navHeight;
+            binding.lnmVp.setLayoutParams(mlp);
+        });
     }
 
     private void initRuleHint() {
