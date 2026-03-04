@@ -24,25 +24,22 @@
             app:popupTheme="@style/popup_theme">
             <!--android:background="?attr/colorPrimary"-->
 
-            <RelativeLayout
-                android:id="@+id/rl_close_jwk_plan"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
                 <TextView
+                    android:layout_gravity="start|center_vertical"
                     android:drawablePadding="5dp"
                     android:layout_marginStart="16dp"
-                    android:drawableStart="@drawable/ic_close"
                     android:gravity="center"
                     android:id="@+id/tv_lnm_record_title"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="专注统计"
                     android:textColor="@android:color/white"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    app:drawableStartCompat="@drawable/ic_close" />
 
 
                 <ImageView
+                    android:layout_gravity="end|center_vertical"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:id="@+id/iv_share_lnm"
@@ -51,7 +48,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent" />
 
-            </RelativeLayout>
 
         </androidx.appcompat.widget.Toolbar>
 

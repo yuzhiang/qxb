@@ -248,8 +248,8 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
             binding.tvLnmRecordStart.setText(s0);
             binding.tvLnmRecordEnd.setText(s1);
 
-            binding.tvLnmRecordStart0.setText("第" + LnmDateUtils.getThisWeek(dateList.get(0)) + "周");
-            binding.tvLnmRecordEnd0.setText("第" + LnmDateUtils.getThisWeek(dateList.get(dateList.size() - 1)) + "周");
+//            binding.tvLnmRecordStart0.setText("第" + LnmDateUtils.getThisWeek(dateList.get(0)) + "周");
+//            binding.tvLnmRecordEnd0.setText("第" + LnmDateUtils.getThisWeek(dateList.get(dateList.size() - 1)) + "周");
 
         }
 
@@ -308,7 +308,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
 
         BarData lineDataDay = new BarData();
 
-        BarDataSet lineDataSetDay = new BarDataSet(entries, "每日专注时间"); // add entries to dataset
+        BarDataSet lineDataSetDay = new BarDataSet(entries, "专注时间"); // add entries to dataset
         lineDataSetDay.setColor(ContextCompat.getColor(mContext, UsrMsgUtils.getThemeColor()));
         lineDataSetDay.setValueTextSize(10f);
         lineDataSetDay.setValueTextColor(ContextCompat.getColor(mContext, UsrMsgUtils.getThemeColor())); // styling, ...
@@ -339,7 +339,6 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
 
 
         String s2 = "共" + allTime + "h";
-        binding.tvLnmRecordTime.setText(String.valueOf(allTime));
 
 
         LimitLine ll2 = new LimitLine((float) dayTime, s + "，" + s2);
@@ -362,12 +361,11 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
         if (!dateList.isEmpty()) {
             Date start = dateList.get(0);
             Date end = dateList.get(dateList.size() - 1);
-            updateRecordList(start, end);
+            updateRecordList(start, end, s2);
         }
-
     }
 
-    private void updateRecordList(Date start, Date end) {
+    private void updateRecordList(Date start, Date end, String s2) {
         List<Lnm> list = lnmDBUtils.findBetween(start, end);
         if (list == null) list = new ArrayList<>();
         list.sort((a, b) -> {
@@ -379,7 +377,7 @@ public class PlaceholderLnmRecordFragment extends LazyFragment {
             list = list.subList(0, 50);
         }
         recordAdapter.submit(list);
-        binding.tvLnmRecordDetailLabel.setText(list.isEmpty() ? "历史记录（暂无）" : "历史记录（" + list.size() + "）");
+        binding.tvLnmRecordDetailLabel.setText(list.isEmpty() ? "历史记录（暂无）" : "历史记录（" + list.size() + "条，" + s2 + "）");
     }
 
     private static class RecordAdapter extends RecyclerView.Adapter<RecordHolder> {
