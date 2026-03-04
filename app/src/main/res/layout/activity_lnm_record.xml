@@ -53,6 +53,10 @@
 
         <com.google.android.material.tabs.TabLayout
             app:tabIndicatorFullWidth="false"
+            app:tabIndicatorColor="@color/white"
+            app:tabRippleColor="@color/transparent"
+            app:tabTextColor="@color/white70"
+            app:tabSelectedTextColor="@color/white"
             android:id="@+id/tabs_lnm_record"
             android:layout_width="match_parent"
             android:layout_height="36dp" />

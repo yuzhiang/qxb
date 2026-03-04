@@ -88,7 +88,7 @@ public class LearnNoMobileActivity extends BaseActivity {
         binding.bottomNavigationLnm.addItems(Arrays.asList(
                 new AHBottomNavigationItem(R.string.main_tab_lnm3, R.drawable.ic_suggestion, R.color.white),
                 new AHBottomNavigationItem(R.string.main_tab_lnm6, R.drawable.ic_tongji_24dp, R.color.white),
-                new AHBottomNavigationItem(R.string.main_tab_lnm5, R.drawable.ic_boy, R.color.white)
+                new AHBottomNavigationItem(R.string.main_tab_lnm5, R.drawable.ic_my, R.color.white)
         ));
 
         // Set background color

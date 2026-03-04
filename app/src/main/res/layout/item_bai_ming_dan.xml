@@ -17,7 +17,6 @@
     <ImageView
         android:id="@+id/iv_app_icon"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/logo"
         android:layout_width="36dp"
         android:layout_height="match_parent" />
 

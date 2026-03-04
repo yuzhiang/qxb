@@ -28,7 +28,6 @@
         android:id="@+id/lnm_all_head"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:src="@drawable/logo"
         android:transitionName="@string/tn_head"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/tv_item_lnm_num"

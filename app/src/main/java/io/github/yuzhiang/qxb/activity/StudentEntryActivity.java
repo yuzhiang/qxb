@@ -80,10 +80,10 @@ public class StudentEntryActivity extends BaseActivity {
 
     private void menu() {
         binding.bottomNavigationLnm.addItems(Arrays.asList(
-                new AHBottomNavigationItem(R.string.main_tab_lnm1, R.drawable.ic_timeline, R.color.white),
-                new AHBottomNavigationItem(R.string.main_tab_lnm2, R.drawable.ic_pets, R.color.white),
+                new AHBottomNavigationItem(R.string.main_tab_lnm1, R.drawable.ic_todo, R.color.white),
+                new AHBottomNavigationItem(R.string.main_tab_lnm2, R.drawable.ic_time, R.color.white),
                 new AHBottomNavigationItem(R.string.main_tab_lnm4, R.drawable.ic_timeline, R.color.white),
-                new AHBottomNavigationItem(R.string.main_tab_lnm5, R.drawable.ic_boy, R.color.white)
+                new AHBottomNavigationItem(R.string.main_tab_lnm5, R.drawable.ic_my, R.color.white)
         ));
 
         binding.bottomNavigationLnm.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.navigation_color));
