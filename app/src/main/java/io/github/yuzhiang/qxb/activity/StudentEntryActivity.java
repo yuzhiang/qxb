@@ -53,8 +53,6 @@ public class StudentEntryActivity extends BaseActivity {
         BarUtils.setNavBarLightMode(this, true);
         BarUtils.setNavBarColor(this, ContextCompat.getColor(this, R.color.navigation_color));
 
-        showMsg();
-
         List<Fragment> mFragments = Arrays.asList(
                 LnmAllFragment.newInstance(),
                 LnmMainFragment.newInstance(),
@@ -159,40 +157,4 @@ public class StudentEntryActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    public void showMsg() {
-        if (SPUtils.getInstance().getInt(PM_TC, 0) == 0 && (RomUtils.isXiaomi() || RomUtils.isVivo())) {
-
-            String showCalculateMsgTitle = "注意";
-            String showCalculateMsg
-                    = "小米手机需要\n" +
-                    "    1. 后台弹出界面权限（小米手机权限设置中）\n" +
-                    "    2. 后台保护（vivo手机，最近程序加上“锁”）\n" +
-                    "    3. 自启权限（大多手机都需要，一般在设置里打开）" +
-                    "请自行开启";
-
-            new MessageDialog.Builder(StudentEntryActivity.this)
-                    .setTitle(showCalculateMsgTitle)
-                    .setMessage(showCalculateMsg)
-                    .setCancelable(false)
-                    .setConfirm("“后台弹出界面”权限")
-                    .setCancel("取消")
-                    .setListener(dialog1 -> {
-
-                        if (RomUtils.isXiaomi()) {
-                            Jump();
-                        } else {
-                            launchAppDetailsSettings();
-                        }
-                    })
-                    .show();
-        }
-    }
-
-    public void Jump() {
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.fromParts("package", getPackageName(), null));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
 }
