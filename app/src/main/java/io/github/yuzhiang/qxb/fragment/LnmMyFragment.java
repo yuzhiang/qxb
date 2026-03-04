@@ -95,21 +95,15 @@ public class LnmMyFragment extends LazyFragment {
         updateCalendar();
         updateVow();
         updateNick();
-        updateParentEntry();
+        updateModeEntry();
         applyStudentModeUi();
 
         binding.tvMySettings.setOnClickListener(v -> openSettingsActivity());
         if (binding.layoutParentEntry != null) {
-            binding.layoutParentEntry.setOnClickListener(v -> openParentEntry());
+            binding.layoutParentEntry.setOnClickListener(v -> openModeEntry());
         }
         if (binding.tvParentEntryAction != null) {
-            binding.tvParentEntryAction.setOnClickListener(v -> openParentEntry());
-        }
-        if (binding.layoutStudentEntry != null) {
-            binding.layoutStudentEntry.setOnClickListener(v -> openStudentEntry());
-        }
-        if (binding.tvStudentEntryAction != null) {
-            binding.tvStudentEntryAction.setOnClickListener(v -> openStudentEntry());
+            binding.tvParentEntryAction.setOnClickListener(v -> openModeEntry());
         }
         binding.ivMyAvatar.setOnClickListener(v -> changeAvatar());
         if (binding.tvMyAvatarEdit != null) {
@@ -142,7 +136,7 @@ public class LnmMyFragment extends LazyFragment {
         updateCalendar();
         updateVow();
         updateNick();
-        updateParentEntry();
+        updateModeEntry();
         applyStudentModeUi();
     }
 
@@ -156,15 +150,20 @@ public class LnmMyFragment extends LazyFragment {
         binding.tvMyNick.setText(UsrMsgUtils.getNickName());
     }
 
-    private void updateParentEntry() {
-        if (binding == null || binding.tvParentEntryDesc == null) return;
-        String pw = UsrMsgUtils.getFocusExitPassword();
-        if (pw == null || pw.trim().isEmpty()) {
-            binding.tvParentEntryDesc.setText("未设置家长密码");
-            binding.tvParentEntryDesc.setTextColor(ContextCompat.getColor(getContext(), R.color.colorTextAssistant));
+    private void updateModeEntry() {
+        if (binding == null || binding.tvParentEntryAction == null) return;
+        if (!studentMode) {
+            binding.tvParentEntryAction.setText("学生入口");
+            return;
+        }
+        binding.tvParentEntryAction.setText("家长入口");
+    }
+
+    private void openModeEntry() {
+        if (studentMode) {
+            openParentEntry();
         } else {
-            binding.tvParentEntryDesc.setText("需输入密码");
-            binding.tvParentEntryDesc.setTextColor(ContextCompat.getColor(getContext(), R.color.colorTextAssistant));
+            openStudentEntry();
         }
     }
 
@@ -189,12 +188,22 @@ public class LnmMyFragment extends LazyFragment {
 
     private void openParentMode() {
         if (getContext() == null) return;
-        startActivity(new Intent(getContext(), LearnNoMobileActivity.class));
+        Intent intent = new Intent(getContext(), LearnNoMobileActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
     }
 
     private void openStudentEntry() {
         if (getContext() == null) return;
-        startActivity(new Intent(getContext(), StudentEntryActivity.class));
+        Intent intent = new Intent(getContext(), StudentEntryActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
     }
 
     private void applyStudentModeUi() {
@@ -203,12 +212,10 @@ public class LnmMyFragment extends LazyFragment {
             if (binding.tvMySettings != null) binding.tvMySettings.setVisibility(View.GONE);
             if (binding.layoutMyShortcuts != null) binding.layoutMyShortcuts.setVisibility(View.GONE);
             if (binding.layoutParentEntry != null) binding.layoutParentEntry.setVisibility(View.VISIBLE);
-            if (binding.layoutStudentEntry != null) binding.layoutStudentEntry.setVisibility(View.GONE);
         } else {
             if (binding.tvMySettings != null) binding.tvMySettings.setVisibility(View.VISIBLE);
             if (binding.layoutMyShortcuts != null) binding.layoutMyShortcuts.setVisibility(View.VISIBLE);
-            if (binding.layoutParentEntry != null) binding.layoutParentEntry.setVisibility(View.GONE);
-            if (binding.layoutStudentEntry != null) binding.layoutStudentEntry.setVisibility(View.VISIBLE);
+            if (binding.layoutParentEntry != null) binding.layoutParentEntry.setVisibility(View.VISIBLE);
         }
     }
 
