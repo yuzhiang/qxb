@@ -48,14 +48,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="选择已有科目" />
+                android:text="已有" />
 
             <RadioButton
                 android:id="@+id/rb_category_new"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:text="新建科目" />
+                android:text="新建" />
         </RadioGroup>
 
         <Spinner

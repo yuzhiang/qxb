@@ -13,7 +13,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,7 +45,9 @@ import io.github.yuzhiang.qxb.model.todo.TodoListEntry;
 import io.github.yuzhiang.qxb.model.todo.TodoPrefs;
 import io.github.yuzhiang.qxb.model.todo.TodoTimeUtils;
 import io.github.yuzhiang.qxb.view.dialog.InputDialog;
+import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
+import io.github.yuzhiang.qxb.view.dialog.UIDialog;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 public class LnmAllFragment extends LazyFragment {
@@ -187,14 +188,23 @@ public class LnmAllFragment extends LazyFragment {
                         rebuildList();
                         return;
                     }
-                    new AlertDialog.Builder(mContext)
+                    new MessageDialog.Builder(mContext)
                             .setTitle("删除科目")
                             .setMessage("删除科目后，该科目内作业会移到未分类")
-                            .setNegativeButton("取消", (d, w) -> rebuildList())
-                            .setPositiveButton("删除", (d, w) -> {
-                                moveGroupToDefault(group);
-                                saveGroups();
-                                rebuildList();
+                            .setCancel("取消")
+                            .setConfirm("删除")
+                            .setListener(new MessageDialog.OnListener() {
+                                @Override
+                                public void onConfirm(BaseDialog dialog) {
+                                    moveGroupToDefault(group);
+                                    saveGroups();
+                                    rebuildList();
+                                }
+
+                                @Override
+                                public void onCancel(BaseDialog dialog) {
+                                    rebuildList();
+                                }
                             })
                             .show();
                 } else {
@@ -203,14 +213,23 @@ public class LnmAllFragment extends LazyFragment {
                         rebuildList();
                         return;
                     }
-                    new AlertDialog.Builder(mContext)
+                    new MessageDialog.Builder(mContext)
                             .setTitle("删除作业")
                             .setMessage("确定删除该作业？")
-                            .setNegativeButton("取消", (d, w) -> rebuildList())
-                            .setPositiveButton("删除", (d, w) -> {
-                                removeTodoItem(entry.getGroup(), item);
-                                saveGroups();
-                                rebuildList();
+                            .setCancel("取消")
+                            .setConfirm("删除")
+                            .setListener(new MessageDialog.OnListener() {
+                                @Override
+                                public void onConfirm(BaseDialog dialog) {
+                                    removeTodoItem(entry.getGroup(), item);
+                                    saveGroups();
+                                    rebuildList();
+                                }
+
+                                @Override
+                                public void onCancel(BaseDialog dialog) {
+                                    rebuildList();
+                                }
                             })
                             .show();
                 }
@@ -252,14 +271,18 @@ public class LnmAllFragment extends LazyFragment {
                     } else if ("编辑科目".equals(action)) {
                         showEditGroupDialog(group);
                     } else if ("删除科目".equals(action)) {
-                        new AlertDialog.Builder(mContext)
+                        new MessageDialog.Builder(mContext)
                                 .setTitle("删除科目")
                                 .setMessage("删除科目后，该科目内作业会移到未分类")
-                                .setNegativeButton("取消", null)
-                                .setPositiveButton("删除", (d2, w2) -> {
-                                    moveGroupToDefault(group);
-                                    saveGroups();
-                                    rebuildList();
+                                .setCancel("取消")
+                                .setConfirm("删除")
+                                .setListener(new MessageDialog.OnListener() {
+                                    @Override
+                                    public void onConfirm(BaseDialog dialog) {
+                                        moveGroupToDefault(group);
+                                        saveGroups();
+                                        rebuildList();
+                                    }
                                 })
                                 .show();
                     }
@@ -439,65 +462,72 @@ public class LnmAllFragment extends LazyFragment {
             dialog.show();
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑作业")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", null)
-                .create();
-
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String title = etTitle.getText().toString().trim();
-            if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入作业名称");
-                return;
-            }
-
-            String category = "";
-            if (rbCategoryExist.isChecked()) {
-                if (!categories.isEmpty()) {
-                    category = categories.get(spCategory.getSelectedItemPosition());
-                }
-            } else if (rbCategoryNew.isChecked()) {
-                category = etCategoryNew.getText().toString().trim();
-            }
-
-            boolean repeat = rbRepeatYes.isChecked();
-            String repeatUnit = null;
-            long dueAt;
-            if (repeat) {
-                Calendar repeatCal = Calendar.getInstance();
-                if (rbRepeatDay.isChecked()) {
-                    repeatUnit = "天";
-                    repeatCal.add(Calendar.DAY_OF_YEAR, 1);
-                } else if (rbRepeatMonth.isChecked()) {
-                    repeatUnit = "月";
-                    repeatCal.add(Calendar.MONTH, 1);
-                } else {
-                    repeatUnit = "年";
-                    repeatCal.add(Calendar.YEAR, 1);
-                }
-                dueAt = repeatCal.getTimeInMillis();
-            } else {
-                dueAt = selected.getTimeInMillis();
-                if (dueAt <= System.currentTimeMillis()) {
-                    SimToast.toastEL("请选择未来的时间");
+        new UIDialog.Builder(mContext) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
                     return;
                 }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                String title = etTitle.getText().toString().trim();
+                if (TextUtils.isEmpty(title)) {
+                    SimToast.toastEL("请输入作业名称");
+                    return;
+                }
+
+                String category = "";
+                if (rbCategoryExist.isChecked()) {
+                    if (!categories.isEmpty()) {
+                        category = categories.get(spCategory.getSelectedItemPosition());
+                    }
+                } else if (rbCategoryNew.isChecked()) {
+                    category = etCategoryNew.getText().toString().trim();
+                }
+
+                boolean repeat = rbRepeatYes.isChecked();
+                String repeatUnit = null;
+                long dueAt;
+                if (repeat) {
+                    Calendar repeatCal = Calendar.getInstance();
+                    if (rbRepeatDay.isChecked()) {
+                        repeatUnit = "天";
+                        repeatCal.add(Calendar.DAY_OF_YEAR, 1);
+                    } else if (rbRepeatMonth.isChecked()) {
+                        repeatUnit = "月";
+                        repeatCal.add(Calendar.MONTH, 1);
+                    } else {
+                        repeatUnit = "年";
+                        repeatCal.add(Calendar.YEAR, 1);
+                    }
+                    dueAt = repeatCal.getTimeInMillis();
+                } else {
+                    dueAt = selected.getTimeInMillis();
+                    if (dueAt <= System.currentTimeMillis()) {
+                        SimToast.toastEL("请选择未来的时间");
+                        return;
+                    }
+                }
+
+                item.setTitle(title);
+                item.setRepeat(repeat);
+                item.setRepeatUnit(repeatUnit);
+                item.setDueAt(dueAt);
+
+                updateItemCategory(group, item, category);
+                saveGroups();
+                rebuildList();
+                dismiss();
             }
-
-            item.setTitle(title);
-            item.setRepeat(repeat);
-            item.setRepeatUnit(repeatUnit);
-            item.setDueAt(dueAt);
-
-            updateItemCategory(group, item, category);
-            saveGroups();
-            rebuildList();
-            dialog.dismiss();
-        }));
-
-        dialog.show();
+        }
+                .setTitle("编辑作业")
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
+                .show();
     }
 
     private void updateItemCategory(TodoGroup oldGroup, TodoItem item, String newCategory) {
@@ -613,54 +643,61 @@ public class LnmAllFragment extends LazyFragment {
             dialog.show();
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑重要目标")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", null)
-                .create();
-
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String title = etTitle.getText().toString().trim();
-            if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入作业名称");
-                return;
-            }
-            boolean repeat = rbRepeatYes.isChecked();
-            String repeatUnit = null;
-            long dueAt;
-            if (repeat) {
-                Calendar repeatCal = Calendar.getInstance();
-                if (rbRepeatDay.isChecked()) {
-                    repeatUnit = "天";
-                    repeatCal.add(Calendar.DAY_OF_YEAR, 1);
-                } else if (rbRepeatMonth.isChecked()) {
-                    repeatUnit = "月";
-                    repeatCal.add(Calendar.MONTH, 1);
-                } else {
-                    repeatUnit = "年";
-                    repeatCal.add(Calendar.YEAR, 1);
-                }
-                dueAt = repeatCal.getTimeInMillis();
-            } else {
-                dueAt = selected.getTimeInMillis();
-                if (dueAt <= System.currentTimeMillis()) {
-                    SimToast.toastEL("请选择未来的时间");
+        new UIDialog.Builder(mContext) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
                     return;
                 }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                String title = etTitle.getText().toString().trim();
+                if (TextUtils.isEmpty(title)) {
+                    SimToast.toastEL("请输入作业名称");
+                    return;
+                }
+                boolean repeat = rbRepeatYes.isChecked();
+                String repeatUnit = null;
+                long dueAt;
+                if (repeat) {
+                    Calendar repeatCal = Calendar.getInstance();
+                    if (rbRepeatDay.isChecked()) {
+                        repeatUnit = "天";
+                        repeatCal.add(Calendar.DAY_OF_YEAR, 1);
+                    } else if (rbRepeatMonth.isChecked()) {
+                        repeatUnit = "月";
+                        repeatCal.add(Calendar.MONTH, 1);
+                    } else {
+                        repeatUnit = "年";
+                        repeatCal.add(Calendar.YEAR, 1);
+                    }
+                    dueAt = repeatCal.getTimeInMillis();
+                } else {
+                    dueAt = selected.getTimeInMillis();
+                    if (dueAt <= System.currentTimeMillis()) {
+                        SimToast.toastEL("请选择未来的时间");
+                        return;
+                    }
+                }
+
+                item.setTitle(title);
+                item.setRepeat(repeat);
+                item.setRepeatUnit(repeatUnit);
+                item.setDueAt(dueAt);
+                TodoPrefs.saveImportant(item);
+                EventBus.getDefault().post(new TodoImportantChanged(item));
+                updateImportantBanner();
+                dismiss();
             }
-
-            item.setTitle(title);
-            item.setRepeat(repeat);
-            item.setRepeatUnit(repeatUnit);
-            item.setDueAt(dueAt);
-            TodoPrefs.saveImportant(item);
-            EventBus.getDefault().post(new TodoImportantChanged(item));
-            updateImportantBanner();
-            dialog.dismiss();
-        }));
-
-        dialog.show();
+        }
+                .setTitle("编辑重要目标")
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
+                .show();
     }
 
     private void loadGroups() {
@@ -846,89 +883,95 @@ public class LnmAllFragment extends LazyFragment {
             dialog.show();
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("添加作业")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", null)
-                .create();
-
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String title = etTitle.getText().toString().trim();
-            if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入作业名称");
-                return;
-            }
-
-            String category = "";
-            if (rbCategoryExist.isChecked()) {
-                if (!categories.isEmpty()) {
-                    category = categories.get(spCategory.getSelectedItemPosition());
+        new UIDialog.Builder(mContext) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
                 }
-            } else if (rbCategoryNew.isChecked()) {
-                category = etCategoryNew.getText().toString().trim();
-            }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                String title = etTitle.getText().toString().trim();
+                if (TextUtils.isEmpty(title)) {
+                    SimToast.toastEL("请输入作业名称");
+                    return;
+                }
 
-            boolean repeat = rbRepeatYes.isChecked();
-            String repeatUnit = null;
-            long dueAt;
-            if (repeat) {
-                Calendar repeatCal = Calendar.getInstance();
-                if (rbRepeatDay.isChecked()) {
-                    repeatUnit = "天";
-                    repeatCal.add(Calendar.DAY_OF_YEAR, 1);
-                } else if (rbRepeatMonth.isChecked()) {
-                    repeatUnit = "月";
-                    repeatCal.add(Calendar.MONTH, 1);
+                String category = "";
+                if (rbCategoryExist.isChecked()) {
+                    if (!categories.isEmpty()) {
+                        category = categories.get(spCategory.getSelectedItemPosition());
+                    }
+                } else if (rbCategoryNew.isChecked()) {
+                    category = etCategoryNew.getText().toString().trim();
+                }
+
+                boolean repeat = rbRepeatYes.isChecked();
+                String repeatUnit = null;
+                long dueAt;
+                if (repeat) {
+                    Calendar repeatCal = Calendar.getInstance();
+                    if (rbRepeatDay.isChecked()) {
+                        repeatUnit = "天";
+                        repeatCal.add(Calendar.DAY_OF_YEAR, 1);
+                    } else if (rbRepeatMonth.isChecked()) {
+                        repeatUnit = "月";
+                        repeatCal.add(Calendar.MONTH, 1);
+                    } else {
+                        repeatUnit = "年";
+                        repeatCal.add(Calendar.YEAR, 1);
+                    }
+                    dueAt = repeatCal.getTimeInMillis();
+                } else if (rbNonRepeatDate.isChecked()) {
+                    dueAt = selected.getTimeInMillis();
+                    if (dueAt <= System.currentTimeMillis()) {
+                        SimToast.toastEL("请选择未来的时间");
+                        return;
+                    }
                 } else {
-                    repeatUnit = "年";
-                    repeatCal.add(Calendar.YEAR, 1);
+                    int hours = parseInt(etHours.getText().toString());
+                    int minutes = parseInt(etMinutes.getText().toString());
+                    int seconds = parseInt(etSeconds.getText().toString());
+                    long totalSeconds = hours * 3600L + minutes * 60L + seconds;
+                    if (totalSeconds <= 0) {
+                        SimToast.toastEL("请输入倒计时时间");
+                        return;
+                    }
+                    dueAt = System.currentTimeMillis() + totalSeconds * 1000L;
                 }
-                dueAt = repeatCal.getTimeInMillis();
-            } else if (rbNonRepeatDate.isChecked()) {
-                dueAt = selected.getTimeInMillis();
-                if (dueAt <= System.currentTimeMillis()) {
-                    SimToast.toastEL("请选择未来的时间");
-                    return;
+
+                if (swImportant.isChecked() && TodoPrefs.loadImportant() != null) {
+                    TodoPrefs.saveImportant(null);
+                    SimToast.toastSe("已替换之前的目标");
                 }
-            } else {
-                int hours = parseInt(etHours.getText().toString());
-                int minutes = parseInt(etMinutes.getText().toString());
-                int seconds = parseInt(etSeconds.getText().toString());
-                long totalSeconds = hours * 3600L + minutes * 60L + seconds;
-                if (totalSeconds <= 0) {
-                    SimToast.toastEL("请输入倒计时时间");
-                    return;
+
+                TodoItem item = new TodoItem(UUID.randomUUID().toString(), title);
+                item.setCategory(category);
+                item.setRepeat(repeat);
+                item.setRepeatUnit(repeatUnit);
+                item.setDueAt(dueAt);
+                item.setCreatedAt(System.currentTimeMillis());
+                item.setImportant(swImportant.isChecked());
+
+                if (item.isImportant()) {
+                    TodoPrefs.saveImportant(item);
+                    EventBus.getDefault().post(new TodoImportantChanged(item));
+                } else {
+                    addTodoItem(item, category);
+                    saveGroups();
                 }
-                dueAt = System.currentTimeMillis() + totalSeconds * 1000L;
+                rebuildList();
+                dismiss();
             }
-
-
-            if (swImportant.isChecked() && TodoPrefs.loadImportant() != null) {
-                TodoPrefs.saveImportant(null);
-                SimToast.toastSe("已替换之前的目标");
-            }
-
-            TodoItem item = new TodoItem(UUID.randomUUID().toString(), title);
-            item.setCategory(category);
-            item.setRepeat(repeat);
-            item.setRepeatUnit(repeatUnit);
-            item.setDueAt(dueAt);
-            item.setCreatedAt(System.currentTimeMillis());
-            item.setImportant(swImportant.isChecked());
-
-            if (item.isImportant()) {
-                TodoPrefs.saveImportant(item);
-                EventBus.getDefault().post(new TodoImportantChanged(item));
-            } else {
-                addTodoItem(item, category);
-                saveGroups();
-            }
-            rebuildList();
-            dialog.dismiss();
-        }));
-
-        dialog.show();
+        }
+                .setTitle("添加作业")
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
+                .show();
     }
 
     private void addTodoItem(TodoItem item, String category) {

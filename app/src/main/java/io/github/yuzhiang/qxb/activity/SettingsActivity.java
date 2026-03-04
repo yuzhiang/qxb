@@ -9,7 +9,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.luck.picture.lib.entity.LocalMedia;
@@ -28,7 +27,9 @@ import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
 import io.github.yuzhiang.qxb.base.BaseDialog;
 import io.github.yuzhiang.qxb.view.dialog.InputDialog;
+import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
+import io.github.yuzhiang.qxb.view.dialog.UIDialog;
 import io.github.yuzhiang.qxb.view.pickpic.ImageCropEngine;
 import io.github.yuzhiang.qxb.view.pickpic.ImageFileCompressEngine;
 import io.github.yuzhiang.qxb.view.pickpic.PicUtils;
@@ -118,11 +119,16 @@ public class SettingsActivity extends AppCompatActivity {
         et2.setHint("确认密码");
         et1.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         et2.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new AlertDialog.Builder(this)
-                .setTitle(hadOld ? "修改家长密码" : "设置家长密码")
-                .setView(layout)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
+        new UIDialog.Builder(this) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
                     String p1 = et1.getText().toString().trim();
                     String p2 = et2.getText().toString().trim();
                     if (p1.isEmpty()) {
@@ -136,7 +142,14 @@ public class SettingsActivity extends AppCompatActivity {
                     UsrMsgUtils.setFocusExitPassword(p1);
                     SimToast.toastSe("密码已保存");
                     refreshUi();
-                })
+                dismiss();
+            }
+        }
+                .setTitle(hadOld ? "修改家长密码" : "设置家长密码")
+                .setCustomView(layout)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
                 .show();
     }
 
@@ -159,11 +172,16 @@ public class SettingsActivity extends AppCompatActivity {
         etA.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         etQ.setText(UsrMsgUtils.getFocusExitQuestion());
         etA.setText(UsrMsgUtils.getFocusExitAnswer());
-        new AlertDialog.Builder(this)
-                .setTitle("设置安全问题")
-                .setView(layout)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
+        new UIDialog.Builder(this) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
                     String q = etQ.getText().toString().trim();
                     String a = etA.getText().toString().trim();
                     if (q.isEmpty() || a.isEmpty()) {
@@ -174,21 +192,32 @@ public class SettingsActivity extends AppCompatActivity {
                     UsrMsgUtils.setFocusExitAnswer(a);
                     SimToast.toastSe("已保存");
                     refreshUi();
-                })
+                dismiss();
+            }
+        }
+                .setTitle("设置安全问题")
+                .setCustomView(layout)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
                 .show();
     }
 
     private void clearPassword() {
-        verifyFocusPassword(() -> new AlertDialog.Builder(this)
+        verifyFocusPassword(() -> new MessageDialog.Builder(this)
                 .setTitle("清除密码")
                 .setMessage("清除后退出专注将不再需要密码，同时清除安全问题。")
-                .setNegativeButton("取消", null)
-                .setPositiveButton("清除", (d, w) -> {
-                    UsrMsgUtils.setFocusExitPassword("");
-                    UsrMsgUtils.setFocusExitQuestion("");
-                    UsrMsgUtils.setFocusExitAnswer("");
-                    SimToast.toastSe("已清除");
-                    refreshUi();
+                .setCancel("取消")
+                .setConfirm("清除")
+                .setListener(new MessageDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog) {
+                        UsrMsgUtils.setFocusExitPassword("");
+                        UsrMsgUtils.setFocusExitQuestion("");
+                        UsrMsgUtils.setFocusExitAnswer("");
+                        SimToast.toastSe("已清除");
+                        refreshUi();
+                    }
                 })
                 .show());
     }
@@ -326,15 +355,26 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        new AlertDialog.Builder(this)
-                .setTitle("规则设置")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
+        new UIDialog.Builder(this) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
                     cfg.enabled = swEnabled.isChecked();
                     FocusRulePrefs.save(cfg);
                     SimToast.toastSe("规则已保存");
-                })
+                dismiss();
+            }
+        }
+                .setTitle("规则设置")
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
                 .show();
     }
 
@@ -351,18 +391,29 @@ public class SettingsActivity extends AppCompatActivity {
         etDaily.setText(String.valueOf(cfg.dailyMaxMinutes));
         etLimit.setText(String.valueOf(cfg.violationLimit));
 
-        new AlertDialog.Builder(this)
-                .setTitle("激励设置")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
+        new UIDialog.Builder(this) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
                     cfg.exchangeBaseMinutes = parseInt(etBase.getText().toString(), cfg.exchangeBaseMinutes);
                     cfg.exchangeRewardMinutes = parseInt(etGain.getText().toString(), cfg.exchangeRewardMinutes);
                     cfg.dailyMaxMinutes = parseInt(etDaily.getText().toString(), cfg.dailyMaxMinutes);
                     cfg.violationLimit = parseInt(etLimit.getText().toString(), cfg.violationLimit);
                     RewardPrefs.saveConfig(cfg);
                     SimToast.toastSe("已保存激励设置");
-                })
+                dismiss();
+            }
+        }
+                .setTitle("激励设置")
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
                 .show();
     }
 

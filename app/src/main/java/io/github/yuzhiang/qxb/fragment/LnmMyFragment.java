@@ -46,7 +46,8 @@ import io.github.yuzhiang.qxb.base.BaseDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
+
+import io.github.yuzhiang.qxb.view.dialog.UIDialog;
 
 public class LnmMyFragment extends LazyFragment {
 
@@ -528,20 +529,24 @@ public class LnmMyFragment extends LazyFragment {
         });
 
         btnClear.setOnClickListener(v -> {
-            Runnable doClear = () -> new AlertDialog.Builder(getContext())
+            Runnable doClear = () -> new MessageDialog.Builder(getContext())
                     .setTitle("清除专注退出密码")
                     .setMessage("清除后退出专注将不再需要密码，同时清除安全问题。")
-                    .setNegativeButton("取消", null)
-                    .setPositiveButton("清除", (d, w) -> {
-                        UsrMsgUtils.setFocusExitPassword("");
-                        UsrMsgUtils.setFocusExitQuestion("");
-                        UsrMsgUtils.setFocusExitAnswer("");
-                        etPw.setText("");
-                        etPwConfirm.setText("");
-                        etQuestion.setText("");
-                        etAnswer.setText("");
-                        cbShowPw.setChecked(false);
-                        SimToast.toastSe("已清除");
+                    .setCancel("取消")
+                    .setConfirm("清除")
+                    .setListener(new MessageDialog.OnListener() {
+                        @Override
+                        public void onConfirm(BaseDialog dialog) {
+                            UsrMsgUtils.setFocusExitPassword("");
+                            UsrMsgUtils.setFocusExitQuestion("");
+                            UsrMsgUtils.setFocusExitAnswer("");
+                            etPw.setText("");
+                            etPwConfirm.setText("");
+                            etQuestion.setText("");
+                            etAnswer.setText("");
+                            cbShowPw.setChecked(false);
+                            SimToast.toastSe("已清除");
+                        }
                     })
                     .show();
             if (hasPw && !pwVerified[0]) {
@@ -560,14 +565,16 @@ public class LnmMyFragment extends LazyFragment {
             btnRewards.setOnClickListener(v -> showRewardSettingsDialog());
         }
 
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setTitle("设置")
-                .setView(view)
-                .setPositiveButton("保存", null)
-                .setNeutralButton("更换背景", (d, w) -> showBackgroundDialog())
-                .setNegativeButton("关闭", null)
-                .create();
-        dialog.setOnShowListener(dlg -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+        new UIDialog.Builder(getContext()) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    showBackgroundDialog();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
             String nick = etNick.getText().toString().trim();
             if (nick.isEmpty()) {
                 SimToast.toastEL("昵称不能为空");
@@ -589,7 +596,7 @@ public class LnmMyFragment extends LazyFragment {
                         return;
                     }
                     UsrMsgUtils.setFocusExitPassword(pw);
-                    dialog.dismiss();
+                    dismiss();
                 });
                 return;
             }
@@ -614,9 +621,15 @@ public class LnmMyFragment extends LazyFragment {
                 UsrMsgUtils.setFocusExitQuestion(q);
                 UsrMsgUtils.setFocusExitAnswer(a);
             }
-            dialog.dismiss();
-        }));
-        dialog.show();
+                dismiss();
+            }
+        }
+                .setTitle("设置")
+                .setCustomView(view)
+                .setCancel("更换背景")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
+                .show();
     }
 
     private void verifyFocusPassword(Runnable onPass) {
@@ -752,15 +765,26 @@ public class LnmMyFragment extends LazyFragment {
             }
         });
 
-        new AlertDialog.Builder(getContext())
+        new UIDialog.Builder(getContext()) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                cfg.enabled = swEnabled.isChecked();
+                FocusRulePrefs.save(cfg);
+                SimToast.toastSe("规则已保存");
+                dismiss();
+            }
+        }
                 .setTitle("规则设置")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
-                    cfg.enabled = swEnabled.isChecked();
-                    FocusRulePrefs.save(cfg);
-                    SimToast.toastSe("规则已保存");
-                })
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
                 .show();
     }
 
@@ -777,18 +801,29 @@ public class LnmMyFragment extends LazyFragment {
         etDaily.setText(String.valueOf(cfg.dailyMaxMinutes));
         etLimit.setText(String.valueOf(cfg.violationLimit));
 
-        new AlertDialog.Builder(getContext())
+        new UIDialog.Builder(getContext()) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                cfg.exchangeBaseMinutes = parseInt(etBase.getText().toString(), cfg.exchangeBaseMinutes);
+                cfg.exchangeRewardMinutes = parseInt(etGain.getText().toString(), cfg.exchangeRewardMinutes);
+                cfg.dailyMaxMinutes = parseInt(etDaily.getText().toString(), cfg.dailyMaxMinutes);
+                cfg.violationLimit = parseInt(etLimit.getText().toString(), cfg.violationLimit);
+                RewardPrefs.saveConfig(cfg);
+                SimToast.toastSe("已保存激励设置");
+                dismiss();
+            }
+        }
                 .setTitle("激励设置")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
-                    cfg.exchangeBaseMinutes = parseInt(etBase.getText().toString(), cfg.exchangeBaseMinutes);
-                    cfg.exchangeRewardMinutes = parseInt(etGain.getText().toString(), cfg.exchangeRewardMinutes);
-                    cfg.dailyMaxMinutes = parseInt(etDaily.getText().toString(), cfg.dailyMaxMinutes);
-                    cfg.violationLimit = parseInt(etLimit.getText().toString(), cfg.violationLimit);
-                    RewardPrefs.saveConfig(cfg);
-                    SimToast.toastSe("已保存激励设置");
-                })
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
                 .show();
     }
 
@@ -889,24 +924,36 @@ public class LnmMyFragment extends LazyFragment {
         view.findViewById(R.id.btn_setting_clear_pw).setVisibility(View.GONE);
         view.findViewById(R.id.btn_setting_reset_pw).setVisibility(View.GONE);
         view.findViewById(R.id.cb_setting_show_password).setVisibility(View.GONE);
-        new AlertDialog.Builder(getContext())
+        new UIDialog.Builder(getContext()) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                String pw = etPw.getText().toString().trim();
+                String confirm = etPwConfirm.getText().toString().trim();
+                if (pw.isEmpty()) {
+                    SimToast.toastEL("密码不能为空");
+                    return;
+                }
+                if (!pw.equals(confirm)) {
+                    SimToast.toastEL("两次密码不一致");
+                    return;
+                }
+                UsrMsgUtils.setFocusExitPassword(pw);
+                SimToast.toastSe("密码已重置");
+                dismiss();
+            }
+        }
                 .setTitle("设置新密码")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
-                    String pw = etPw.getText().toString().trim();
-                    String confirm = etPwConfirm.getText().toString().trim();
-                    if (pw.isEmpty()) {
-                        SimToast.toastEL("密码不能为空");
-                        return;
-                    }
-                    if (!pw.equals(confirm)) {
-                        SimToast.toastEL("两次密码不一致");
-                        return;
-                    }
-                    UsrMsgUtils.setFocusExitPassword(pw);
-                    SimToast.toastSe("密码已重置");
-                })
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
                 .show();
     }
 
@@ -917,15 +964,26 @@ public class LnmMyFragment extends LazyFragment {
         etPw.setVisibility(View.GONE);
         et.setHint("写一句誓言");
         et.setText(UsrMsgUtils.getLocalSignature());
-        new AlertDialog.Builder(getContext())
+        new UIDialog.Builder(getContext()) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
+                    return;
+                }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                String vow = et.getText().toString().trim();
+                UsrMsgUtils.saveLocalSignature(vow);
+                updateVow();
+                dismiss();
+            }
+        }
                 .setTitle("我的誓言")
-                .setView(view)
-                .setPositiveButton("保存", (d, w) -> {
-                    String vow = et.getText().toString().trim();
-                    UsrMsgUtils.saveLocalSignature(vow);
-                    updateVow();
-                })
-                .setNegativeButton("关闭", null)
+                .setCustomView(view)
+                .setCancel("关闭")
+                .setConfirm("保存")
                 .show();
     }
 

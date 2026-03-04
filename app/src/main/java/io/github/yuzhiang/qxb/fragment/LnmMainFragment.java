@@ -34,7 +34,6 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -73,6 +72,7 @@ import io.github.yuzhiang.qxb.model.lnm2file;
 import io.github.yuzhiang.qxb.view.dialog.InputDialog;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
+import io.github.yuzhiang.qxb.view.dialog.UIDialog;
 import io.github.yuzhiang.qxb.view.pickpic.ImageCropEngine;
 import io.github.yuzhiang.qxb.view.pickpic.ImageFileCompressEngine;
 import io.github.yuzhiang.qxb.view.pickpic.PicUtils;
@@ -427,54 +427,61 @@ public class LnmMainFragment extends LazyFragment {
             dialog.show();
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑重要目标")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", null)
-                .create();
-
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String title = etTitle.getText().toString().trim();
-            if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入作业名称");
-                return;
-            }
-            boolean repeat = rbRepeatYes.isChecked();
-            String repeatUnit = null;
-            long dueAt;
-            if (repeat) {
-                Calendar repeatCal = Calendar.getInstance();
-                if (rbRepeatDay.isChecked()) {
-                    repeatUnit = "天";
-                    repeatCal.add(Calendar.DAY_OF_YEAR, 1);
-                } else if (rbRepeatMonth.isChecked()) {
-                    repeatUnit = "月";
-                    repeatCal.add(Calendar.MONTH, 1);
-                } else {
-                    repeatUnit = "年";
-                    repeatCal.add(Calendar.YEAR, 1);
-                }
-                dueAt = repeatCal.getTimeInMillis();
-            } else {
-                dueAt = selected.getTimeInMillis();
-                if (dueAt <= System.currentTimeMillis()) {
-                    SimToast.toastEL("请选择未来的时间");
+        new UIDialog.Builder(mContext) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
                     return;
                 }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                String title = etTitle.getText().toString().trim();
+                if (TextUtils.isEmpty(title)) {
+                    SimToast.toastEL("请输入作业名称");
+                    return;
+                }
+                boolean repeat = rbRepeatYes.isChecked();
+                String repeatUnit = null;
+                long dueAt;
+                if (repeat) {
+                    Calendar repeatCal = Calendar.getInstance();
+                    if (rbRepeatDay.isChecked()) {
+                        repeatUnit = "天";
+                        repeatCal.add(Calendar.DAY_OF_YEAR, 1);
+                    } else if (rbRepeatMonth.isChecked()) {
+                        repeatUnit = "月";
+                        repeatCal.add(Calendar.MONTH, 1);
+                    } else {
+                        repeatUnit = "年";
+                        repeatCal.add(Calendar.YEAR, 1);
+                    }
+                    dueAt = repeatCal.getTimeInMillis();
+                } else {
+                    dueAt = selected.getTimeInMillis();
+                    if (dueAt <= System.currentTimeMillis()) {
+                        SimToast.toastEL("请选择未来的时间");
+                        return;
+                    }
+                }
+
+                item.setTitle(title);
+                item.setRepeat(repeat);
+                item.setRepeatUnit(repeatUnit);
+                item.setDueAt(dueAt);
+                TodoPrefs.saveImportant(item);
+                EventBus.getDefault().post(new TodoImportantChanged(item));
+                updateImportantBanner();
+                dismiss();
             }
-
-            item.setTitle(title);
-            item.setRepeat(repeat);
-            item.setRepeatUnit(repeatUnit);
-            item.setDueAt(dueAt);
-            TodoPrefs.saveImportant(item);
-            EventBus.getDefault().post(new TodoImportantChanged(item));
-            updateImportantBanner();
-            dialog.dismiss();
-        }));
-
-        dialog.show();
+        }
+                .setTitle("编辑重要目标")
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
+                .show();
     }
 
 
@@ -787,13 +794,18 @@ public class LnmMainFragment extends LazyFragment {
         Date start = lnm2file.getStartTime();
 
         if (plan == null || start == null) {
-            new AlertDialog.Builder(mContext, R.style.MyAlertDialog)
+            new MessageDialog.Builder(mContext)
+                    .setTitle("注意！")
                     .setMessage("检测到残留专注状态，已无法恢复，本次记录将清除。")
                     .setCancelable(false)
-                    .setTitle("注意！")
-                    .setNegativeButton("清除", (d, i) -> {
-                        cancelLastLearn(id);
-                    }).create().show();
+                    .setConfirm("清除")
+                    .setListener(new MessageDialog.OnListener() {
+                        @Override
+                        public void onConfirm(BaseDialog dialog) {
+                            cancelLastLearn(id);
+                        }
+                    })
+                    .show();
 
             return;
         }
@@ -802,16 +814,20 @@ public class LnmMainFragment extends LazyFragment {
         double time = Math.ceil(TimeUtils.getTimeSpan(plan, start, TimeConstants.SEC) / 60.0);
         s = s + "上次计划专注约" + time + "分钟，未在中断后及时返回。\n将记为专注失败（用于统计完成率）。";
 
-        new AlertDialog.Builder(mContext, R.style.MyAlertDialog)
+        new MessageDialog.Builder(mContext)
+                .setTitle("注意！")
                 .setMessage(s)
                 .setCancelable(false)
-                .setTitle("注意！")
-                .setNegativeButton("记为失败", (d, i) -> {
-
-                    LogUtils.file("\n\n处理上次本地专注记录 ~ ");
-                    LogUtils.i("处理上次本地专注记录 ~ ");
-                    failLastLearn(id);
-                }).create().show();
+                .setConfirm("记为失败")
+                .setListener(new MessageDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog) {
+                        LogUtils.file("\n\n处理上次本地专注记录 ~ ");
+                        LogUtils.i("处理上次本地专注记录 ~ ");
+                        failLastLearn(id);
+                    }
+                })
+                .show();
 
     }
 
@@ -830,20 +846,27 @@ public class LnmMainFragment extends LazyFragment {
     }
 
     private void showResumeLearnDialog() {
-        new AlertDialog.Builder(mContext, R.style.MyAlertDialog)
+        new MessageDialog.Builder(mContext)
                 .setTitle("继续专注")
                 .setMessage("检测到上次专注仍在进行中，是否继续？")
                 .setCancelable(false)
-                .setPositiveButton("继续", (d, i) -> {
-                    Intent intent = new Intent(mContext, StartLearnActivity.class);
-                    intent.putExtra(lnmState, lnmStart);
-                    startActivity(intent);
+                .setConfirm("继续")
+                .setCancel("放弃本次")
+                .setListener(new MessageDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog) {
+                        Intent intent = new Intent(mContext, StartLearnActivity.class);
+                        intent.putExtra(lnmState, lnmStart);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancel(BaseDialog dialog) {
+                        long id = getThisId();
+                        if (id > 0) failLastLearn(id);
+                    }
                 })
-                .setNegativeButton("放弃本次", (d, i) -> {
-                    long id = getThisId();
-                    if (id > 0) failLastLearn(id);
-                })
-                .create().show();
+                .show();
     }
 
     private void finishLastLearn(long id) {

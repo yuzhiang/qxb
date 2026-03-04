@@ -4,8 +4,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.blankj.utilcode.util.TimeUtils;
 
 import java.util.List;
@@ -17,6 +15,8 @@ import io.github.yuzhiang.qxb.MyUtils.StatusBarUtil;
 import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
 import io.github.yuzhiang.qxb.model.reward.RewardEngine;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
+import io.github.yuzhiang.qxb.base.BaseDialog;
+import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 public class LnmRewardFragment extends LazyFragment {
@@ -125,19 +125,23 @@ public class LnmRewardFragment extends LazyFragment {
             return;
         }
 
-        new AlertDialog.Builder(getContext())
+        new MessageDialog.Builder(getContext())
                 .setTitle("使用奖励")
                 .setMessage("确认使用 " + minutes + " 分钟奖励时长？")
-                .setNegativeButton("取消", null)
-                .setPositiveButton("确认", (d, w) -> {
-                    st.balanceMinutes -= minutes;
-                    st.todayUsedMinutes += minutes;
-                    RewardPrefs.saveState(st);
-                    String today = TimeUtils.date2String(new java.util.Date(), "yyyy-MM-dd");
-                    RewardPrefs.addUsageForDate(today, minutes);
-                    FocusRulePrefs.setTempPassUntil(System.currentTimeMillis() + minutes * 60_000L);
-                    SimToast.toastSe("已开启 " + minutes + " 分钟奖励通行");
-                    refreshUi();
+                .setCancel("取消")
+                .setConfirm("确认")
+                .setListener(new MessageDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog) {
+                        st.balanceMinutes -= minutes;
+                        st.todayUsedMinutes += minutes;
+                        RewardPrefs.saveState(st);
+                        String today = TimeUtils.date2String(new java.util.Date(), "yyyy-MM-dd");
+                        RewardPrefs.addUsageForDate(today, minutes);
+                        FocusRulePrefs.setTempPassUntil(System.currentTimeMillis() + minutes * 60_000L);
+                        SimToast.toastSe("已开启 " + minutes + " 分钟奖励通行");
+                        refreshUi();
+                    }
                 })
                 .show();
     }

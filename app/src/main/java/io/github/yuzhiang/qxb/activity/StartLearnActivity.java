@@ -36,10 +36,10 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.text.TextUtils;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -120,7 +120,7 @@ public class StartLearnActivity extends AppCompatActivity {
     private long lastRestRemindAt = 0L;
     private boolean restActive = false;
     private CountDownTimer restTimer;
-    private AlertDialog restDialog;
+    private BaseDialog restDialog;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -567,21 +567,27 @@ public class StartLearnActivity extends AppCompatActivity {
             String s = "无障碍权限被关闭！无法继续拦截\n\n请在30s内重新开启，否则此次专注失败，专注时间将会被扣除！" +
                     "\n\n如果一次专注中不断出现该问题，可能是因为没有给予“自启权限、后台保护防止清理权限”";
 
-            new AlertDialog.Builder(StartLearnActivity.this, R.style.MyAlertDialog)
+            new MessageDialog.Builder(StartLearnActivity.this)
                     .setTitle("权限缺失！")
                     .setMessage(s)
                     .setCancelable(false)
-                    .setPositiveButton("重新开启", (dialog1, which) -> {
+                    .setConfirm("重新开启")
+                    .setCancel("不学了")
+                    .setListener(new MessageDialog.OnListener() {
+                        @Override
+                        public void onConfirm(BaseDialog dialog) {
+                            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            AppUtils.exitApp();
+                        }
 
-                        Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-
-                        AppUtils.exitApp();
+                        @Override
+                        public void onCancel(BaseDialog dialog) {
+                            postCancelLearn();
+                        }
                     })
-                    .setNegativeButton("不学了", (dialog1, which) -> {
-                        postCancelLearn();
-                    }).create().show();
+                    .show();
 
             saveNowTime(new Date());
 
@@ -1120,10 +1126,12 @@ public class StartLearnActivity extends AppCompatActivity {
             }
         }
         if (restDialog == null) {
-            restDialog = new AlertDialog.Builder(this)
+            restDialog = new MessageDialog.Builder(this)
                     .setTitle("视力保护")
                     .setMessage("已连续使用60分钟，请休息10分钟")
                     .setCancelable(false)
+                    .setConfirm("休息中")
+                    .setAutoDismiss(false)
                     .create();
         }
         restDialog.show();
@@ -1136,7 +1144,10 @@ public class StartLearnActivity extends AppCompatActivity {
                 long min = Math.max(0, millisUntilFinished / 60000);
                 long sec = Math.max(0, (millisUntilFinished / 1000) % 60);
                 if (restDialog != null && restDialog.isShowing()) {
-                    restDialog.setMessage("已连续使用60分钟，请休息 " + min + "分" + sec + "秒");
+                    TextView messageView = restDialog.findViewById(R.id.tv_message_message);
+                    if (messageView != null) {
+                        messageView.setText("已连续使用60分钟，请休息 " + min + "分" + sec + "秒");
+                    }
                 }
             }
 

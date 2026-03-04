@@ -20,7 +20,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
 
 import com.blankj.utilcode.constant.TimeConstants;
 import com.blankj.utilcode.util.LogUtils;
@@ -73,6 +72,7 @@ import io.github.yuzhiang.qxb.model.reward.RewardEngine;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
+import io.github.yuzhiang.qxb.view.dialog.UIDialog;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -1309,16 +1309,20 @@ public class LnmTJFragment extends LazyFragment {
 
 
     private void showSeedDataDialog() {
-        new AlertDialog.Builder(mContext)
+        new MessageDialog.Builder(mContext)
                 .setTitle("生成三周测试数据")
                 .setMessage("将写入近三周的专注记录、学科统计、睡眠报告与奖励使用数据，是否继续？")
-                .setNegativeButton("取消", null)
-                .setPositiveButton("生成", (d, w) -> {
-                    seedThreeWeeks();
-                    getMyAll();
-                    updateProjectCharts();
-                    updateSleepReportHint();
-                    toastSe("已生成三周测试数据");
+                .setCancel("取消")
+                .setConfirm("生成")
+                .setListener(new MessageDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog) {
+                        seedThreeWeeks();
+                        getMyAll();
+                        updateProjectCharts();
+                        updateSleepReportHint();
+                        toastSe("已生成三周测试数据");
+                    }
                 })
                 .show();
     }
@@ -1591,9 +1595,15 @@ public class LnmTJFragment extends LazyFragment {
         body.setText(report);
         setupWeeklyRadar(radar, start, end);
 
-        new AlertDialog.Builder(mContext)
-                .setView(view)
-                .setPositiveButton("知道了", (d, w) -> SPUtils.getInstance().put(WEEKLY_REPORT_KEY, weekKey))
+        new UIDialog.Builder(mContext)
+                .setTitle("使用周报")
+                .setCustomView(view)
+                .setCancel("")
+                .setConfirm("知道了")
+                .setOnClickListener(R.id.tv_ui_confirm, (d, v) -> {
+                    SPUtils.getInstance().put(WEEKLY_REPORT_KEY, weekKey);
+                    d.dismiss();
+                })
                 .show();
     }
 
@@ -2304,54 +2314,61 @@ public class LnmTJFragment extends LazyFragment {
             dialog.show();
         });
 
-        AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle("编辑重要目标")
-                .setView(view)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", null)
-                .create();
-
-        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String title = etTitle.getText().toString().trim();
-            if (TextUtils.isEmpty(title)) {
-                SimToast.toastEL("请输入作业名称");
-                return;
-            }
-            boolean repeat = rbRepeatYes.isChecked();
-            String repeatUnit = null;
-            long dueAt;
-            if (repeat) {
-                Calendar repeatCal = Calendar.getInstance();
-                if (rbRepeatDay.isChecked()) {
-                    repeatUnit = "天";
-                    repeatCal.add(Calendar.DAY_OF_YEAR, 1);
-                } else if (rbRepeatMonth.isChecked()) {
-                    repeatUnit = "月";
-                    repeatCal.add(Calendar.MONTH, 1);
-                } else {
-                    repeatUnit = "年";
-                    repeatCal.add(Calendar.YEAR, 1);
-                }
-                dueAt = repeatCal.getTimeInMillis();
-            } else {
-                dueAt = selected.getTimeInMillis();
-                if (dueAt <= System.currentTimeMillis()) {
-                    SimToast.toastEL("请选择未来的时间");
+        new UIDialog.Builder(mContext) {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.tv_ui_cancel) {
+                    dismiss();
                     return;
                 }
+                if (v.getId() != R.id.tv_ui_confirm) {
+                    return;
+                }
+                String title = etTitle.getText().toString().trim();
+                if (TextUtils.isEmpty(title)) {
+                    SimToast.toastEL("请输入作业名称");
+                    return;
+                }
+                boolean repeat = rbRepeatYes.isChecked();
+                String repeatUnit = null;
+                long dueAt;
+                if (repeat) {
+                    Calendar repeatCal = Calendar.getInstance();
+                    if (rbRepeatDay.isChecked()) {
+                        repeatUnit = "天";
+                        repeatCal.add(Calendar.DAY_OF_YEAR, 1);
+                    } else if (rbRepeatMonth.isChecked()) {
+                        repeatUnit = "月";
+                        repeatCal.add(Calendar.MONTH, 1);
+                    } else {
+                        repeatUnit = "年";
+                        repeatCal.add(Calendar.YEAR, 1);
+                    }
+                    dueAt = repeatCal.getTimeInMillis();
+                } else {
+                    dueAt = selected.getTimeInMillis();
+                    if (dueAt <= System.currentTimeMillis()) {
+                        SimToast.toastEL("请选择未来的时间");
+                        return;
+                    }
+                }
+
+                item.setTitle(title);
+                item.setRepeat(repeat);
+                item.setRepeatUnit(repeatUnit);
+                item.setDueAt(dueAt);
+                TodoPrefs.saveImportant(item);
+                EventBus.getDefault().post(new TodoImportantChanged(item));
+                updateImportantBanner();
+                dismiss();
             }
-
-            item.setTitle(title);
-            item.setRepeat(repeat);
-            item.setRepeatUnit(repeatUnit);
-            item.setDueAt(dueAt);
-            TodoPrefs.saveImportant(item);
-            EventBus.getDefault().post(new TodoImportantChanged(item));
-            updateImportantBanner();
-            dialog.dismiss();
-        }));
-
-        dialog.show();
+        }
+                .setTitle("编辑重要目标")
+                .setCustomView(view)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setAutoDismiss(false)
+                .show();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
