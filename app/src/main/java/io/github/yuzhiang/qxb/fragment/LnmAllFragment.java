@@ -36,6 +36,7 @@ import java.util.UUID;
 import io.github.yuzhiang.qxb.MyUtils.StatusBarUtil;
 import io.github.yuzhiang.qxb.R;
 import io.github.yuzhiang.qxb.adapter.TodoListAdapter;
+import io.github.yuzhiang.qxb.base.BaseDialog;
 import io.github.yuzhiang.qxb.base.LazyFragment;
 import io.github.yuzhiang.qxb.databinding.LnmFragmentAllBinding;
 import io.github.yuzhiang.qxb.model.eventbus.TodoImportantChanged;
@@ -44,6 +45,8 @@ import io.github.yuzhiang.qxb.model.todo.TodoItem;
 import io.github.yuzhiang.qxb.model.todo.TodoListEntry;
 import io.github.yuzhiang.qxb.model.todo.TodoPrefs;
 import io.github.yuzhiang.qxb.model.todo.TodoTimeUtils;
+import io.github.yuzhiang.qxb.view.dialog.InputDialog;
+import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 public class LnmAllFragment extends LazyFragment {
@@ -226,9 +229,14 @@ public class LnmAllFragment extends LazyFragment {
             options.add("删除科目");
         }
         String[] items = options.toArray(new String[0]);
-        new AlertDialog.Builder(mContext)
+        new SelectDialog.Builder(mContext)
                 .setTitle(group.getName())
-                .setItems(items, (d, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
                     String action = items[which];
                     if ("置顶".equals(action) || "取消置顶".equals(action)) {
                         String groupId = group.getId();
@@ -261,26 +269,27 @@ public class LnmAllFragment extends LazyFragment {
 
     private void showEditGroupDialog(TodoGroup group) {
         if (group == null) return;
-        EditText input = new EditText(mContext);
-        input.setText(group.getName());
-        input.setSelection(input.getText().length());
-        new AlertDialog.Builder(mContext)
+        new InputDialog.Builder(mContext)
                 .setTitle("编辑科目")
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        SimToast.toastEL("科目名不能为空");
-                        return;
+                .setContent(group.getName())
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String name = content == null ? "" : content.trim();
+                        if (name.isEmpty()) {
+                            SimToast.toastEL("科目名不能为空");
+                            return;
+                        }
+                        if (DEFAULT_GROUP_NAME.equals(name)) {
+                            SimToast.toastEL("不可命名为未分类");
+                            return;
+                        }
+                        renameGroup(group, name);
+                        saveGroups();
+                        rebuildList();
                     }
-                    if (DEFAULT_GROUP_NAME.equals(name)) {
-                        SimToast.toastEL("不可命名为未分类");
-                        return;
-                    }
-                    renameGroup(group, name);
-                    saveGroups();
-                    rebuildList();
                 })
                 .show();
     }
@@ -505,9 +514,14 @@ public class LnmAllFragment extends LazyFragment {
     private void showImportantActionDialog(TodoItem important) {
         if (important == null) return;
         String[] items = new String[]{"编辑", "删除"};
-        new AlertDialog.Builder(mContext)
+        new SelectDialog.Builder(mContext)
                 .setTitle("重要目标")
-                .setItems(items, (d, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
                     if (which == 0) {
                         showEditImportantDialog(important);
                     } else {

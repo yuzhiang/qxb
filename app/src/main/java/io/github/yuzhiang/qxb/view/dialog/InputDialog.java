@@ -59,6 +59,11 @@ public final class InputDialog {
             return this;
         }
 
+        public Builder setInputType(int type) {
+            mInputView.setInputType(type);
+            return this;
+        }
+
         public Builder setListener(OnListener listener) {
             mListener = listener;
             return this;

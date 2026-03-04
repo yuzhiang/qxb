@@ -17,33 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize">
-
-                <TextView
-                    android:id="@+id/lnm_title_qa"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginStart="16dp"
-                    android:gravity="center"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="16dp"
-                    android:text="说明"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_lnm_tj_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="专注统计"
-                    android:textColor="@android:color/white"
-                    android:textSize="18sp" />
-
-            </RelativeLayout>
+            <TextView
+                android:id="@+id/tv_lnm_tj_title"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="专注统计"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

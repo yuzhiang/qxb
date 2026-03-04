@@ -26,6 +26,9 @@ import io.github.yuzhiang.qxb.R;
 import io.github.yuzhiang.qxb.databinding.ActivitySettingsBinding;
 import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
+import io.github.yuzhiang.qxb.base.BaseDialog;
+import io.github.yuzhiang.qxb.view.dialog.InputDialog;
+import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
 import io.github.yuzhiang.qxb.view.pickpic.ImageCropEngine;
 import io.github.yuzhiang.qxb.view.pickpic.ImageFileCompressEngine;
 import io.github.yuzhiang.qxb.view.pickpic.PicUtils;
@@ -76,21 +79,24 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void showNickDialog() {
-        EditText input = new EditText(this);
-        input.setText(UsrMsgUtils.getNickName());
-        new AlertDialog.Builder(this)
+        new InputDialog.Builder(this)
                 .setTitle("设置昵称")
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
-                    String nick = input.getText().toString().trim();
-                    if (nick.isEmpty()) {
-                        SimToast.toastEL("昵称不能为空");
-                        return;
+                .setHint("请输入昵称")
+                .setContent(UsrMsgUtils.getNickName())
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String nick = content == null ? "" : content.trim();
+                        if (nick.isEmpty()) {
+                            SimToast.toastEL("昵称不能为空");
+                            return;
+                        }
+                        String avatar = UsrMsgUtils.getLocalAvatar();
+                        UsrMsgUtils.saveLocalProfile(nick, avatar);
+                        refreshUi();
                     }
-                    String avatar = UsrMsgUtils.getLocalAvatar();
-                    UsrMsgUtils.saveLocalProfile(nick, avatar);
-                    refreshUi();
                 })
                 .show();
     }
@@ -194,20 +200,22 @@ public class SettingsActivity extends AppCompatActivity {
             SimToast.toastEL("请先设置安全问题和答案");
             return;
         }
-        EditText input = new EditText(this);
-        input.setHint("请输入答案");
-        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new AlertDialog.Builder(this)
+        new InputDialog.Builder(this)
                 .setTitle(q)
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("验证", (d, w) -> {
-                    String in = input.getText().toString().trim();
-                    if (!a.equals(in)) {
-                        SimToast.toastEL("答案错误");
-                        return;
+                .setHint("请输入答案")
+                .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                .setCancel("取消")
+                .setConfirm("验证")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String in = content == null ? "" : content.trim();
+                        if (!a.equals(in)) {
+                            SimToast.toastEL("答案错误");
+                            return;
+                        }
+                        showSetPasswordDialog(false);
                     }
-                    showSetPasswordDialog(false);
                 })
                 .show();
     }
@@ -224,25 +232,28 @@ public class SettingsActivity extends AppCompatActivity {
             SimToast.toastEL("输入错误次数过多，请稍后再试（" + left + "s）");
             return;
         }
-        EditText input = new EditText(this);
-        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new AlertDialog.Builder(this)
+        new InputDialog.Builder(this)
                 .setTitle("验证家长密码")
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("确认", (d, w) -> {
-                    String in = input.getText().toString().trim();
-                    if (pw.equals(in)) {
-                        pwFailCount = 0;
-                        onPass.run();
-                    } else {
-                        pwFailCount++;
-                        if (pwFailCount >= 3) {
-                            pwLockUntil = System.currentTimeMillis() + 30_000L;
+                .setHint("请输入密码")
+                .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                .setCancel("取消")
+                .setConfirm("确认")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String in = content == null ? "" : content.trim();
+                        if (pw.equals(in)) {
                             pwFailCount = 0;
-                            SimToast.toastEL("错误次数过多，已锁定30秒");
+                            onPass.run();
                         } else {
-                            SimToast.toastEL("密码错误（还可尝试 " + (3 - pwFailCount) + " 次）");
+                            pwFailCount++;
+                            if (pwFailCount >= 3) {
+                                pwLockUntil = System.currentTimeMillis() + 30_000L;
+                                pwFailCount = 0;
+                                SimToast.toastEL("错误次数过多，已锁定30秒");
+                            } else {
+                                SimToast.toastEL("密码错误（还可尝试 " + (3 - pwFailCount) + " 次）");
+                            }
                         }
                     }
                 })
@@ -356,15 +367,26 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void showBackgroundDialog() {
-        String[] items = new String[]{"纯白（默认）", "红色渐变", "暖橙渐变", "柔和蓝"};
+        String[] items = new String[]{"纯白（默认）", "红色渐变", "暖橙渐变", "柔和蓝", "选择图片"};
         int style = UsrMsgUtils.getPageBgStyle();
         int current = 0;
         if (style == UsrMsgUtils.BG_STYLE_RED) current = 1;
         else if (style == UsrMsgUtils.BG_STYLE_WARM) current = 2;
         else if (style == UsrMsgUtils.BG_STYLE_SOFT) current = 3;
-        new AlertDialog.Builder(this)
+        else if (style == UsrMsgUtils.BG_STYLE_IMAGE) current = 4;
+        new SelectDialog.Builder(this)
                 .setTitle("更换背景")
-                .setSingleChoiceItems(items, current, (d, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setSelect(current)
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
+                    if (which == 4) {
+                        selectBackgroundImage();
+                        return;
+                    }
                     int target;
                     if (which == 1) target = UsrMsgUtils.BG_STYLE_RED;
                     else if (which == 2) target = UsrMsgUtils.BG_STYLE_WARM;
@@ -372,10 +394,7 @@ public class SettingsActivity extends AppCompatActivity {
                     else target = UsrMsgUtils.BG_STYLE_WHITE;
                     UsrMsgUtils.setPageBgStyle(target);
                     applyBackground();
-                    d.dismiss();
                 })
-                .setNeutralButton("选择图片", (d, w) -> selectBackgroundImage())
-                .setNegativeButton("取消", null)
                 .show();
     }
 

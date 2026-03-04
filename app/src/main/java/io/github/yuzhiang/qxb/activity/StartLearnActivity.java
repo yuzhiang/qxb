@@ -69,6 +69,7 @@ import io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils;
 import io.github.yuzhiang.qxb.model.StudyProjectRecord;
 import io.github.yuzhiang.qxb.model.LnmApp;
 import io.github.yuzhiang.qxb.model.eventbus.MeLnmShowChart;
+import io.github.yuzhiang.qxb.view.dialog.InputDialog;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
 import io.github.yuzhiang.qxb.receiver.StudyAdminReceiver;
 
@@ -505,25 +506,28 @@ public class StartLearnActivity extends AppCompatActivity {
             toastEL("输入错误次数过多，请稍后再试（" + left + "s）");
             return;
         }
-        EditText input = new EditText(this);
-        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new AlertDialog.Builder(this)
+        new InputDialog.Builder(this)
                 .setTitle("请输入专注退出密码")
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("确认", (d, w) -> {
-                    String in = input.getText().toString().trim();
-                    if (pw.equals(in)) {
-                        exitPwFailCount = 0;
-                        onPass.run();
-                    } else {
-                        exitPwFailCount++;
-                        if (exitPwFailCount >= 3) {
-                            exitPwLockUntil = System.currentTimeMillis() + 30_000L;
+                .setHint("请输入密码")
+                .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                .setCancel("取消")
+                .setConfirm("确认")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String in = content == null ? "" : content.trim();
+                        if (pw.equals(in)) {
                             exitPwFailCount = 0;
-                            toastEL("错误次数过多，已锁定30秒");
+                            onPass.run();
                         } else {
-                            toastEL("密码错误（还可尝试 " + (3 - exitPwFailCount) + " 次）");
+                            exitPwFailCount++;
+                            if (exitPwFailCount >= 3) {
+                                exitPwLockUntil = System.currentTimeMillis() + 30_000L;
+                                exitPwFailCount = 0;
+                                toastEL("错误次数过多，已锁定30秒");
+                            } else {
+                                toastEL("密码错误（还可尝试 " + (3 - exitPwFailCount) + " 次）");
+                            }
                         }
                     }
                 })

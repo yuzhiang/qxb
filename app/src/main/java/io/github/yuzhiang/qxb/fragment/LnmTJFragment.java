@@ -72,6 +72,7 @@ import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
 import io.github.yuzhiang.qxb.model.reward.RewardEngine;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
+import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -255,9 +256,14 @@ public class LnmTJFragment extends LazyFragment {
     private void showCardOrderDialog(View card) {
         if (binding == null || binding.layoutStatsCards == null || card == null) return;
         String[] items = new String[]{"上移", "下移", "置顶", "置底"};
-        new AlertDialog.Builder(mContext)
+        new SelectDialog.Builder(mContext)
                 .setTitle("调整顺序")
-                .setItems(items, (d, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
                     switch (which) {
                         case 0:
                             moveCard(card, -1);
@@ -345,18 +351,13 @@ public class LnmTJFragment extends LazyFragment {
         LogUtils.i("lnmTj======initData");
 
         EventBus.getDefault().register(this);
-
-
-        if (!SPUtils.getInstance("enterNum").getBoolean("lnmTj", false)) showMsg(true);
-
     }
 
     @Override
     protected void initEvent() {
         super.initEvent();
 
-        binding.lnmTitleQa.setOnClickListener(v -> showMsg(false));
-        binding.lnmTitleQa.setOnLongClickListener(v -> {
+        binding.tvLnmTjTitle.setOnLongClickListener(v -> {
             showSeedDataDialog();
             return true;
         });
@@ -372,36 +373,6 @@ public class LnmTJFragment extends LazyFragment {
         }
 
     }
-
-    private void showMsg(boolean auto) {
-        String msg = "    请仔细看轻学伴模式使用说明，并给予相关权限，否则会出现诸多问题！";
-
-        new MessageDialog.Builder(mContext)
-                .setTitle("权限说明")
-                .setMessage(msg)
-                .setConfirm("查看")
-                .setCancel("就不看")
-                .setCancelable(false)
-                .setListener(new MessageDialog.OnListener() {
-                    @Override
-                    public void onConfirm(BaseDialog dialog) {
-                        if (auto) {
-                            toastSL("随时可以在统计界面右上角问号查看 ～");
-                            SPUtils.getInstance("enterNum").put("lnmTj", true);
-                        }
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(lnmMsg)));
-                    }
-
-                    @Override
-                    public void onCancel(BaseDialog dialog) {
-                        if (auto) {
-                            toastSL("随时可以在统计界面右上角问号查看 ～");
-                        }
-
-                    }
-                }).show();
-    }
-
 
     /**
      * onDestroyView中进行解绑操作
@@ -1344,96 +1315,7 @@ public class LnmTJFragment extends LazyFragment {
         updateProjectCharts();
     }
 
-    private void maybeShowWeeklyReport() {
-        if (!SPUtils.getInstance().getBoolean(WEEKLY_REPORT_ENABLED, true)) return;
-        Calendar now = Calendar.getInstance();
-        int dayOfWeek = now.get(Calendar.DAY_OF_WEEK);
-        if (dayOfWeek != Calendar.MONDAY) return;
 
-        Calendar lastWeekStart = getWeekStart(now, -1);
-        Calendar lastWeekEnd = getWeekStart(now, 0);
-        String weekKey = formatDate(lastWeekStart);
-
-        String lastShown = SPUtils.getInstance().getString(WEEKLY_REPORT_KEY, "");
-        boolean allowRepeat = SPUtils.getInstance().getBoolean(WEEKLY_REPORT_REPEAT, false);
-        if (!allowRepeat && weekKey.equals(lastShown)) return;
-
-        String report = buildWeeklyReport(lastWeekStart, lastWeekEnd);
-        showWeeklyReportDialog(weekKey, report, lastWeekStart, lastWeekEnd);
-    }
-
-    private void showWeeklyReportSettings() {
-        boolean enabled = SPUtils.getInstance().getBoolean(WEEKLY_REPORT_ENABLED, true);
-        boolean repeat = SPUtils.getInstance().getBoolean(WEEKLY_REPORT_REPEAT, false);
-        String[] items = new String[]{
-                "开启周报提醒",
-                "允许重复查看"
-        };
-        boolean[] checks = new boolean[]{enabled, repeat};
-
-        new AlertDialog.Builder(mContext)
-                .setTitle("周报设置")
-                .setMultiChoiceItems(items, checks, (d, which, isChecked) -> checks[which] = isChecked)
-                .setPositiveButton("保存", (d, w) -> {
-                    SPUtils.getInstance().put(WEEKLY_REPORT_ENABLED, checks[0]);
-                    SPUtils.getInstance().put(WEEKLY_REPORT_REPEAT, checks[1]);
-                })
-                .setNeutralButton("查看历史周报", (d, w) -> showHistoryWeeklyReports())
-                .setNegativeButton("使用说明", (d, w) -> showMsg(false))
-                .setCancelable(true)
-                .show();
-    }
-
-    private void showLastWeekReportManual() {
-        Calendar now = Calendar.getInstance();
-        Calendar lastWeekStart = getWeekStart(now, -1);
-        Calendar lastWeekEnd = getWeekStart(now, 0);
-        String weekKey = formatDate(lastWeekStart);
-        String report = buildWeeklyReport(lastWeekStart, lastWeekEnd);
-        showWeeklyReportDialog(weekKey, report, lastWeekStart, lastWeekEnd);
-    }
-
-    private void showHistoryWeeklyReports() {
-        List<Lnm> list = lnmDBUtils.findByTimeAsc();
-        if (list == null || list.isEmpty()) {
-            toastEL("暂无历史记录");
-            return;
-        }
-        TreeSet<Long> weekStarts = new TreeSet<>(Collections.reverseOrder());
-        for (Lnm item : list) {
-            if (item == null || item.createdDate == null) continue;
-            Calendar base = Calendar.getInstance();
-            base.setTime(item.createdDate);
-            Calendar start = getWeekStart(base, 0);
-            weekStarts.add(start.getTimeInMillis());
-        }
-        if (weekStarts.isEmpty()) {
-            toastEL("暂无历史周报");
-            return;
-        }
-        List<Long> starts = new ArrayList<>(weekStarts);
-        List<String> labels = new ArrayList<>();
-        for (Long startMs : starts) {
-            Calendar start = Calendar.getInstance();
-            start.setTimeInMillis(startMs);
-            Calendar end = getWeekStart(start, 1);
-            labels.add(formatDate(start) + " ~ " + formatDate(end));
-        }
-        String[] items = labels.toArray(new String[0]);
-        new AlertDialog.Builder(mContext)
-                .setTitle("历史周报")
-                .setItems(items, (d, which) -> {
-                    if (which < 0 || which >= starts.size()) return;
-                    Calendar start = Calendar.getInstance();
-                    start.setTimeInMillis(starts.get(which));
-                    Calendar end = getWeekStart(start, 1);
-                    String weekKey = formatDate(start);
-                    String report = buildWeeklyReport(start, end);
-                    showWeeklyReportDialog(weekKey, report, start, end);
-                })
-                .setNegativeButton("关闭", null)
-                .show();
-    }
 
     private void showSeedDataDialog() {
         new AlertDialog.Builder(mContext)
@@ -1754,13 +1636,17 @@ public class LnmTJFragment extends LazyFragment {
             String end = report.endAt > 0 ? TimeUtils.date2String(new Date(report.endAt), "HH:mm") : "未结束";
             items.add(start + " - " + end + " · 尝试 " + report.attemptCount + " 次");
         }
-        new AlertDialog.Builder(mContext)
+        new SelectDialog.Builder(mContext)
                 .setTitle("历史睡眠报告")
-                .setItems(items.toArray(new String[0]), (dialog, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
                     SleepReportStore.SleepReport report = history.get(which);
                     showSleepReportDetail(report);
                 })
-                .setNegativeButton("关闭", null)
                 .show();
     }
 
@@ -2333,9 +2219,14 @@ public class LnmTJFragment extends LazyFragment {
     private void showImportantActionDialog(TodoItem important) {
         if (important == null) return;
         String[] items = new String[]{"编辑", "删除"};
-        new AlertDialog.Builder(mContext)
+        new SelectDialog.Builder(mContext)
                 .setTitle("重要目标")
-                .setItems(items, (d, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
                     if (which == 0) {
                         showEditImportantDialog(important);
                     } else {

@@ -70,7 +70,9 @@ import io.github.yuzhiang.qxb.model.todo.TodoItem;
 import io.github.yuzhiang.qxb.model.todo.TodoPrefs;
 import io.github.yuzhiang.qxb.model.todo.TodoTimeUtils;
 import io.github.yuzhiang.qxb.model.lnm2file;
+import io.github.yuzhiang.qxb.view.dialog.InputDialog;
 import io.github.yuzhiang.qxb.view.dialog.MessageDialog;
+import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
 import io.github.yuzhiang.qxb.view.pickpic.ImageCropEngine;
 import io.github.yuzhiang.qxb.view.pickpic.ImageFileCompressEngine;
 import io.github.yuzhiang.qxb.view.pickpic.PicUtils;
@@ -87,6 +89,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -325,9 +328,14 @@ public class LnmMainFragment extends LazyFragment {
     private void showImportantActionDialog(TodoItem important) {
         if (important == null) return;
         String[] items = new String[]{"编辑", "删除"};
-        new AlertDialog.Builder(mContext)
+        new SelectDialog.Builder(mContext)
                 .setTitle("重要目标")
-                .setItems(items, (d, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
                     if (which == 0) {
                         showEditImportantDialog(important);
                     } else {
@@ -488,19 +496,34 @@ public class LnmMainFragment extends LazyFragment {
         String selected = lnm2file.getSelectedStudyProject();
         int checked = projects.indexOf(selected);
         if (checked < 0) checked = 0;
-        final int[] picked = {checked};
-        String[] items = projects.toArray(new String[0]);
-        new AlertDialog.Builder(mContext)
+        final int defaultIndex = checked;
+        new SelectDialog.Builder(mContext)
                 .setTitle("选择学科")
-                .setSingleChoiceItems(items, checked, (d, which) -> picked[0] = which)
-                .setPositiveButton("开始", (d, w) -> {
-                    String name = items[picked[0]];
-                    lnm2file.saveSelectedStudyProject(name);
-                    updateProjectManageLabel();
-                    onSelected.run();
+                .setList(projects)
+                .setConfirm("开始")
+                .setCancel("管理学科")
+                .setSingleSelect()
+                .setSelect(checked)
+                .setListener(new SelectDialog.OnListener<Object>() {
+                    @Override
+                    public void onSelected(BaseDialog dialog, HashMap<Integer, Object> data) {
+                        int which = defaultIndex;
+                        if (data != null && !data.isEmpty()) {
+                            Object selectedKey = data.keySet().iterator().next();
+                            which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
+                        }
+                        if (which < 0 || which >= projects.size()) return;
+                        String name = projects.get(which);
+                        lnm2file.saveSelectedStudyProject(name);
+                        updateProjectManageLabel();
+                        onSelected.run();
+                    }
+
+                    @Override
+                    public void onCancel(BaseDialog dialog) {
+                        showManageProjectsDialog(onSelected);
+                    }
                 })
-                .setNeutralButton("管理", (d, w) -> showManageProjectsDialog(onSelected))
-                .setNegativeButton("取消", null)
                 .show();
     }
 
@@ -510,25 +533,54 @@ public class LnmMainFragment extends LazyFragment {
             showAddProjectDialog(() -> showManageProjectsDialog(onSelected));
             return;
         }
-        String[] items = projects.toArray(new String[0]);
-        new AlertDialog.Builder(mContext)
+        int checked = 0;
+        String selected = lnm2file.getSelectedStudyProject();
+        int selectedIndex = projects.indexOf(selected);
+        if (selectedIndex >= 0) checked = selectedIndex;
+        final int defaultIndex = checked;
+        new SelectDialog.Builder(mContext)
                 .setTitle("管理学科")
-                .setItems(items, (d, which) -> showProjectActionDialog(projects, which, onSelected))
-                .setPositiveButton("新增", (d, w) -> showAddProjectDialog(() -> showManageProjectsDialog(onSelected)))
-                .setNegativeButton("返回", (d, w) -> showStudyProjectSelector(onSelected))
+                .setList(projects)
+                .setConfirm("管理选中")
+                .setCancel("新增学科")
+                .setSingleSelect()
+                .setSelect(checked)
+                .setListener(new SelectDialog.OnListener<Object>() {
+                    @Override
+                    public void onSelected(BaseDialog dialog, HashMap<Integer, Object> data) {
+                        int which = defaultIndex;
+                        if (data != null && !data.isEmpty()) {
+                            Object selectedKey = data.keySet().iterator().next();
+                            which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
+                        }
+                        if (which < 0 || which >= projects.size()) return;
+                        showProjectActionDialog(projects, which, onSelected);
+                    }
+
+                    @Override
+                    public void onCancel(BaseDialog dialog) {
+                        showAddProjectDialog(() -> showManageProjectsDialog(onSelected));
+                    }
+                })
                 .show();
     }
 
     private void showProjectActionDialog(List<String> projects, int index, Runnable onSelected) {
         if (projects == null || index < 0 || index >= projects.size()) return;
         String current = projects.get(index);
-        String[] actions = new String[]{"编辑", "删除"};
-        new AlertDialog.Builder(mContext)
+        new MessageDialog.Builder(mContext)
                 .setTitle(current)
-                .setItems(actions, (d, which) -> {
-                    if (which == 0) {
+                .setMessage("请选择操作")
+                .setConfirm("编辑")
+                .setCancel("删除")
+                .setListener(new MessageDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog) {
                         showEditProjectDialog(projects, index, onSelected);
-                    } else {
+                    }
+
+                    @Override
+                    public void onCancel(BaseDialog dialog) {
                         lnm2file.moveStudyProjectRecordsToDeleted(current);
                         projects.remove(index);
                         lnm2file.saveStudyProjects(projects);
@@ -542,24 +594,26 @@ public class LnmMainFragment extends LazyFragment {
     }
 
     private void showAddProjectDialog(Runnable onDone) {
-        EditText input = new EditText(mContext);
-        input.setHint("输入学科");
-        new AlertDialog.Builder(mContext)
+        new InputDialog.Builder(mContext)
                 .setTitle("新增学科")
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        SimToast.toastEL("学科名称不能为空");
-                        return;
+                .setHint("输入学科")
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String name = content == null ? "" : content.trim();
+                        if (name.isEmpty()) {
+                            SimToast.toastEL("学科名称不能为空");
+                            return;
+                        }
+                        List<String> projects = new ArrayList<>(lnm2file.getStudyProjects());
+                        projects.add(name);
+                        lnm2file.saveStudyProjects(projects);
+                        lnm2file.saveSelectedStudyProject(name);
+                        updateProjectManageLabel();
+                        onDone.run();
                     }
-                    List<String> projects = new ArrayList<>(lnm2file.getStudyProjects());
-                    projects.add(name);
-                    lnm2file.saveStudyProjects(projects);
-                    lnm2file.saveSelectedStudyProject(name);
-                    updateProjectManageLabel();
-                    onDone.run();
                 })
                 .show();
     }
@@ -567,26 +621,27 @@ public class LnmMainFragment extends LazyFragment {
     private void showEditProjectDialog(List<String> projects, int index, Runnable onSelected) {
         if (projects == null || index < 0 || index >= projects.size()) return;
         String current = projects.get(index);
-        EditText input = new EditText(mContext);
-        input.setText(current);
-        input.setSelection(input.getText().length());
-        new AlertDialog.Builder(mContext)
+        new InputDialog.Builder(mContext)
                 .setTitle("编辑学科")
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("保存", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        SimToast.toastEL("学科名称不能为空");
-                        return;
+                .setContent(current)
+                .setCancel("取消")
+                .setConfirm("保存")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String name = content == null ? "" : content.trim();
+                        if (name.isEmpty()) {
+                            SimToast.toastEL("学科名称不能为空");
+                            return;
+                        }
+                        projects.set(index, name);
+                        lnm2file.saveStudyProjects(projects);
+                        lnm2file.renameStudyProjectInRecords(current, name);
+                        if (current.equals(lnm2file.getSelectedStudyProject())) {
+                            lnm2file.saveSelectedStudyProject(name);
+                        }
+                        showManageProjectsDialog(onSelected);
                     }
-                    projects.set(index, name);
-                    lnm2file.saveStudyProjects(projects);
-                    lnm2file.renameStudyProjectInRecords(current, name);
-                    if (current.equals(lnm2file.getSelectedStudyProject())) {
-                        lnm2file.saveSelectedStudyProject(name);
-                    }
-                    showManageProjectsDialog(onSelected);
                 })
                 .show();
     }

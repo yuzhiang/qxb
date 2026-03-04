@@ -35,10 +35,13 @@ import io.github.yuzhiang.qxb.db.room.dbUtils.lnmDBUtils;
 import io.github.yuzhiang.qxb.model.focus.FocusRulePrefs;
 import io.github.yuzhiang.qxb.model.lnm2file;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
+import io.github.yuzhiang.qxb.view.dialog.InputDialog;
+import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
 import io.github.yuzhiang.qxb.view.pickpic.ImageCropEngine;
 import io.github.yuzhiang.qxb.view.pickpic.ImageFileCompressEngine;
 import io.github.yuzhiang.qxb.view.pickpic.PicUtils;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
+import io.github.yuzhiang.qxb.base.BaseDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.core.content.ContextCompat;
@@ -106,7 +109,8 @@ public class LnmMyFragment extends LazyFragment {
         if (binding.tvMyVow != null) {
             binding.tvMyVow.setOnClickListener(v -> showVowDialog());
         }
-        binding.tvMyHistory.setOnClickListener(v -> showHistoryPopup());
+        binding.tvMyHistory.setOnClickListener(v ->
+                startActivity(new android.content.Intent(getContext(), LnmRecordActivity.class)));
         if (binding.tvMyWeekly != null) {
             binding.tvMyWeekly.setOnClickListener(v -> {
                 if (getActivity() instanceof LearnNoMobileActivity) {
@@ -439,10 +443,12 @@ public class LnmMyFragment extends LazyFragment {
                 start.get(Calendar.YEAR),
                 start.get(Calendar.MONTH) + 1,
                 start.get(Calendar.DAY_OF_MONTH));
-        new AlertDialog.Builder(getContext())
+        new SelectDialog.Builder(getContext())
                 .setTitle(title)
-                .setItems(rows.toArray(new String[0]), null)
-                .setPositiveButton("关闭", null)
+                .setList(rows)
+                .setMinSelect(0)
+                .setListener((dialog, data) -> {
+                })
                 .show();
     }
 
@@ -621,25 +627,28 @@ public class LnmMyFragment extends LazyFragment {
             SimToast.toastEL("输入错误次数过多，请稍后再试（" + left + "s）");
             return;
         }
-        android.widget.EditText input = new android.widget.EditText(getContext());
-        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new AlertDialog.Builder(getContext())
+        new InputDialog.Builder(getContext())
                 .setTitle("验证专注退出密码")
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("确认", (d, w) -> {
-                    String in = input.getText().toString().trim();
-                    if (pw.equals(in)) {
-                        parentPwFailCount = 0;
-                        onPass.run();
-                    } else {
-                        parentPwFailCount++;
-                        if (parentPwFailCount >= 3) {
-                            parentPwLockUntil = System.currentTimeMillis() + 30_000L;
+                .setHint("请输入密码")
+                .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                .setCancel("取消")
+                .setConfirm("确认")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String in = content == null ? "" : content.trim();
+                        if (pw.equals(in)) {
                             parentPwFailCount = 0;
-                            SimToast.toastEL("错误次数过多，已锁定30秒");
+                            onPass.run();
                         } else {
-                            SimToast.toastEL("密码错误（还可尝试 " + (3 - parentPwFailCount) + " 次）");
+                            parentPwFailCount++;
+                            if (parentPwFailCount >= 3) {
+                                parentPwLockUntil = System.currentTimeMillis() + 30_000L;
+                                parentPwFailCount = 0;
+                                SimToast.toastEL("错误次数过多，已锁定30秒");
+                            } else {
+                                SimToast.toastEL("密码错误（还可尝试 " + (3 - parentPwFailCount) + " 次）");
+                            }
                         }
                     }
                 })
@@ -653,20 +662,22 @@ public class LnmMyFragment extends LazyFragment {
             SimToast.toastEL("请先在设置中填写安全问题和答案");
             return;
         }
-        android.widget.EditText input = new android.widget.EditText(getContext());
-        input.setHint("请输入答案");
-        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new AlertDialog.Builder(getContext())
+        new InputDialog.Builder(getContext())
                 .setTitle(q)
-                .setView(input)
-                .setNegativeButton("取消", null)
-                .setPositiveButton("验证", (d, w) -> {
-                    String in = input.getText().toString().trim();
-                    if (!a.equals(in)) {
-                        SimToast.toastEL("答案错误");
-                        return;
+                .setHint("请输入答案")
+                .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                .setCancel("取消")
+                .setConfirm("验证")
+                .setListener(new InputDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog, String content) {
+                        String in = content == null ? "" : content.trim();
+                        if (!a.equals(in)) {
+                            SimToast.toastEL("答案错误");
+                            return;
+                        }
+                        showSetNewPasswordDialog();
                     }
-                    showSetNewPasswordDialog();
                 })
                 .show();
     }
@@ -915,15 +926,26 @@ public class LnmMyFragment extends LazyFragment {
     }
 
     private void showBackgroundDialog() {
-        String[] items = new String[]{"纯白（默认）", "红色渐变", "暖橙渐变", "柔和蓝"};
+        String[] items = new String[]{"纯白（默认）", "红色渐变", "暖橙渐变", "柔和蓝", "选择图片"};
         int style = UsrMsgUtils.getPageBgStyle();
         int current = 0;
         if (style == UsrMsgUtils.BG_STYLE_RED) current = 1;
         else if (style == UsrMsgUtils.BG_STYLE_WARM) current = 2;
         else if (style == UsrMsgUtils.BG_STYLE_SOFT) current = 3;
-        new AlertDialog.Builder(getContext())
+        else if (style == UsrMsgUtils.BG_STYLE_IMAGE) current = 4;
+        new SelectDialog.Builder(getContext())
                 .setTitle("更换背景")
-                .setSingleChoiceItems(items, current, (d, which) -> {
+                .setList(items)
+                .setSingleSelect()
+                .setSelect(current)
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
+                    if (which == 4) {
+                        selectBackgroundImage();
+                        return;
+                    }
                     int target;
                     if (which == 1) target = UsrMsgUtils.BG_STYLE_RED;
                     else if (which == 2) target = UsrMsgUtils.BG_STYLE_WARM;
@@ -931,10 +953,7 @@ public class LnmMyFragment extends LazyFragment {
                     else target = UsrMsgUtils.BG_STYLE_WHITE;
                     UsrMsgUtils.setPageBgStyle(target);
                     applyBackgroundToAllPages();
-                    d.dismiss();
                 })
-                .setNeutralButton("选择图片", (d, w) -> selectBackgroundImage())
-                .setNegativeButton("取消", null)
                 .show();
     }
 
@@ -989,11 +1008,12 @@ public class LnmMyFragment extends LazyFragment {
             return;
         }
         int size = Math.min(list.size(), 30);
-        String[] items = new String[size];
+        String[] items = new String[size + 1];
+        items[0] = "查看全部记录";
         for (int i = 0; i < size; i++) {
             Lnm l = list.get(list.size() - 1 - i);
             if (l == null || l.createdDate == null) {
-                items[i] = "未知记录";
+                items[i + 1] = "未知记录";
                 continue;
             }
             String start = TimeUtils.date2String(l.createdDate, "MM-dd HH:mm");
@@ -1001,13 +1021,20 @@ public class LnmMyFragment extends LazyFragment {
             long endMs = l.endTime != null ? l.endTime.getTime() : l.schedule.getTime();
             long durMin = Math.max(0, (endMs - l.createdDate.getTime()) / 60000);
             int blocked = io.github.yuzhiang.qxb.model.lnm2file.getScreenOnCount(l.id);
-            items[i] = start + " ~ " + end + " · " + durMin + "分钟 · 未允许应用" + blocked + "次";
+            items[i + 1] = start + " ~ " + end + " · " + durMin + "分钟 · 未允许应用" + blocked + "次";
         }
-        new androidx.appcompat.app.AlertDialog.Builder(getContext())
+        new SelectDialog.Builder(getContext())
                 .setTitle("专注记录（最近30次）")
-                .setItems(items, null)
-                .setPositiveButton("查看全部", (d, w) -> startActivity(new android.content.Intent(getContext(), LnmRecordActivity.class)))
-                .setNegativeButton("关闭", null)
+                .setList(items)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
+                    if (which == 0) {
+                        startActivity(new android.content.Intent(getContext(), LnmRecordActivity.class));
+                    }
+                })
                 .show();
     }
 

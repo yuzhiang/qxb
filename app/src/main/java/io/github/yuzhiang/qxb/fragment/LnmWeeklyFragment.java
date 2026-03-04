@@ -2,7 +2,6 @@ package io.github.yuzhiang.qxb.fragment;
 
 import android.view.View;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.blankj.utilcode.util.TimeUtils;
@@ -29,6 +28,7 @@ import io.github.yuzhiang.qxb.model.lnm2file;
 import io.github.yuzhiang.qxb.model.ParentTodayReport;
 import io.github.yuzhiang.qxb.model.reward.RewardEngine;
 import io.github.yuzhiang.qxb.model.reward.RewardPrefs;
+import io.github.yuzhiang.qxb.view.dialog.SelectDialog;
 import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 public class LnmWeeklyFragment extends LazyFragment {
@@ -183,17 +183,20 @@ public class LnmWeeklyFragment extends LazyFragment {
         List<String> labels = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
             Calendar start = getWeekStart(now, -i);
-            Calendar end = getWeekStart(start, 1);
             weeks.add(start);
-            labels.add(buildRangeLabel(start, end));
+            labels.add(formatDate(start));
         }
-        new AlertDialog.Builder(getContext())
+        new SelectDialog.Builder(getContext())
                 .setTitle("选择周报")
-                .setItems(labels.toArray(new String[0]), (d, which) -> {
+                .setList(labels)
+                .setSingleSelect()
+                .setListener((dialog, data) -> {
+                    if (data == null || data.isEmpty()) return;
+                    Object selectedKey = data.keySet().iterator().next();
+                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
                     if (which < 0 || which >= weeks.size()) return;
                     selectWeek(weeks.get(which));
                 })
-                .setNegativeButton("关闭", null)
                 .show();
     }
 
