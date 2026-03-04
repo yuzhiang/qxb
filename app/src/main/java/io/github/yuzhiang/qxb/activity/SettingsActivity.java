@@ -37,6 +37,8 @@ import io.github.yuzhiang.qxb.view.tastytoast.SimToast;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    public static final String EXTRA_OPEN_RESET_PASSWORD = "extra_open_reset_password";
+
     private ActivitySettingsBinding binding;
     private int pwFailCount = 0;
     private long pwLockUntil = 0L;
@@ -51,6 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         setupActions();
         refreshUi();
+        handleIntentAction();
     }
 
     @Override
@@ -68,6 +71,13 @@ public class SettingsActivity extends AppCompatActivity {
         binding.layoutSettingRules.setOnClickListener(v -> showRuleSettingsDialog());
         binding.layoutSettingRewards.setOnClickListener(v -> showRewardSettingsDialog());
         binding.layoutSettingBackground.setOnClickListener(v -> showBackgroundDialog());
+    }
+
+    private void handleIntentAction() {
+        if (getIntent() == null) return;
+        boolean openReset = getIntent().getBooleanExtra(EXTRA_OPEN_RESET_PASSWORD, false);
+        if (!openReset) return;
+        binding.getRoot().post(this::showResetPasswordDialog);
     }
 
     private void refreshUi() {

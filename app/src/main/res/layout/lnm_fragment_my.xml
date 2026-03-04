@@ -60,7 +60,7 @@
                     android:contentDescription="设置"
                     android:padding="8dp"
                     android:src="@drawable/ic_menu_lines"
-                    android:tint="@android:color/white" />
+                    app:tint="@android:color/white" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

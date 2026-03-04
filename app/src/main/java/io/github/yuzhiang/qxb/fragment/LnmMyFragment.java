@@ -104,28 +104,24 @@ public class LnmMyFragment extends LazyFragment {
         applyStudentModeUi();
 
         binding.tvMySettings.setOnClickListener(v -> openSettingsActivity());
-        {
+
             binding.tvParentEntryAction.setOnClickListener(v -> openModeEntry());
-        }
+
         binding.ivMyAvatar.setOnClickListener(v -> changeAvatar());
-        {
-            binding.tvMyVow.setOnClickListener(v -> showVowDialog());
-        }
+
         binding.tvMyHistory.setOnClickListener(v ->
                 startActivity(new android.content.Intent(getContext(), LnmRecordActivity.class)));
-        {
-            binding.tvMyWeekly.setOnClickListener(v -> {
+
+        binding.tvMyWeekly.setOnClickListener(v -> {
                 if (getActivity() instanceof LearnNoMobileActivity) {
                     ((LearnNoMobileActivity) getActivity()).switchToTab(0);
                 }
             });
-        }
-        {
-            binding.tvMyCalendarPrev.setOnClickListener(v -> shiftMonth(-1));
-        }
-        {
-            binding.tvMyCalendarNext.setOnClickListener(v -> shiftMonth(1));
-        }
+
+        binding.tvMyCalendarPrev.setOnClickListener(v -> shiftMonth(-1));
+
+        binding.tvMyCalendarNext.setOnClickListener(v -> shiftMonth(1));
+
     }
 
     @Override
@@ -184,6 +180,13 @@ public class LnmMyFragment extends LazyFragment {
     private void openSettingsActivity() {
         if (getContext() == null) return;
         startActivity(new Intent(getContext(), SettingsActivity.class));
+    }
+
+    private void openSettingsAndResetPassword() {
+        if (getContext() == null) return;
+        Intent intent = new Intent(getContext(), SettingsActivity.class);
+        intent.putExtra(SettingsActivity.EXTRA_OPEN_RESET_PASSWORD, true);
+        startActivity(intent);
     }
 
     private void openParentMode() {
@@ -457,15 +460,6 @@ public class LnmMyFragment extends LazyFragment {
                 .show();
     }
 
-    private void saveProfileNick(String nick) {
-        if (nick.isEmpty()) {
-            SimToast.toastEL("昵称不能为空");
-            return;
-        }
-        String avatar = UsrMsgUtils.getLocalAvatar();
-        UsrMsgUtils.saveLocalProfile(nick, avatar);
-        SimToast.toastSe("保存成功");
-    }
 
     private void changeAvatar() {
         int size = 480;
@@ -487,151 +481,6 @@ public class LnmMyFragment extends LazyFragment {
                 });
     }
 
-    private void showSettingsDialog() {
-        View view = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_my_settings, null);
-        android.widget.EditText etNick = view.findViewById(R.id.et_setting_nick);
-        android.widget.EditText etPw = view.findViewById(R.id.et_setting_password);
-        android.widget.EditText etPwConfirm = view.findViewById(R.id.et_setting_password_confirm);
-        android.widget.CheckBox cbShowPw = view.findViewById(R.id.cb_setting_show_password);
-        android.widget.EditText etQuestion = view.findViewById(R.id.et_setting_pw_question);
-        android.widget.EditText etAnswer = view.findViewById(R.id.et_setting_pw_answer);
-        android.widget.Button btnClear = view.findViewById(R.id.btn_setting_clear_pw);
-        android.widget.Button btnReset = view.findViewById(R.id.btn_setting_reset_pw);
-        android.widget.Button btnRules = view.findViewById(R.id.btn_setting_rules);
-        android.widget.Button btnRewards = view.findViewById(R.id.btn_setting_rewards);
-
-        etNick.setText(UsrMsgUtils.getNickName());
-        etPw.setText(UsrMsgUtils.getFocusExitPassword());
-        etPwConfirm.setText(UsrMsgUtils.getFocusExitPassword());
-        etQuestion.setText(UsrMsgUtils.getFocusExitQuestion());
-        etAnswer.setText(UsrMsgUtils.getFocusExitAnswer());
-
-        final boolean hasPw = !UsrMsgUtils.getFocusExitPassword().trim().isEmpty();
-        final boolean[] pwVerified = new boolean[]{false};
-        cbShowPw.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked && hasPw && !pwVerified[0]) {
-                cbShowPw.setChecked(false);
-                verifyFocusPassword(() -> {
-                    pwVerified[0] = true;
-                    cbShowPw.setChecked(true);
-                });
-                return;
-            }
-            int pwType = isChecked
-                    ? android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                    : android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD;
-            etPw.setInputType(pwType);
-            etPwConfirm.setInputType(pwType);
-            etAnswer.setInputType(pwType);
-            etPw.setSelection(etPw.getText().length());
-            etPwConfirm.setSelection(etPwConfirm.getText().length());
-            etAnswer.setSelection(etAnswer.getText().length());
-        });
-
-        btnClear.setOnClickListener(v -> {
-            Runnable doClear = () -> new MessageDialog.Builder(getContext())
-                    .setTitle("清除专注退出密码")
-                    .setMessage("清除后退出专注将不再需要密码，同时清除安全问题。")
-                    .setCancel("取消")
-                    .setConfirm("清除")
-                    .setListener(new MessageDialog.OnListener() {
-                        @Override
-                        public void onConfirm(BaseDialog dialog) {
-                            UsrMsgUtils.setFocusExitPassword("");
-                            UsrMsgUtils.setFocusExitQuestion("");
-                            UsrMsgUtils.setFocusExitAnswer("");
-                            etPw.setText("");
-                            etPwConfirm.setText("");
-                            etQuestion.setText("");
-                            etAnswer.setText("");
-                            cbShowPw.setChecked(false);
-                            SimToast.toastSe("已清除");
-                        }
-                    })
-                    .show();
-            if (hasPw && !pwVerified[0]) {
-                verifyFocusPassword(() -> {
-                    pwVerified[0] = true;
-                    doClear.run();
-                });
-            } else {
-                doClear.run();
-            }
-        });
-
-        btnReset.setOnClickListener(v -> showResetPasswordDialog());
-        btnRules.setOnClickListener(v -> showRuleSettingsDialog());
-        if (btnRewards != null) {
-            btnRewards.setOnClickListener(v -> showRewardSettingsDialog());
-        }
-
-        new UIDialog.Builder(getContext()) {
-            @Override
-            public void onClick(View v) {
-                if (v.getId() == R.id.tv_ui_cancel) {
-                    showBackgroundDialog();
-                    return;
-                }
-                if (v.getId() != R.id.tv_ui_confirm) {
-                    return;
-                }
-            String nick = etNick.getText().toString().trim();
-            if (nick.isEmpty()) {
-                SimToast.toastEL("昵称不能为空");
-                return;
-            }
-
-            String pw = etPw.getText().toString().trim();
-            String confirm = etPwConfirm.getText().toString().trim();
-            boolean wantChangePw = !pw.isEmpty() || !confirm.isEmpty();
-            if (wantChangePw && !pw.equals(confirm)) {
-                SimToast.toastEL("两次密码不一致");
-                return;
-            }
-            if (hasPw && wantChangePw && !pwVerified[0]) {
-                verifyFocusPassword(() -> {
-                    pwVerified[0] = true;
-                    if (pw.isEmpty()) {
-                        SimToast.toastEL("新密码不能为空");
-                        return;
-                    }
-                    UsrMsgUtils.setFocusExitPassword(pw);
-                    dismiss();
-                });
-                return;
-            }
-
-            String q = etQuestion.getText().toString().trim();
-            String a = etAnswer.getText().toString().trim();
-            boolean wantQa = !q.isEmpty() || !a.isEmpty();
-            if (wantQa && (q.isEmpty() || a.isEmpty())) {
-                SimToast.toastEL("安全问题与答案都需要填写");
-                return;
-            }
-
-            saveProfileNick(nick);
-            if (wantChangePw) {
-                if (pw.isEmpty()) {
-                    SimToast.toastEL("新密码不能为空");
-                    return;
-                }
-                UsrMsgUtils.setFocusExitPassword(pw);
-            }
-            if (wantQa) {
-                UsrMsgUtils.setFocusExitQuestion(q);
-                UsrMsgUtils.setFocusExitAnswer(a);
-            }
-                dismiss();
-            }
-        }
-                .setTitle("设置")
-                .setCustomView(view)
-                .setCancel("更换背景")
-                .setConfirm("保存")
-                .setAutoDismiss(false)
-                .show();
-    }
-
     private void verifyFocusPassword(Runnable onPass) {
         String pw = UsrMsgUtils.getFocusExitPassword();
         if (pw == null || pw.trim().isEmpty()) {
@@ -648,7 +497,7 @@ public class LnmMyFragment extends LazyFragment {
                 .setTitle("验证专注退出密码")
                 .setHint("请输入密码")
                 .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
-                .setCancel("取消")
+                .setCancel("找回密码")
                 .setConfirm("确认")
                 .setListener(new InputDialog.OnListener() {
                     @Override
@@ -668,433 +517,10 @@ public class LnmMyFragment extends LazyFragment {
                             }
                         }
                     }
-                })
-                .show();
-    }
-
-    private void showResetPasswordDialog() {
-        String q = UsrMsgUtils.getFocusExitQuestion();
-        String a = UsrMsgUtils.getFocusExitAnswer();
-        if (q == null || q.trim().isEmpty() || a == null || a.trim().isEmpty()) {
-            SimToast.toastEL("请先在设置中填写安全问题和答案");
-            return;
-        }
-        new InputDialog.Builder(getContext())
-                .setTitle(q)
-                .setHint("请输入答案")
-                .setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD)
-                .setCancel("取消")
-                .setConfirm("验证")
-                .setListener(new InputDialog.OnListener() {
-                    @Override
-                    public void onConfirm(BaseDialog dialog, String content) {
-                        String in = content == null ? "" : content.trim();
-                        if (!a.equals(in)) {
-                            SimToast.toastEL("答案错误");
-                            return;
-                        }
-                        showSetNewPasswordDialog();
-                    }
-                })
-                .show();
-    }
-
-    private void showRuleSettingsDialog() {
-        View view = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_focus_rules, null);
-        android.widget.Switch swEnabled = view.findViewById(R.id.sw_rules_enabled);
-        android.widget.Spinner spTemplate = view.findViewById(R.id.sp_rule_template);
-        android.widget.TextView tvSchoolHomework = view.findViewById(R.id.tv_school_homework);
-        android.widget.TextView tvSchoolSleep = view.findViewById(R.id.tv_school_sleep);
-        android.widget.TextView tvSchoolFree = view.findViewById(R.id.tv_school_free);
-        android.widget.TextView tvWeekendHomework = view.findViewById(R.id.tv_weekend_homework);
-        android.widget.TextView tvWeekendSleep = view.findViewById(R.id.tv_weekend_sleep);
-        android.widget.TextView tvWeekendFree = view.findViewById(R.id.tv_weekend_free);
-
-        FocusRulePrefs.RuleConfig cfg = FocusRulePrefs.load();
-        swEnabled.setChecked(cfg.enabled);
-
-        String[] templates = new String[]{"小学生", "初中生", "高中生", "自定义"};
-        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, templates);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spTemplate.setAdapter(adapter);
-        spTemplate.setSelection(3);
-
-        updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-
-        tvSchoolHomework.setOnClickListener(v -> pickWindowTime("作业时间", cfg.schoolHomework, w -> {
-            cfg.schoolHomework = w;
-            updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-        }));
-        tvSchoolSleep.setOnClickListener(v -> pickWindowTime("睡眠时间", cfg.schoolSleep, w -> {
-            cfg.schoolSleep = w;
-            updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-        }));
-        tvSchoolFree.setOnClickListener(v -> pickWindowTime("自由时间", cfg.schoolFree, w -> {
-            cfg.schoolFree = w;
-            updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-        }));
-        tvWeekendHomework.setOnClickListener(v -> pickWindowTime("作业时间", cfg.weekendHomework, w -> {
-            cfg.weekendHomework = w;
-            updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-        }));
-        tvWeekendSleep.setOnClickListener(v -> pickWindowTime("睡眠时间", cfg.weekendSleep, w -> {
-            cfg.weekendSleep = w;
-            updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-        }));
-        tvWeekendFree.setOnClickListener(v -> pickWindowTime("自由时间", cfg.weekendFree, w -> {
-            cfg.weekendFree = w;
-            updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-        }));
-
-        spTemplate.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view1, int position, long id) {
-                if (position == 3) return;
-                FocusRulePrefs.RuleConfig t = buildTemplate(position);
-                cfg.schoolHomework = t.schoolHomework;
-                cfg.schoolSleep = t.schoolSleep;
-                cfg.schoolFree = t.schoolFree;
-                cfg.weekendHomework = t.weekendHomework;
-                cfg.weekendSleep = t.weekendSleep;
-                cfg.weekendFree = t.weekendFree;
-                updateRuleTimeLabels(cfg, tvSchoolHomework, tvSchoolSleep, tvSchoolFree, tvWeekendHomework, tvWeekendSleep, tvWeekendFree);
-            }
-
-            @Override
-            public void onNothingSelected(android.widget.AdapterView<?> parent) {
-            }
-        });
-
-        new UIDialog.Builder(getContext()) {
-            @Override
-            public void onClick(View v) {
-                if (v.getId() == R.id.tv_ui_cancel) {
-                    dismiss();
-                    return;
-                }
-                if (v.getId() != R.id.tv_ui_confirm) {
-                    return;
-                }
-                cfg.enabled = swEnabled.isChecked();
-                FocusRulePrefs.save(cfg);
-                SimToast.toastSe("规则已保存");
-                dismiss();
-            }
-        }
-                .setTitle("规则设置")
-                .setCustomView(view)
-                .setCancel("取消")
-                .setConfirm("保存")
-                .show();
-    }
-
-    private void showRewardSettingsDialog() {
-        View view = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_reward_settings, null);
-        android.widget.EditText etBase = view.findViewById(R.id.et_reward_base);
-        android.widget.EditText etGain = view.findViewById(R.id.et_reward_gain);
-        android.widget.EditText etDaily = view.findViewById(R.id.et_reward_daily_max);
-        android.widget.EditText etLimit = view.findViewById(R.id.et_reward_violation);
-
-        RewardPrefs.RewardConfig cfg = RewardPrefs.loadConfig();
-        etBase.setText(String.valueOf(cfg.exchangeBaseMinutes));
-        etGain.setText(String.valueOf(cfg.exchangeRewardMinutes));
-        etDaily.setText(String.valueOf(cfg.dailyMaxMinutes));
-        etLimit.setText(String.valueOf(cfg.violationLimit));
-
-        new UIDialog.Builder(getContext()) {
-            @Override
-            public void onClick(View v) {
-                if (v.getId() == R.id.tv_ui_cancel) {
-                    dismiss();
-                    return;
-                }
-                if (v.getId() != R.id.tv_ui_confirm) {
-                    return;
-                }
-                cfg.exchangeBaseMinutes = parseInt(etBase.getText().toString(), cfg.exchangeBaseMinutes);
-                cfg.exchangeRewardMinutes = parseInt(etGain.getText().toString(), cfg.exchangeRewardMinutes);
-                cfg.dailyMaxMinutes = parseInt(etDaily.getText().toString(), cfg.dailyMaxMinutes);
-                cfg.violationLimit = parseInt(etLimit.getText().toString(), cfg.violationLimit);
-                RewardPrefs.saveConfig(cfg);
-                SimToast.toastSe("已保存激励设置");
-                dismiss();
-            }
-        }
-                .setTitle("激励设置")
-                .setCustomView(view)
-                .setCancel("取消")
-                .setConfirm("保存")
-                .show();
-    }
-
-    private int parseInt(String text, int fallback) {
-        try {
-            return Integer.parseInt(text.trim());
-        } catch (Exception ignored) {
-            return fallback;
-        }
-    }
-
-    private FocusRulePrefs.RuleConfig buildTemplate(int type) {
-        FocusRulePrefs.RuleConfig t = new FocusRulePrefs.RuleConfig();
-        if (type == 0) { // 小学生
-            t.schoolHomework = new FocusRulePrefs.TimeWindow(17 * 60, 19 * 60);
-            t.schoolSleep = new FocusRulePrefs.TimeWindow(20 * 60 + 30, 6 * 60 + 30);
-            t.schoolFree = new FocusRulePrefs.TimeWindow(16 * 60, 17 * 60);
-            t.weekendHomework = new FocusRulePrefs.TimeWindow(9 * 60, 10 * 60 + 30);
-            t.weekendSleep = new FocusRulePrefs.TimeWindow(20 * 60 + 30, 7 * 60);
-            t.weekendFree = new FocusRulePrefs.TimeWindow(14 * 60, 16 * 60);
-        } else if (type == 1) { // 初中生
-            t.schoolHomework = new FocusRulePrefs.TimeWindow(18 * 60, 20 * 60);
-            t.schoolSleep = new FocusRulePrefs.TimeWindow(21 * 60, 6 * 60 + 30);
-            t.schoolFree = new FocusRulePrefs.TimeWindow(16 * 60, 18 * 60);
-            t.weekendHomework = new FocusRulePrefs.TimeWindow(9 * 60, 11 * 60);
-            t.weekendSleep = new FocusRulePrefs.TimeWindow(21 * 60, 7 * 60);
-            t.weekendFree = new FocusRulePrefs.TimeWindow(14 * 60, 18 * 60);
-        } else { // 高中生
-            t.schoolHomework = new FocusRulePrefs.TimeWindow(18 * 60, 21 * 60);
-            t.schoolSleep = new FocusRulePrefs.TimeWindow(22 * 60, 6 * 60);
-            t.schoolFree = new FocusRulePrefs.TimeWindow(16 * 60, 18 * 60);
-            t.weekendHomework = new FocusRulePrefs.TimeWindow(9 * 60, 12 * 60);
-            t.weekendSleep = new FocusRulePrefs.TimeWindow(22 * 60, 7 * 60);
-            t.weekendFree = new FocusRulePrefs.TimeWindow(14 * 60, 19 * 60);
-        }
-        return t;
-    }
-
-    private interface WindowPicked {
-        void onPicked(FocusRulePrefs.TimeWindow window);
-    }
-
-    private void pickWindowTime(String title, FocusRulePrefs.TimeWindow window, WindowPicked cb) {
-        if (window == null) window = new FocusRulePrefs.TimeWindow(18 * 60, 20 * 60);
-        int startH = (window.startMin / 60) % 24;
-        int startM = window.startMin % 60;
-        int endH = (window.endMin / 60) % 24;
-        int endM = window.endMin % 60;
-        android.app.TimePickerDialog startPicker = new android.app.TimePickerDialog(getContext(), R.style.TimePickerDialogTheme,
-                (v, h, m) -> {
-                    android.app.TimePickerDialog endPicker = new android.app.TimePickerDialog(getContext(), R.style.TimePickerDialogTheme,
-                            (v2, h2, m2) -> {
-                                FocusRulePrefs.TimeWindow w = new FocusRulePrefs.TimeWindow(h * 60 + m, h2 * 60 + m2);
-                                cb.onPicked(w);
-                            }, endH, endM, true);
-                    endPicker.setTitle("选择结束时间");
-                    endPicker.show();
-                }, startH, startM, true);
-        startPicker.setTitle("选择开始时间");
-        startPicker.show();
-    }
-
-    private void updateRuleTimeLabels(FocusRulePrefs.RuleConfig cfg,
-                                      android.widget.TextView schoolHomework,
-                                      android.widget.TextView schoolSleep,
-                                      android.widget.TextView schoolFree,
-                                      android.widget.TextView weekendHomework,
-                                      android.widget.TextView weekendSleep,
-                                      android.widget.TextView weekendFree) {
-        schoolHomework.setText("作业时间：" + formatWindow(cfg.schoolHomework));
-        schoolSleep.setText("睡眠时间：" + formatWindow(cfg.schoolSleep));
-        schoolFree.setText("自由时间：" + formatWindow(cfg.schoolFree));
-        weekendHomework.setText("作业时间：" + formatWindow(cfg.weekendHomework));
-        weekendSleep.setText("睡眠时间：" + formatWindow(cfg.weekendSleep));
-        weekendFree.setText("自由时间：" + formatWindow(cfg.weekendFree));
-    }
-
-    private String formatWindow(FocusRulePrefs.TimeWindow w) {
-        if (w == null) return "--";
-        return formatMin(w.startMin) + " - " + formatMin(w.endMin);
-    }
-
-    private String formatMin(int min) {
-        int h = (min / 60) % 24;
-        int m = min % 60;
-        return String.format(Locale.CHINA, "%02d:%02d", h, m);
-    }
-
-    // 临时通行入口已移动到专注页面
-
-    private void showSetNewPasswordDialog() {
-        View view = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_my_settings, null);
-        android.widget.EditText etPw = view.findViewById(R.id.et_setting_password);
-        android.widget.EditText etPwConfirm = view.findViewById(R.id.et_setting_password_confirm);
-        view.findViewById(R.id.et_setting_nick).setVisibility(View.GONE);
-        view.findViewById(R.id.et_setting_pw_question).setVisibility(View.GONE);
-        view.findViewById(R.id.et_setting_pw_answer).setVisibility(View.GONE);
-        view.findViewById(R.id.btn_setting_clear_pw).setVisibility(View.GONE);
-        view.findViewById(R.id.btn_setting_reset_pw).setVisibility(View.GONE);
-        view.findViewById(R.id.cb_setting_show_password).setVisibility(View.GONE);
-        new UIDialog.Builder(getContext()) {
-            @Override
-            public void onClick(View v) {
-                if (v.getId() == R.id.tv_ui_cancel) {
-                    dismiss();
-                    return;
-                }
-                if (v.getId() != R.id.tv_ui_confirm) {
-                    return;
-                }
-                String pw = etPw.getText().toString().trim();
-                String confirm = etPwConfirm.getText().toString().trim();
-                if (pw.isEmpty()) {
-                    SimToast.toastEL("密码不能为空");
-                    return;
-                }
-                if (!pw.equals(confirm)) {
-                    SimToast.toastEL("两次密码不一致");
-                    return;
-                }
-                UsrMsgUtils.setFocusExitPassword(pw);
-                SimToast.toastSe("密码已重置");
-                dismiss();
-            }
-        }
-                .setTitle("设置新密码")
-                .setCustomView(view)
-                .setCancel("取消")
-                .setConfirm("保存")
-                .setAutoDismiss(false)
-                .show();
-    }
-
-    private void showVowDialog() {
-        View view = android.view.LayoutInflater.from(getContext()).inflate(R.layout.dialog_my_settings, null);
-        android.widget.EditText et = view.findViewById(R.id.et_setting_nick);
-        android.widget.EditText etPw = view.findViewById(R.id.et_setting_password);
-        etPw.setVisibility(View.GONE);
-        et.setHint("写一句誓言");
-        et.setText(UsrMsgUtils.getLocalSignature());
-        new UIDialog.Builder(getContext()) {
-            @Override
-            public void onClick(View v) {
-                if (v.getId() == R.id.tv_ui_cancel) {
-                    dismiss();
-                    return;
-                }
-                if (v.getId() != R.id.tv_ui_confirm) {
-                    return;
-                }
-                String vow = et.getText().toString().trim();
-                UsrMsgUtils.saveLocalSignature(vow);
-                updateVow();
-                dismiss();
-            }
-        }
-                .setTitle("我的誓言")
-                .setCustomView(view)
-                .setCancel("关闭")
-                .setConfirm("保存")
-                .show();
-    }
-
-    private void showBackgroundDialog() {
-        String[] items = new String[]{"纯白（默认）", "红色渐变", "暖橙渐变", "柔和蓝", "选择图片"};
-        int style = UsrMsgUtils.getPageBgStyle();
-        int current = 0;
-        if (style == UsrMsgUtils.BG_STYLE_RED) current = 1;
-        else if (style == UsrMsgUtils.BG_STYLE_WARM) current = 2;
-        else if (style == UsrMsgUtils.BG_STYLE_SOFT) current = 3;
-        else if (style == UsrMsgUtils.BG_STYLE_IMAGE) current = 4;
-        new SelectDialog.Builder(getContext())
-                .setTitle("更换背景")
-                .setList(items)
-                .setSingleSelect()
-                .setSelect(current)
-                .setListener((dialog, data) -> {
-                    if (data == null || data.isEmpty()) return;
-                    Object selectedKey = data.keySet().iterator().next();
-                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
-                    if (which == 4) {
-                        selectBackgroundImage();
-                        return;
-                    }
-                    int target;
-                    if (which == 1) target = UsrMsgUtils.BG_STYLE_RED;
-                    else if (which == 2) target = UsrMsgUtils.BG_STYLE_WARM;
-                    else if (which == 3) target = UsrMsgUtils.BG_STYLE_SOFT;
-                    else target = UsrMsgUtils.BG_STYLE_WHITE;
-                    UsrMsgUtils.setPageBgStyle(target);
-                    applyBackgroundToAllPages();
-                })
-                .show();
-    }
-
-    private void selectBackgroundImage() {
-        int size = 1280;
-        picSel().setCropEngine(new ImageCropEngine(size, size))
-                .setCompressEngine(new ImageFileCompressEngine())
-                .forResult(new OnResultCallbackListener<>() {
-                    @Override
-                    public void onResult(ArrayList<LocalMedia> result) {
-                        if (result == null || result.isEmpty()) return;
-                        String path = PicUtils.getRealLocalPath(result.get(0));
-                        if (path == null || path.trim().isEmpty()) return;
-                        UsrMsgUtils.setPageBgImage(path);
-                        UsrMsgUtils.setPageBgStyle(UsrMsgUtils.BG_STYLE_IMAGE);
-                        applyBackgroundToAllPages();
-                    }
 
                     @Override
-                    public void onCancel() {
-                    }
-                });
-    }
-
-    private void applyBackgroundToAllPages() {
-        if (getActivity() != null) {
-            UsrMsgUtils.applyPageBackground(getActivity().findViewById(android.R.id.content));
-            if (getActivity() instanceof androidx.fragment.app.FragmentActivity) {
-                List<androidx.fragment.app.Fragment> fragments =
-                        ((androidx.fragment.app.FragmentActivity) getActivity())
-                                .getSupportFragmentManager().getFragments();
-                for (androidx.fragment.app.Fragment fragment : fragments) {
-                    if (fragment == null) continue;
-                    View v = fragment.getView();
-                    if (v != null) {
-                        UsrMsgUtils.applyPageBackground(v);
-                    }
-                }
-            }
-        } else {
-            View root = getView();
-            if (root != null) {
-                UsrMsgUtils.applyPageBackground(root);
-            }
-        }
-    }
-
-    private void showHistoryPopup() {
-        List<Lnm> list = lnmDBUtils.findByTimeAsc();
-        if (list == null || list.isEmpty()) {
-            SimToast.toastEL("暂无历史记录");
-            return;
-        }
-        int size = Math.min(list.size(), 30);
-        String[] items = new String[size + 1];
-        items[0] = "查看全部记录";
-        for (int i = 0; i < size; i++) {
-            Lnm l = list.get(list.size() - 1 - i);
-            if (l == null || l.createdDate == null) {
-                items[i + 1] = "未知记录";
-                continue;
-            }
-            String start = TimeUtils.date2String(l.createdDate, "MM-dd HH:mm");
-            String end = TimeUtils.date2String(l.endTime != null ? l.endTime : l.schedule, "HH:mm");
-            long endMs = l.endTime != null ? l.endTime.getTime() : l.schedule.getTime();
-            long durMin = Math.max(0, (endMs - l.createdDate.getTime()) / 60000);
-            int blocked = io.github.yuzhiang.qxb.model.lnm2file.getScreenOnCount(l.id);
-            items[i + 1] = start + " ~ " + end + " · " + durMin + "分钟 · 未允许应用" + blocked + "次";
-        }
-        new SelectDialog.Builder(getContext())
-                .setTitle("专注记录（最近30次）")
-                .setList(items)
-                .setSingleSelect()
-                .setListener((dialog, data) -> {
-                    if (data == null || data.isEmpty()) return;
-                    Object selectedKey = data.keySet().iterator().next();
-                    int which = selectedKey instanceof Integer ? (Integer) selectedKey : Integer.parseInt(String.valueOf(selectedKey));
-                    if (which == 0) {
-                        startActivity(new android.content.Intent(getContext(), LnmRecordActivity.class));
+                    public void onCancel(BaseDialog dialog) {
+                        openSettingsAndResetPassword();
                     }
                 })
                 .show();

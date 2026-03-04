@@ -4,7 +4,7 @@
     android:height="512dp"
     android:viewportWidth="512"
     android:viewportHeight="512">
-    <path android:pathData="M140,44L372,44A96,96 0,0 1,468 140L468,372A96,96 0,0 1,372 468L140,468A96,96 0,0 1,44 372L44,140A96,96 0,0 1,140 44z">
+    <path android:pathData="M0,0h512v512h-512z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:startX="80"
@@ -21,13 +21,13 @@
             </gradient>
         </aapt:attr>
     </path>
-    <path android:pathData="M124,132C170,86 252,78 318,98C388,120 430,188 426,250C420,344 330,424 228,424C164,424 116,398 90,366C72,344 78,300 114,286C154,270 166,216 152,178C144,156 110,146 124,132Z">
+    <path android:pathData="M97.6,107.2C152.8,52 251.2,42.4 330.4,66.4C414.4,92.8 464.8,174.4 460,248.8C452.8,361.6 344.8,457.6 222.4,457.6C145.6,457.6 88,426.4 56.8,388C35.2,361.6 42.4,308.8 85.6,292C133.6,272.8 148,208 131.2,162.4C121.6,136 80.8,124 97.6,107.2Z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:startX="140"
-                android:startY="120"
-                android:endX="420"
-                android:endY="420"
+                android:startX="116.8"
+                android:startY="92.8"
+                android:endX="452.8"
+                android:endY="452.8"
                 android:type="linear">
                 <item
                     android:offset="0"
@@ -39,69 +39,69 @@
         </aapt:attr>
     </path>
     <path
-        android:pathData="M212,118L300,118A36,36 0,0 1,336 154L336,358A36,36 0,0 1,300 394L212,394A36,36 0,0 1,176 358L176,154A36,36 0,0 1,212 118z"
+        android:pathData="M203.2,92L308.8,92A43.2,43.2 0,0 1,352 135.2L352,380A43.2,43.2 0,0 1,308.8 423.2L203.2,423.2A43.2,43.2 0,0 1,160 380L160,135.2A43.2,43.2 0,0 1,203.2 92z"
         android:fillColor="#FFFFFF"
         android:fillAlpha="0.96" />
     <path
-        android:pathData="M216,148L296,148A20,20 0,0 1,316 168L316,324A20,20 0,0 1,296 344L216,344A20,20 0,0 1,196 324L196,168A20,20 0,0 1,216 148z"
+        android:pathData="M208,128L304,128A24,24 0,0 1,328 152L328,339.2A24,24 0,0 1,304 363.2L208,363.2A24,24 0,0 1,184 339.2L184,152A24,24 0,0 1,208 128z"
         android:fillColor="#0B1E3A"
         android:fillAlpha="0.1" />
     <path
-        android:pathData="M242,132L270,132A4,4 0,0 1,274 136L274,136A4,4 0,0 1,270 140L242,140A4,4 0,0 1,238 136L238,136A4,4 0,0 1,242 132z"
+        android:pathData="M239.2,108.8L272.8,108.8A4.8,4.8 0,0 1,277.6 113.6L277.6,113.6A4.8,4.8 0,0 1,272.8 118.4L239.2,118.4A4.8,4.8 0,0 1,234.4 113.6L234.4,113.6A4.8,4.8 0,0 1,239.2 108.8z"
         android:fillColor="#0B1E3A"
         android:fillAlpha="0.22" />
     <path
-        android:pathData="M286,136m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"
+        android:pathData="M292,113.6m-4.8,0a4.8,4.8 0,1 1,9.6 0a4.8,4.8 0,1 1,-9.6 0"
         android:fillColor="#0B1E3A"
         android:fillAlpha="0.22" />
     <path
-        android:pathData="M211,216.5Q211,204 223.5,204L287.25,204Q301,204 301,216.5L301,269Q301,284 286,284L228.5,284Q211,284 211,269Z"
+        android:pathData="M199.84,208.88Q199.84,193.28 215.44,193.28L295,193.28Q312.16,193.28 312.16,208.88L312.16,274.4Q312.16,293.12 293.44,293.12L221.68,293.12Q199.84,293.12 199.84,274.4Z"
         android:strokeAlpha="0.95"
         android:fillColor="#FFFFFF"
         android:fillAlpha="0.95" />
     <path
         android:fillColor="#FF000000"
-        android:pathData="M231,221.5L283.5,221.5"
+        android:pathData="M224.8,215.12L290.32,215.12"
         android:strokeAlpha="0.22"
-        android:strokeWidth="12.5"
+        android:strokeWidth="15.6"
         android:strokeColor="#0B1E3A"
         android:strokeLineCap="round" />
     <path
         android:fillColor="#FF000000"
-        android:pathData="M231,246.5L271,246.5"
+        android:pathData="M224.8,246.32L274.72,246.32"
         android:strokeAlpha="0.18"
-        android:strokeWidth="12.5"
+        android:strokeWidth="15.6"
         android:strokeColor="#0B1E3A"
         android:strokeLineCap="round" />
     <path
-        android:pathData="M231,257.15L247.1,272.1L277,239.9"
+        android:pathData="M224.8,254.24L244.96,272.96L282.4,232.64"
         android:strokeLineJoin="round"
-        android:strokeWidth="13.8"
+        android:strokeWidth="17.28"
         android:fillColor="#00000000"
         android:strokeColor="#2F6BFF"
         android:strokeLineCap="round" />
     <path
-        android:pathData="M352,180L360,196L376,204L360,212L352,228L344,212L328,204L344,196Z"
+        android:pathData="M371.2,166.4L380.8,185.6L400,195.2L380.8,204.8L371.2,224L361.6,204.8L342.4,195.2L361.6,185.6Z"
         android:strokeAlpha="0.95"
         android:fillColor="#FFFFFF"
         android:fillAlpha="0.95" />
     <path
-        android:pathData="M374,166m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"
+        android:pathData="M397.6,149.6m-9.6,0a9.6,9.6 0,1 1,19.2 0a9.6,9.6 0,1 1,-19.2 0"
         android:strokeAlpha="0.9"
         android:fillColor="#FFFFFF"
         android:fillAlpha="0.9" />
     <path
-        android:pathData="M350,158m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"
+        android:pathData="M368.8,140m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0"
         android:strokeAlpha="0.85"
         android:fillColor="#FFFFFF"
         android:fillAlpha="0.85" />
     <path
-        android:pathData="M235,360L277,360A5,5 0,0 1,282 365L282,365A5,5 0,0 1,277 370L235,370A5,5 0,0 1,230 365L230,365A5,5 0,0 1,235 360z"
+        android:pathData="M230.8,382.4L281.2,382.4A6,6 0,0 1,287.2 388.4L287.2,388.4A6,6 0,0 1,281.2 394.4L230.8,394.4A6,6 0,0 1,224.8 388.4L224.8,388.4A6,6 0,0 1,230.8 382.4z"
         android:fillColor="#0B1E3A"
         android:fillAlpha="0.18" />
     <path
-        android:pathData="M140,44L372,44A96,96 0,0 1,468 140L468,372A96,96 0,0 1,372 468L140,468A96,96 0,0 1,44 372L44,140A96,96 0,0 1,140 44z"
-        android:strokeAlpha="0.18"
+        android:pathData="M0,0h512v512h-512z"
+        android:strokeAlpha="0.12"
         android:strokeWidth="4"
         android:fillColor="#00000000"
         android:strokeColor="#FFFFFF" />
