@@ -124,6 +124,11 @@ public class LnmAllFragment extends LazyFragment {
 
         binding.rvTodo.setLayoutManager(new LinearLayoutManager(mContext));
         binding.rvTodo.setAdapter(adapter);
+        View empty = LayoutInflater.from(mContext).inflate(R.layout.rv_empty_view, binding.rvTodo, false);
+        TextView tv = empty.findViewById(R.id.tv_empty_msg);
+        tv.setText("暂无作业，点击右上角添加");
+        adapter.setStateView(empty);
+        adapter.setStateViewEnable(true);
 
 
         attachSwipeToDelete();
@@ -726,7 +731,6 @@ public class LnmAllFragment extends LazyFragment {
         }
 
         adapter.submit(entries);
-        binding.tvTodoEmpty.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void showAddTodoDialog() {

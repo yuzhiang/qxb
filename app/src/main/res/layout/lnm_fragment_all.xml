@@ -50,7 +50,7 @@
                         android:background="@android:color/transparent"
                         android:contentDescription="添加作业"
                         android:src="@android:drawable/ic_input_add"
-                        android:tint="@android:color/white" />
+                        app:tint="@android:color/white" />
                 </RelativeLayout>
 
             </androidx.appcompat.widget.Toolbar>
@@ -70,17 +70,4 @@
             tools:listitem="@layout/item_todo_group" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_todo_empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="暂无作业，点击右下角添加"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="14sp"
-        android:visibility="gone" />
-
-    
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
