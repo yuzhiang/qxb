@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.RomUtils;
 import com.blankj.utilcode.util.SPUtils;
 
+import io.github.yuzhiang.qxb.base.BaseDialog;
 import io.github.yuzhiang.qxb.fragment.LnmMyFragment;
 import io.github.yuzhiang.qxb.fragment.LnmTJFragment;
 import io.github.yuzhiang.qxb.fragment.LnmWeeklyFragment;
@@ -129,26 +130,27 @@ public class LearnNoMobileActivity extends BaseActivity {
 
     private void showParentTodayDialog() {
         ParentTodayReport.TodayStats stats = ParentTodayReport.buildTodayStats();
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        new MessageDialog.Builder(this)
                 .setTitle("今日快报")
                 .setMessage(ParentTodayReport.buildDetailLines(stats))
-                .setPositiveButton("知道了", null)
-                .setNeutralButton("一键确认", (d, w) -> {
-                    int confirmed = ParentTodayReport.confirmPendingTodos();
-                    if (confirmed <= 0) {
-                        SimToast.toastEL("暂无待确认作业");
-                    } else {
-                        SimToast.toastSe("已确认 " + confirmed + " 项作业");
+                .setConfirm("知道了")
+                .setCancel("一键确认")
+                .setListener(new MessageDialog.OnListener() {
+                    @Override
+                    public void onConfirm(BaseDialog dialog) {
+                    }
+
+                    @Override
+                    public void onCancel(BaseDialog dialog) {
+                        int confirmed = ParentTodayReport.confirmPendingTodos();
+                        if (confirmed <= 0) {
+                            SimToast.toastEL("暂无待确认作业");
+                        } else {
+                            SimToast.toastSe("已确认 " + confirmed + " 项作业");
+                        }
                     }
                 })
-                .create();
-        dialog.setOnShowListener(d -> {
-            if (stats.pendingConfirm <= 0) {
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setEnabled(false);
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setAlpha(0.5f);
-            }
-        });
-        dialog.show();
+                .show();
     }
 
 }

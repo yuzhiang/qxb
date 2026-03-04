@@ -18,15 +18,11 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize">
-
                 <TextView
                     android:id="@+id/tv_weekly_history"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="end|center_vertical"
                     android:layout_marginStart="16dp"
                     android:gravity="center"
                     android:paddingStart="8dp"
@@ -36,6 +32,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:layout_gravity="start|center_vertical"
                     android:id="@+id/tv_weekly_title"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
@@ -44,7 +41,6 @@
                     android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
-            </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

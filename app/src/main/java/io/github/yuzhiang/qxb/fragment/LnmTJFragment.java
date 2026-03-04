@@ -241,7 +241,7 @@ public class LnmTJFragment extends LazyFragment {
             binding.cardStatProject.setVisibility(expanded ? View.VISIBLE : View.GONE);
         }
         if (binding.tvStatToggle != null) {
-            binding.tvStatToggle.setText(expanded ? "收起学科统计" : "展开学科统计");
+            binding.tvStatToggle.setText(expanded ? "隐藏学科统计" : "显示学科统计");
         }
     }
 
