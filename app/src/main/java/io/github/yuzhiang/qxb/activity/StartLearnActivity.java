@@ -484,11 +484,7 @@ public class StartLearnActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancel(BaseDialog dialog) {
-                        requestExitWithPassword(() -> Snackbar.make(binding.rlStartLearn,
-                                        canCancelAsNoRecord() ? "将取消本次专注" : "将视为失败！！",
-                                        Snackbar.LENGTH_LONG)
-                                .setAction("确定", v1 -> postUserStopLearn())
-                                .show());
+                        requestExitWithPassword(StartLearnActivity.this::postUserStopLearn);
                     }
                 }).show();
 
@@ -724,6 +720,14 @@ public class StartLearnActivity extends AppCompatActivity {
             binding.wlStartLearn.setBottomTitle("数据保存成功");
             LearnFinish(lnm.finish);
             allFinish();
+        } else {
+            // Fallback: local id missing, but we still need to clear running state
+            // to prevent DetectService from relaunching this activity.
+            finishLearn();
+            lnmDBUtils.deletePendingAll();
+            timeOff();
+            binding.wlStartLearn.setBottomTitle("专注已结束");
+            allFinish();
         }
         FocusRulePrefs.setSleepAutoActive(false);
     }
@@ -775,6 +779,7 @@ public class StartLearnActivity extends AppCompatActivity {
     }
 
     private void finishSleepAutoSilently() {
+        markManualCancelNow();
         timeOff();
         long id = getThisId();
         finishLearn();
@@ -1223,9 +1228,11 @@ public class StartLearnActivity extends AppCompatActivity {
                 toastEL("休息中，暂不可操作");
                 return;
             }
-            binding.tvStartLearnCalMsg.setText("取消中……");
-            binding.tvStartLearnCal.setClickable(false);
-            requestExitWithPassword(this::postCancelLearn);
+            requestExitWithPassword(() -> {
+                binding.tvStartLearnCalMsg.setText("取消中……");
+                binding.tvStartLearnCal.setClickable(false);
+                postCancelLearn();
+            });
             return;
         }
         if (calAction == CAL_ACTION_RECORD) {
@@ -1239,10 +1246,13 @@ public class StartLearnActivity extends AppCompatActivity {
     }
 
     private void postUserStopLearn() {
+        markManualCancelNow();
         if (canCancelAsNoRecord()) {
             postCancelLearn();
         } else {
             postFinishLearn();
+            finishLearn();
+            finish();
         }
     }
 

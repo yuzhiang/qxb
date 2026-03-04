@@ -1,6 +1,7 @@
 package io.github.yuzhiang.qxb.Service;
 
 import static io.github.yuzhiang.qxb.model.lnm2file.getLearning;
+import static io.github.yuzhiang.qxb.model.lnm2file.getManualCancelAt;
 import static io.github.yuzhiang.qxb.model.lnm2file.saveLnmLogs;
 import static io.github.yuzhiang.qxb.common.Constant.Constant.lnmDetectUnbind;
 import static io.github.yuzhiang.qxb.common.Constant.Constant.lnmStart;
@@ -43,6 +44,7 @@ import java.util.List;
  * Created by wenmingvs on 16/2/10.
  */
 public class DetectService extends AccessibilityService {
+    private static final long MANUAL_EXIT_SUPPRESS_MS = 30_000L;
 
     private static String mForegroundPackageName;
     private static DetectService mInstance = null;
@@ -240,7 +242,12 @@ public class DetectService extends AccessibilityService {
     }
 
     private boolean isInterceptLearningActive() {
-        return getLearning() && lnmDBUtils.countPending() > 0;
+        return !isManualExitSuppressed() && getLearning() && lnmDBUtils.countPending() > 0;
+    }
+
+    private boolean isManualExitSuppressed() {
+        long at = getManualCancelAt();
+        return at > 0 && System.currentTimeMillis() - at <= MANUAL_EXIT_SUPPRESS_MS;
     }
 
     private void startSleepCheck() {
@@ -276,6 +283,9 @@ public class DetectService extends AccessibilityService {
     }
 
     private void checkSleepAuto(FocusRulePrefs.RuleConfig cfgRule) {
+        if (isManualExitSuppressed()) {
+            return;
+        }
         boolean inSleep = isInSleepWindow(cfgRule);
         if (inSleep && !getLearning() && FocusRulePrefs.isSleepAutoActive()) {
             FocusRulePrefs.setSleepAutoActive(false);
