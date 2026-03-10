@@ -96,6 +96,9 @@ public class StartLearnActivity extends AppCompatActivity {
     private static final int CAL_ACTION_NONE = 0;
     private static final int CAL_ACTION_CANCEL = 1;
     private static final int CAL_ACTION_RECORD = 2;
+    private static final long REST_REMIND_INTERVAL_MS = 30 * 60 * 1000L;
+    private static final long REST_FORCE_TRIGGER_MS = 60 * 60 * 1000L;
+    private static final long REST_FORCE_DURATION_MS = 10 * 60 * 1000L;
 
     Disposable rxTimer;
 
@@ -912,11 +915,11 @@ public class StartLearnActivity extends AppCompatActivity {
         if (restActive) return;
         long now = System.currentTimeMillis();
         long continuous = now - lastRestEndAt;
-        if (continuous >= 60 * 60 * 1000L) {
-            startForcedRest(10 * 60 * 1000L);
+        if (continuous >= REST_FORCE_TRIGGER_MS) {
+            startForcedRest(REST_FORCE_DURATION_MS);
             return;
         }
-        if (continuous >= 30 * 60 * 1000L && (lastRestRemindAt == 0L || now - lastRestRemindAt >= 30 * 60 * 1000L)) {
+        if (continuous >= REST_REMIND_INTERVAL_MS && (lastRestRemindAt == 0L || now - lastRestRemindAt >= REST_REMIND_INTERVAL_MS)) {
             lastRestRemindAt = now;
             toastSL("已连续使用30分钟，建议休息一下");
         }

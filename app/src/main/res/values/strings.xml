@@ -567,8 +567,8 @@
 
     <string name="id">85:4D:60:C0:FE:26:57:B3:4D:03:4A:36:FF:D1:5A:9B</string>
 
-    <string name="app_name_release">轻学伴</string>
-    <string name="app_name_debug">轻学伴（测试版）</string>
+    <string name="app_name_release">安心学习</string>
+    <string name="app_name_debug">安心学习（测试版）</string>
 
     <string name="search_hint">Search</string>
 
